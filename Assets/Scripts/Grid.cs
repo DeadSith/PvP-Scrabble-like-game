@@ -1,17 +1,25 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class Grid : MonoBehaviour
 {
+    public enum Direction
+    {
+        Horizontal, Vertical, None
+    }
     //Make Direction Checks
     public Tile TilePrefab;
+    public Direction CurrentDirection;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
     public LetterBox Player2;
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
-    public Tile[,] Field;
+    public string[,] Field;
+    public int PreviousRow;
+    public int PreviousColumn;
 	void Start () {
 	CreateField();
 	}
@@ -25,7 +33,7 @@ public class Grid : MonoBehaviour
     {
         var xOffset = 0f;
         var yOffset = 0f;
-        Field = new Tile[NumberOfRows, NumberOfColumns];
+        Field = new string[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
@@ -34,7 +42,9 @@ public class Grid : MonoBehaviour
                     new Vector2(transform.position.x + xOffset, transform.position.y+ yOffset),
                     transform.rotation) as Tile;
                 newTile.transform.SetParent(gameObject.transform);
-                Field[i,j]= newTile;
+                newTile.Column = i;
+                newTile.Row = j;
+                Field[i,j] = String.Empty;
                 xOffset += DistanceBetweenTiles;
             }
             xOffset = 0;
