@@ -10,14 +10,16 @@ public class Grid : MonoBehaviour
     }
     //Make Direction Checks
     public Tile TilePrefab;
-    public Direction CurrentDirection;
+    public Direction CurrentDirection= Direction.None;
+    public bool isFirstGeneral = true;
+    public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
     public LetterBox Player2;
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
-    public string[,] Field;
+    public Tile[,] Field;
     public int PreviousRow;
     public int PreviousColumn;
 	void Start () {
@@ -33,7 +35,7 @@ public class Grid : MonoBehaviour
     {
         var xOffset = 0f;
         var yOffset = 0f;
-        Field = new string[NumberOfRows, NumberOfColumns];
+        Field = new Tile[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
@@ -44,7 +46,7 @@ public class Grid : MonoBehaviour
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = i;
                 newTile.Row = j;
-                Field[i,j] = String.Empty;
+                Field[i,j] = newTile;
                 xOffset += DistanceBetweenTiles;
             }
             xOffset = 0;

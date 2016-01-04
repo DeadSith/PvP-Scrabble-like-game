@@ -10,127 +10,31 @@ public class Tile : MonoBehaviour, IDropHandler
 
     public Text CurrentLetter;
     public bool HasLetter;
+    public bool CanDrop;
     public int Row;
     public int Column;
 
     public void OnDrop(PointerEventData eventData)
     {
-        HasLetter = true;
-        CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
-        var letterParent = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
-        letterParent.ChangeLetter(CurrentLetter.text);
         var parent = gameObject.transform.parent.transform.GetComponent<Grid>();
-        parent.Field[Row, Column] = CurrentLetter.text;
-        #region Checks
-        if (Row == 0)
+        if (parent.isFirstGeneral || CanDrop)
         {
-            if (Column == 0)
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column + 1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection!=Grid.Direction.Vertical ? Grid.Direction.Horizontal : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row + 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
-            else if (Column == parent.NumberOfColumns - 1)
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column - 1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical
-                        ? Grid.Direction.Horizontal
-                        : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row + 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
-            else
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column - 1])||!String.IsNullOrEmpty(parent.Field[Row,Column+1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical ? Grid.Direction.Horizontal : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row + 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
+            HasLetter = true;
+            CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
+            var letterParent = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
+            letterParent.ChangeLetter(CurrentLetter.text);
+            parent.isFirstGeneral = false;
+            if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
+            if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
+            if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
+            if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
+            Debug.Log(parent.CurrentDirection.ToString() + " " + DateTime.Now.ToString());
+            Destroy(DragHandler.ObjectDragged);
         }
-        else if (Row == parent.NumberOfRows - 1)
-        {
-            if (Column == 0)
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column + 1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical
-                        ? Grid.Direction.Horizontal
-                        : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row - 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
-            else if (Column == parent.NumberOfColumns - 1)
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column - 1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical
-                        ? Grid.Direction.Horizontal
-                        : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row - 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
-            else
-            {
-                if (!String.IsNullOrEmpty(parent.Field[Row, Column - 1]) ||
-                    !String.IsNullOrEmpty(parent.Field[Row, Column + 1]))
-                {
-                    parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical
-                        ? Grid.Direction.Horizontal
-                        : Grid.Direction.None;
-                }
-                else if (!String.IsNullOrEmpty(parent.Field[Row - 1, Column]))
-                    parent.CurrentDirection = Grid.Direction.Vertical;
-                else
-                {
-                    parent.CurrentDirection = Grid.Direction.None;
-                }
-            }
-        }
-        else
-        {
-            if (!String.IsNullOrEmpty(parent.Field[Row+1, Column]) || !String.IsNullOrEmpty(parent.Field[Row-1, Column]))
-                parent.CurrentDirection=Grid.Direction.Vertical;
-            else if (!String.IsNullOrEmpty(parent.Field[Row, Column - 1]) || !String.IsNullOrEmpty(parent.Field[Row, Column + 1]))
-            {
-                parent.CurrentDirection = parent.CurrentDirection != Grid.Direction.Vertical ? Grid.Direction.Horizontal : Grid.Direction.None;
-            }
-            else parent.CurrentDirection = Grid.Direction.None;
-        }
-#endregion
-        Debug.Log(parent.CurrentDirection.ToString()+" "+DateTime.Now.ToString());
-        Destroy(DragHandler.ObjectDragged);
     }
     void OnMouseDown()
     {
+        //Todo: Add checks for nearby cells CanDrop values
         if (HasLetter)
         {
             HasLetter = false;
