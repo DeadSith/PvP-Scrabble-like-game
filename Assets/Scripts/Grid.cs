@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Grid : MonoBehaviour
 {
@@ -20,9 +20,12 @@ public class Grid : MonoBehaviour
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
     public Tile[,] Field;
-    public int PreviousRow;
-    public int PreviousColumn;
+    public List<int> CurrentCoordinates;
+    
+    
+     
 	void Start () {
+     CurrentCoordinates = new List<int>();
 	CreateField();
 	}
 	
@@ -44,8 +47,8 @@ public class Grid : MonoBehaviour
                     new Vector2(transform.position.x + xOffset, transform.position.y+ yOffset),
                     transform.rotation) as Tile;
                 newTile.transform.SetParent(gameObject.transform);
-                newTile.Column = i;
-                newTile.Row = j;
+                newTile.Column = j;
+                newTile.Row = i;
                 Field[i,j] = newTile;
                 xOffset += DistanceBetweenTiles;
             }
