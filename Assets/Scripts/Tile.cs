@@ -17,31 +17,32 @@ public class Tile : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         var parent = gameObject.transform.parent.transform.GetComponent<Grid>();
-        if (parent.isFirstGeneral || CanDrop)
+        if ((parent.isFirstGeneral || CanDrop)&&!HasLetter)
         {
-            if (parent.CurrentCoordinates.Count == 2 ||
-                parent.CurrentCoordinates.Count == 0 ||
-                (parent.CurrentDirection==Grid.Direction.Horizontal&&Row ==parent.CurrentCoordinates[0])||
-                (parent.CurrentDirection==Grid.Direction.Vertical&&Column==parent.CurrentCoordinates[1])
+            if (parent.CurrentDirection==Grid.Direction.None ||
+                (parent.CurrentDirection==Grid.Direction.Horizontal&&Row ==parent.CurrentTiles[0].Row)||
+                (parent.CurrentDirection==Grid.Direction.Vertical&&Column==parent.CurrentTiles[0].Column)
                 )
             {
-                parent.CurrentCoordinates.Add(Row);
-                parent.CurrentCoordinates.Add(Column);
-                if (parent.CurrentCoordinates.Count == 4)
+                parent.CurrentTiles.Add(this);
+                if (parent.CurrentTurn != 1 && parent.CurrentTiles.Count == 1)
                 {
-                    if(parent.CurrentCoordinates[0]== Row) parent.CurrentDirection=Grid.Direction.Horizontal;
-                    else if (parent.CurrentCoordinates[1] == Column) parent.CurrentDirection = Grid.Direction.Vertical;
+                    CheckDirection();
+                }
+                if (parent.CurrentTiles.Count == 2)
+                {
+                    if(parent.CurrentTiles[0].Row== Row) parent.CurrentDirection=Grid.Direction.Horizontal;
+                    else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = Grid.Direction.Vertical;
                     else
                     {
-                        parent.CurrentCoordinates.RemoveAt(2);
-                        parent.CurrentCoordinates.RemoveAt(3);
+                        parent.CurrentTiles.RemoveAt(1);
                         return;
                     }
                 }
                 HasLetter = true;
                 CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
-                var letterParent = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
-                letterParent.ChangeLetter(CurrentLetter.text);
+                var letterPanel = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
+                letterPanel.ChangeLetter(CurrentLetter.text);
                 parent.isFirstGeneral = false;
                 if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
@@ -53,6 +54,19 @@ public class Tile : MonoBehaviour, IDropHandler
         }
     }
 
+    void CheckDirection()
+    {
+        var parent = gameObject.transform.parent.transform.GetComponent<Grid>();
+        parent.CurrentDirection = Grid.Direction.None;
+        if ((Row != 0 && parent.Field[Row - 1, Column].HasLetter) ||
+            (Row != parent.NumberOfRows - 1 && parent.Field[Row + 1, Column].HasLetter))
+        {
+            parent.CurrentDirection = Grid.Direction.Vertical;
+            Debug.Log("Vertical");
+        }
+        if  ((Column!=0 && parent.Field[Row,Column-1].HasLetter)||(Column!= parent.NumberOfColumns-1&&parent.Field[Row,Column+1].HasLetter))
+            parent.CurrentDirection = parent.CurrentDirection== Grid.Direction.Vertical ? Grid.Direction.None : Grid.Direction.Horizontal;
+    }
     bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
     {
         var parent = checkedTile.gameObject.transform.parent.transform.GetComponent<Grid>();
@@ -76,22 +90,28 @@ public class Tile : MonoBehaviour, IDropHandler
     }
     void OnMouseDown()
     {
+        var parent = transform.parent.gameObject.GetComponent<Grid>();
         //Todo: Add direction checks
-        if (HasLetter)
+        if (parent.CurrentTiles.Contains(this))
         {
             HasLetter = false;
-            var parent = transform.parent.gameObject.GetComponent<Grid>();
             if (parent.CurrentPlayer == 1)
                 parent.Player1.ChangeBox(1, CurrentLetter.text);
             else parent.Player2.ChangeBox(1,CurrentLetter.text);
             CurrentLetter.text = "";
-            parent.CurrentCoordinates.RemoveAt(parent.CurrentCoordinates.Count-1);
-            parent.CurrentCoordinates.RemoveAt(parent.CurrentCoordinates.Count - 1);
+            parent.CurrentTiles.Remove(this);
             if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
             if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
             if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
             if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
             CanDrop = CheckTile(this);
+            if(parent.CurrentTiles.Count==1) CheckDirection();
+            if (parent.CurrentTiles.Count == 0)
+            {
+                parent.CurrentDirection=Grid.Direction.None;
+                if(parent.CurrentTurn == 1)
+                parent.isFirstGeneral = true;
+            }
         }
     }
 }

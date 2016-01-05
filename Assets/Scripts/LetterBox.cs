@@ -3,23 +3,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System.Collections.Generic;
-
+//Todo: Shift letters to free place after dragging
+//Todo: Add leters only in the end of the turn
 public class LetterBox : MonoBehaviour
 {
-    private List<string> AllLetters;
-    private List<Vector3> FreeCoordinates; 
+    private static List<string> _allLetters = new List<string> { "a", "b", "c", "d", "e", "f", "g", "h", "j", "k", "a", "b", "c", "d", "e", "f", "g", "h", "j", "k" };
+    private List<Vector3> _freeCoordinates; 
     public  List<string> CurrentLetters; 
     public Letter LetterPrefab;
-    private Vector3 pos;
+    private Vector3 _pos;
     private int i = 0;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
     // Use this for initialization
     void Start () {
-	AllLetters = new List<string> {"a","b","c","d","e","f","g","h","j","k"};
         CurrentLetters= new List<string>();
-        FreeCoordinates = new List<Vector3>();
-        pos = new Vector3(transform.position.x, transform.position.y);
+        _freeCoordinates = new List<Vector3>();
+        _pos = new Vector3(transform.position.x, transform.position.y);
         ChangeBox(NumberOfLetters);
 	}
 	
@@ -30,24 +30,24 @@ public class LetterBox : MonoBehaviour
 
     public void ChangeBox(byte numberOfLetters,string letter = null)
     {
-        if (FreeCoordinates.Count == 0)
+        if (_freeCoordinates.Count == 0)
         {
             int max = i + numberOfLetters;
             for (; i < max; i++)
             {
-                AddLetter(pos, letter);
-                pos.x += DistanceBetweenLetters;
-                if (i%2 == 1)
+                AddLetter(_pos, letter);
+                _pos.x += DistanceBetweenLetters;
+                if (i%4 == 3)
                 {
-                    pos.x = transform.position.x;
-                    pos.y -= DistanceBetweenLetters;
+                    _pos.x = transform.position.x;
+                    _pos.y -= DistanceBetweenLetters;
                 }
             }
         }
         else
         {
-            AddLetter(FreeCoordinates[0],letter);
-            FreeCoordinates.RemoveAt(0);
+            AddLetter(_freeCoordinates[0],letter);
+            _freeCoordinates.RemoveAt(0);
         }
     }
 
@@ -59,9 +59,9 @@ public class LetterBox : MonoBehaviour
         newLetter.transform.SetParent(gameObject.transform);
         if (String.IsNullOrEmpty(letter))
         {
-            var current = AllLetters[UnityEngine.Random.Range(0, AllLetters.Count - 1)];
+            var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
             newLetter.ChangeLetter(current);
-            AllLetters.Remove(current);
+            _allLetters.Remove(current);
             CurrentLetters.Add(current);
         }
         else
@@ -74,13 +74,14 @@ public class LetterBox : MonoBehaviour
 
     public void ChangeLetter(string input)
     {
+        //Todo: Rewrite this method
         CurrentLetters.Remove(input);
-        if (AllLetters.Count != 0)
+        if (_allLetters.Count != 0)
             AddLetter(DragHandler.StartPosition, "");
         else
         {
             Debug.Log("Out of letters");
-            FreeCoordinates.Add(DragHandler.StartPosition);
+            _freeCoordinates.Add(DragHandler.StartPosition);
         }
     }
 }
