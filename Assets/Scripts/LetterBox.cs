@@ -9,7 +9,7 @@ public class LetterBox : MonoBehaviour
 {
     private static List<string> _allLetters = new List<string> { "a", "b", "c", "d", "e", "f", "g", "h", "j", "k", "a", "b", "c", "d", "e", "f", "g", "h", "j", "k" };
     private List<Vector3> _freeCoordinates; 
-    public  List<string> CurrentLetters; 
+    public  List<Letter> CurrentLetters; 
     public Letter LetterPrefab;
     private Vector3 _pos;
     private int i = 0;
@@ -17,7 +17,7 @@ public class LetterBox : MonoBehaviour
     public float DistanceBetweenLetters = 1.2f;
     // Use this for initialization
     void Start () {
-        CurrentLetters= new List<string>();
+        CurrentLetters= new List<Letter>();
         _freeCoordinates = new List<Vector3>();
         _pos = new Vector3(transform.position.x, transform.position.y);
         ChangeBox(NumberOfLetters);
@@ -62,26 +62,53 @@ public class LetterBox : MonoBehaviour
             var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
             newLetter.ChangeLetter(current);
             _allLetters.Remove(current);
-            CurrentLetters.Add(current);
+            CurrentLetters.Add(newLetter);
         }
         else
         {
             newLetter.ChangeLetter(letter);
-            CurrentLetters.Add(letter);
+            CurrentLetters.Add(newLetter);
         }
-        
     }
 
     public void ChangeLetter(string input)
     {
         //Todo: Rewrite this method
-        CurrentLetters.Remove(input);
+        //Todo: Test
+        //CurrentLetters.Remove(input);
+        var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
         if (_allLetters.Count != 0)
+        {
             AddLetter(DragHandler.StartPosition, "");
+        }
         else
         {
             Debug.Log("Out of letters");
             _freeCoordinates.Add(DragHandler.StartPosition);
         }
+        //_freeCoordinates.Add(DragHandler.StartPosition);
+        var currentIndex = FindIndex(currentObject);
+        Vector3 previousCoordinates = DragHandler.StartPosition;
+        for (int j = currentIndex+1; j < CurrentLetters.Count; j++)
+        {
+            var tempCoordinates = CurrentLetters[j].gameObject.transform.position;
+            CurrentLetters[j].gameObject.transform.position = previousCoordinates;
+            previousCoordinates = tempCoordinates;
+        }
+        _freeCoordinates.Add(previousCoordinates);
+        CurrentLetters.Remove(currentObject);
+        Debug.Log(currentIndex);
+
+    }
+
+    int FindIndex(Letter input)
+    {
+        int j = 0;
+        for (; j < CurrentLetters.Count; j++)
+        {
+            if (CurrentLetters[j] == input)
+                return j;
+        }
+        return -1;
     }
 }
