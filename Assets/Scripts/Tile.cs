@@ -17,7 +17,7 @@ public class Tile : MonoBehaviour, IDropHandler
     public void OnDrop(PointerEventData eventData)
     {
         var parent = gameObject.transform.parent.transform.GetComponent<Grid>();
-        if ((parent.isFirstGeneral || CanDrop)&&!HasLetter)
+        if (CanDrop&&!HasLetter)
         {
             if (parent.CurrentDirection==Grid.Direction.None ||
                 (parent.CurrentDirection==Grid.Direction.Horizontal&&Row ==parent.CurrentTiles[0].Row)||
@@ -43,7 +43,6 @@ public class Tile : MonoBehaviour, IDropHandler
                 CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
                 var letterPanel = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
                 letterPanel.ChangeLetter(CurrentLetter.text);
-                parent.isFirstGeneral = false;
                 if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
                 if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
@@ -109,8 +108,8 @@ public class Tile : MonoBehaviour, IDropHandler
             if (parent.CurrentTiles.Count == 0)
             {
                 parent.CurrentDirection=Grid.Direction.None;
-                if(parent.CurrentTurn == 1)
-                parent.isFirstGeneral = true;
+                if (parent.CurrentTurn == 1)
+                    parent.Field[7, 7].CanDrop = true;
             }
         }
     }

@@ -10,7 +10,6 @@ public class Grid : MonoBehaviour
     //Make Direction Checks
     public Tile TilePrefab;
     public Direction CurrentDirection= Direction.None;
-    public bool isFirstGeneral = true;
     public int CurrentTurn=1;
     //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
@@ -55,6 +54,7 @@ public class Grid : MonoBehaviour
             xOffset = 0;
             yOffset += DistanceBetweenTiles;
         }
+        Field[7, 7].CanDrop = true;
     }
 
     public void OnEndTurn()
@@ -78,4 +78,41 @@ public class Grid : MonoBehaviour
         }
         Debug.Log("Current player: "+CurrentPlayer);
     }
+
+    void FindWord(int currentPosition, Grid.Direction currentDirection, out int startPosition, out int endPosition)
+    {
+        var j = currentPosition;
+        if (currentDirection == Direction.Vertical)
+        {
+            while (j >= 0 && Field[j, CurrentTiles[0].Column].HasLetter)
+            {
+                j--;
+            }
+            j++;
+            startPosition = j;
+            j = currentPosition;
+            while (j < NumberOfRows && Field[j, CurrentTiles[0].Column].HasLetter)
+            {
+                j++;
+            }
+            j--;
+            endPosition = j;
+            return;
+        }
+        while (j >= 0 && Field[CurrentTiles[0].Row, j].HasLetter)
+        {
+            j--;
+        }
+        j++;
+        startPosition = j;
+        j = currentPosition;
+        while (j < NumberOfRows && Field[CurrentTiles[0].Row,j].HasLetter)
+        {
+            j++;
+        }
+        j--;
+        endPosition = j;
+    }
+
 }
+

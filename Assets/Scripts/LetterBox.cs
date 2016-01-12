@@ -7,7 +7,54 @@ using System.Collections.Generic;
 //Todo: Add leters only in the end of the turn
 public class LetterBox : MonoBehaviour
 {
-    private static List<string> _allLetters = new List<string> { "a", "b", "c", "d", "e", "f", "g", "h", "j", "k", "a", "b", "c", "d", "e", "f", "g", "h", "j", "k" };
+    #region Letters and scores
+    public static Dictionary<string, int> PointsDictionary =
+        new Dictionary<string, int>
+        {
+            {"а", 1},
+            {"с", 2},
+            {"и", 1},
+            {"р", 1},
+            {"о", 1},
+            {"д", 2},
+            {"ш", 6},
+            {"ц", 6},
+            {"е", 1},
+            {"н", 1},
+            {"т", 1},
+            {"щ", 8},
+            {"к", 2},
+            {"ж", 6},
+            {"п", 2},
+            {"в", 1},
+            {"у", 3},
+            {"м", 2},
+            {"г", 4},
+            {"і", 1},
+            {"х", 5},
+            {"л", 2},
+            {"ю", 7},
+            {"б", 4},
+            {"я", 4},
+            {"ф", 8},
+            {"ь", 5},
+            {"ґ", 10},
+            {"з", 4},
+            {"є", 8},
+            {"й", 5},
+            {"ї", 6},
+            {"ч", 5}
+        }; 
+    private static List<string> _allLetters = new List<string>
+    {
+        "а","а","с","и","р","о","р","д","ш","и","и","и","ц","е","н","а","т","щ","л","к","ж",
+        "п","в","к","о","в","а","у","н","к","е","м","г","і","н","х","і","н","и","н","а","и",
+        "р","л","р","с","п","м","а","у","а","ю","м","с","б","в","я","м","т","ф","с","и","о",
+        "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
+        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з"," "," "," "
+    };
+    #endregion
+
     private List<Vector3> _freeCoordinates; 
     public  List<Letter> CurrentLetters; 
     public Letter LetterPrefab;
@@ -16,6 +63,7 @@ public class LetterBox : MonoBehaviour
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
     // Use this for initialization
+
     void Start () {
         CurrentLetters= new List<Letter>();
         _freeCoordinates = new List<Vector3>();
