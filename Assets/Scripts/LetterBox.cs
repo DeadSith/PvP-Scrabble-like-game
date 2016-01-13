@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System.Collections.Generic;
-//Todo: Shift letters to free place after dragging
+
 //Todo: Add leters only in the end of the turn
 public class LetterBox : MonoBehaviour
 {
@@ -51,7 +51,7 @@ public class LetterBox : MonoBehaviour
         "п","в","к","о","в","а","у","н","к","е","м","г","і","н","х","і","н","и","н","а","и",
         "р","л","р","с","п","м","а","у","а","ю","м","с","б","в","я","м","т","ф","с","и","о",
         "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
-        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з"," "," "," "
+        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","*","*","*"
     };
     #endregion
 
@@ -66,6 +66,7 @@ public class LetterBox : MonoBehaviour
 
     void Start () {
         CurrentLetters= new List<Letter>();
+        _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         _freeCoordinates = new List<Vector3>();
         _pos = new Vector3(transform.position.x, transform.position.y);
         ChangeBox(NumberOfLetters);
@@ -76,6 +77,7 @@ public class LetterBox : MonoBehaviour
 	
 	}
 
+    
     public void ChangeBox(byte numberOfLetters,string letter = null)
     {
         if (_freeCoordinates.Count == 0)
@@ -145,8 +147,6 @@ public class LetterBox : MonoBehaviour
         }
         _freeCoordinates.Add(previousCoordinates);
         CurrentLetters.Remove(currentObject);
-        Debug.Log(currentIndex);
-
     }
 
     int FindIndex(Letter input)

@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
+
 public class Grid : MonoBehaviour
 {
     public enum Direction
@@ -62,6 +64,7 @@ public class Grid : MonoBehaviour
         CurrentTurn++;
         if (CurrentPlayer == 1)
         {
+            CheckWords();
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentTiles = new List<Tile>();
@@ -70,6 +73,7 @@ public class Grid : MonoBehaviour
         }
         else
         {
+            CheckWords();
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
@@ -79,39 +83,121 @@ public class Grid : MonoBehaviour
         Debug.Log("Current player: "+CurrentPlayer);
     }
 
-    void FindWord(int currentPosition, Grid.Direction currentDirection, out int startPosition, out int endPosition)
+    void CheckWords()
     {
-        var j = currentPosition;
-        if (currentDirection == Direction.Vertical)
+        //Todo: change to bool
+        //Todo: (Main) Fix parallel lines
+        //Check the first word. If not in db return false
+        int curentStart, curentEnd, globalStart, globalEnd;
+        string curent;
+        if (CurrentDirection == Direction.Vertical)
         {
-            while (j >= 0 && Field[j, CurrentTiles[0].Column].HasLetter)
+            FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
+            curent = CreateWord(CurrentDirection, Field[globalStart, CurrentTiles[0].Column], globalEnd);
+            Debug.Log(curent);
+            if (CurrentTiles[0].Column != 0)
+            {
+                FindWord(Field[CurrentTiles[0].Row, CurrentTiles[0].Column - 1], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, curentStart], curentEnd);
+                Debug.Log(curent);
+            }
+            if (CurrentTiles[0].Column != NumberOfColumns - 1)
+            {
+                FindWord(Field[CurrentTiles[0].Row, CurrentTiles[0].Column + 1], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, curentStart], curentEnd);
+                Debug.Log(curent);
+            }
+            CurrentDirection = Direction.Horizontal;
+            
+            for (int j = globalStart; j <= globalEnd; j++)
+            {
+                FindWord(Field[j, CurrentTiles[0].Column], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[j, curentStart], curentEnd);
+                Debug.Log(curent);
+            }
+        }
+        else
+        {
+            FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
+            curent = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, globalStart], globalEnd);
+            Debug.Log(curent);
+            if (CurrentTiles[0].Row != 0)
+            {
+                FindWord(Field[CurrentTiles[0].Row - 1, CurrentTiles[0].Column], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[curentStart, CurrentTiles[0].Column], curentEnd);
+                Debug.Log(curent);
+            }
+            if (CurrentTiles[0].Row != NumberOfRows - 1)
+            {
+                FindWord(Field[CurrentTiles[0].Row + 1, CurrentTiles[0].Column], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[curentStart, CurrentTiles[0].Column], curentEnd);
+                Debug.Log(curent);
+            }
+            CurrentDirection = Direction.Vertical;
+            for (int j = globalStart; j <= globalEnd; j++)
+            {
+                FindWord(Field[CurrentTiles[0].Row, j], CurrentDirection, out curentStart, out curentEnd);
+                curent = CreateWord(CurrentDirection, Field[curentStart, j], curentEnd);
+                Debug.Log(curent);
+            }
+        }
+    }
+    string CreateWord(Direction current, Tile start, int end)
+    {
+        var sb = new StringBuilder();
+        if (current == Direction.Vertical)
+        {
+            for (int j = start.Row; j <= end; j++)
+                sb.Append(Field[j, start.Column].CurrentLetter.text);
+            return sb.ToString();
+        }
+        else
+        {
+            for (int j = start.Column; j <= end; j++)
+                sb.Append(Field[start.Row,j].CurrentLetter.text);
+            return sb.ToString();
+        }
+    }
+    void FindWord(Tile currentTile,Direction current, out int startPosition, out int endPosition)
+    {
+        if (current == Direction.Vertical)
+        {
+            var j = currentTile.Row;
+            while (j >= 0 && Field[j, currentTile.Column].HasLetter)
             {
                 j--;
             }
             j++;
             startPosition = j;
-            j = currentPosition;
-            while (j < NumberOfRows && Field[j, CurrentTiles[0].Column].HasLetter)
+            //Debug.Log(j);
+            j = currentTile.Row;
+            while (j < NumberOfRows && Field[j, currentTile.Column].HasLetter)
+            {
+                j++;
+            }
+            j--;
+            //Debug.Log(j);
+            endPosition = j;
+        }
+        else
+        {
+            var j = currentTile.Column;
+            while (j >= 0 && Field[currentTile.Row, j].HasLetter)
+            {
+                j--;
+            }
+            j++;
+            //Debug.Log(j);
+            startPosition = j;
+            j = currentTile.Column;
+            while (j < NumberOfRows && Field[currentTile.Row, j].HasLetter)
             {
                 j++;
             }
             j--;
             endPosition = j;
-            return;
+            //Debug.Log(j);
         }
-        while (j >= 0 && Field[CurrentTiles[0].Row, j].HasLetter)
-        {
-            j--;
-        }
-        j++;
-        startPosition = j;
-        j = currentPosition;
-        while (j < NumberOfRows && Field[CurrentTiles[0].Row,j].HasLetter)
-        {
-            j++;
-        }
-        j--;
-        endPosition = j;
     }
 
 }
