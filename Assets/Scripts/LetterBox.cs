@@ -55,7 +55,7 @@ public class LetterBox : MonoBehaviour
     };
     #endregion
 
-    private List<Vector3> _freeCoordinates; 
+    public List<Vector3> _freeCoordinates; 
     public  List<Letter> CurrentLetters; 
     public Letter LetterPrefab;
     private Vector3 _pos;
@@ -78,7 +78,7 @@ public class LetterBox : MonoBehaviour
 	}
 
     
-    public void ChangeBox(byte numberOfLetters,string letter = null)
+    public void ChangeBox(int numberOfLetters,string letter = null)
     {
         if (_freeCoordinates.Count == 0)
         {
@@ -96,8 +96,11 @@ public class LetterBox : MonoBehaviour
         }
         else
         {
-            AddLetter(_freeCoordinates[0],letter);
-            _freeCoordinates.RemoveAt(0);
+            for (int j = 0; j < numberOfLetters; j++)
+            {
+                AddLetter(_freeCoordinates[_freeCoordinates.Count-1], letter);
+                _freeCoordinates.RemoveAt(_freeCoordinates.Count-1);
+            }
         }
     }
 
@@ -127,7 +130,7 @@ public class LetterBox : MonoBehaviour
         //Todo: Test
         //CurrentLetters.Remove(input);
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
-        if (_allLetters.Count != 0)
+        /*if (_allLetters.Count != 0)
         {
             AddLetter(DragHandler.StartPosition, "");
         }
@@ -136,8 +139,9 @@ public class LetterBox : MonoBehaviour
             Debug.Log("Out of letters");
             _freeCoordinates.Add(DragHandler.StartPosition);
         }
-        //_freeCoordinates.Add(DragHandler.StartPosition);
+        //_freeCoordinates.Add(DragHandler.StartPosition);*/
         var currentIndex = FindIndex(currentObject);
+        Debug.Log(currentIndex);
         Vector3 previousCoordinates = DragHandler.StartPosition;
         for (int j = currentIndex+1; j < CurrentLetters.Count; j++)
         {

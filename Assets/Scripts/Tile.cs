@@ -47,7 +47,7 @@ public class Tile : MonoBehaviour, IDropHandler
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
                 if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
                 if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
-                Debug.Log(parent.CurrentDirection.ToString() + " " + DateTime.Now.ToString());
+                //Debug.Log(parent.CurrentDirection.ToString() + " " + DateTime.Now.ToString());
                 Destroy(DragHandler.ObjectDragged);
             }
         }
@@ -61,7 +61,6 @@ public class Tile : MonoBehaviour, IDropHandler
             (Row != parent.NumberOfRows - 1 && parent.Field[Row + 1, Column].HasLetter))
         {
             parent.CurrentDirection = Grid.Direction.Vertical;
-            Debug.Log("Vertical");
         }
         if  ((Column!=0 && parent.Field[Row,Column-1].HasLetter)||(Column!= parent.NumberOfColumns-1&&parent.Field[Row,Column+1].HasLetter))
             parent.CurrentDirection = parent.CurrentDirection== Grid.Direction.Vertical ? Grid.Direction.None : Grid.Direction.Horizontal;
