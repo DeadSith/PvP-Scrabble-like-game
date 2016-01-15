@@ -13,7 +13,8 @@ public class Tile : MonoBehaviour, IDropHandler
     public bool CanDrop;
     public int Row;
     public int Column;
-
+    public int LetterMultiplier = 1;
+    public int WordMultiplier = 1;
     public void OnDrop(PointerEventData eventData)
     {
         var parent = gameObject.transform.parent.transform.GetComponent<Grid>();

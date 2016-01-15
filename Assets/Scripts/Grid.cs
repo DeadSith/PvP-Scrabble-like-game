@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 using System.Linq;
 using Mono.Data.Sqlite;
+using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
 {
@@ -13,7 +14,15 @@ public class Grid : MonoBehaviour
         Horizontal, Vertical, None
     }
     //Todo: Implement points count
+    #region Prefabs and materials
     public Tile TilePrefab;
+    public Material StandardMaterial;
+    public Material StartMaterial;
+    public Material WordX2Material;
+    public Material WordX3Material;
+    public Material LetterX2Material;
+    public Material LetterX3Material;
+    #endregion
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
     //public bool isFirstCurrentTurn = true;
@@ -57,6 +66,8 @@ public class Grid : MonoBehaviour
                     transform.rotation) as Tile;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
+                var render = newTile.GetComponent<Image>();
+                render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
                 xOffset += DistanceBetweenTiles;
@@ -65,7 +76,121 @@ public class Grid : MonoBehaviour
             yOffset += DistanceBetweenTiles;
         }
         Field[7, 7].CanDrop = true;
+        Field[7, 7].GetComponent<Image>().material=StartMaterial;
+        AssignMaterials();
+        AssignMultipliers();
     }
+    #region Some shitty code
+    //Todo: rewrite to cycles
+    void AssignMaterials()
+    {
+        Field[0, 0].GetComponent<Image>().material = WordX3Material;
+        Field[0, 14].GetComponent<Image>().material = WordX3Material;
+        Field[14, 0].GetComponent<Image>().material = WordX3Material;
+        Field[14, 14].GetComponent<Image>().material = WordX3Material;
+        Field[0, 7].GetComponent<Image>().material = WordX3Material;
+        Field[14, 7].GetComponent<Image>().material = WordX3Material;
+        Field[7, 0].GetComponent<Image>().material = WordX3Material;
+        Field[14, 7].GetComponent<Image>().material = WordX3Material;
+        for (var i = 1; i < 5; i++)
+        {
+            Field[i,i].GetComponent<Image>().material = WordX2Material;
+            Field[i,NumberOfRows-i-1].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i-1, i].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i-1, NumberOfRows - i-1].GetComponent<Image>().material = WordX2Material;
+        }
+        Field[5, 1].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 13].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 1].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 13].GetComponent<Image>().material = LetterX3Material;
+        Field[1, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[1, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[13, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[13, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[0, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[0, 11].GetComponent<Image>().material = LetterX2Material;
+        Field[14, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[14, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[2, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[2, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[12, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[12, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 0].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 7].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 14].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 0].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 7].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 14].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 2].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 12].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 2].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 12].GetComponent<Image>().material = LetterX2Material;
+        Field[7, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[7, 11].GetComponent<Image>().material = LetterX2Material;
+    }
+    void AssignMultipliers()
+    {
+        Field[0, 0].WordMultiplier = 3;
+        Field[0, 14].WordMultiplier = 3;
+        Field[14, 0].WordMultiplier = 3;
+        Field[14, 14].WordMultiplier = 3;
+        Field[0, 7].WordMultiplier = 3;
+        Field[14, 7].WordMultiplier = 3;
+        Field[7, 0].WordMultiplier = 3;
+        Field[14, 7].WordMultiplier = 3;
+        for (var i = 1; i < 5; i++)
+        {
+            Field[i, i].WordMultiplier = 2;
+            Field[i, NumberOfRows - i - 1].WordMultiplier = 2;
+            Field[NumberOfRows - i - 1, i].WordMultiplier = 2;
+            Field[NumberOfRows - i - 1, NumberOfRows - i - 1].WordMultiplier = 2;
+        }
+        Field[5, 1].LetterMultiplier = 3;
+        Field[5, 5].LetterMultiplier = 3;
+        Field[5, 9].LetterMultiplier = 3;
+        Field[5, 13].LetterMultiplier = 3;
+        Field[9, 1].LetterMultiplier = 3;
+        Field[9, 5].LetterMultiplier = 3;
+        Field[9, 9].LetterMultiplier = 3;
+        Field[9, 13].LetterMultiplier = 3;
+        Field[1, 5].LetterMultiplier = 3;
+        Field[1, 9].LetterMultiplier = 3;
+        Field[13, 5].LetterMultiplier = 3;
+        Field[13, 9].LetterMultiplier = 3;
+        Field[0, 3].LetterMultiplier = 2;
+        Field[0, 11].LetterMultiplier = 2;
+        Field[14, 3].LetterMultiplier = 2;
+        Field[14, 3].LetterMultiplier = 2;
+        Field[2, 6].LetterMultiplier = 2;
+        Field[2, 8].LetterMultiplier = 2;
+        Field[12, 6].LetterMultiplier = 2;
+        Field[12, 8].LetterMultiplier = 2;
+        Field[3, 0].LetterMultiplier = 2;
+        Field[3, 7].LetterMultiplier = 2;
+        Field[3, 14].LetterMultiplier = 2;
+        Field[11, 0].LetterMultiplier = 2;
+        Field[11, 7].LetterMultiplier = 2;
+        Field[11, 14].LetterMultiplier = 2;
+        Field[6, 2].LetterMultiplier = 2;
+        Field[6, 6].LetterMultiplier = 2;
+        Field[6, 8].LetterMultiplier = 2;
+        Field[6, 12].LetterMultiplier = 2;
+        Field[8, 2].LetterMultiplier = 2;
+        Field[8, 6].LetterMultiplier = 2;
+        Field[8, 8].LetterMultiplier = 2;
+        Field[8, 12].LetterMultiplier = 2;
+        Field[7, 3].LetterMultiplier = 2;
+        Field[7, 11].LetterMultiplier = 2;
+    }
+    #endregion
 
     public void OnEndTurn()
     {
@@ -97,8 +222,7 @@ public class Grid : MonoBehaviour
 
     bool CheckWords()
     {
-        //Todo: change to bool
-        //Check the first word. If not in db return false
+        //Todo: check nearby words(they should also be in dictionary)
         int currentStart, currentEnd, globalStart, globalEnd;
         string current;
         bool wordExists;
@@ -127,7 +251,6 @@ public class Grid : MonoBehaviour
             wordExists = CheckWord(current);
             if (!wordExists)
                 return false;
-            CountPoints(Field[CurrentTiles[0].Row, globalStart], Field[CurrentTiles[0].Row, globalEnd]);
             CurrentDirection = Direction.Vertical;
             for (int j = globalStart; j <= globalEnd; j++)
             {
