@@ -126,20 +126,7 @@ public class LetterBox : MonoBehaviour
 
     public void ChangeLetter(string input)
     {
-        //Todo: Rewrite this method
-        //Todo: Test
-        //CurrentLetters.Remove(input);
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
-        /*if (_allLetters.Count != 0)
-        {
-            AddLetter(DragHandler.StartPosition, "");
-        }
-        else
-        {
-            Debug.Log("Out of letters");
-            _freeCoordinates.Add(DragHandler.StartPosition);
-        }
-        //_freeCoordinates.Add(DragHandler.StartPosition);*/
         var currentIndex = FindIndex(currentObject);
         Debug.Log(currentIndex);
         Vector3 previousCoordinates = DragHandler.StartPosition;

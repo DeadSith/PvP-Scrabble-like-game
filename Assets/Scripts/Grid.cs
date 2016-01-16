@@ -226,39 +226,83 @@ public class Grid : MonoBehaviour
         int currentStart, currentEnd, globalStart, globalEnd;
         string current;
         bool wordExists;
-        if (CurrentDirection == Direction.Vertical)
+        switch (CurrentDirection)
         {
-            FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
-            current = CreateWord(CurrentDirection, Field[globalStart, CurrentTiles[0].Column], globalEnd);
-            Debug.Log(current);
-            wordExists = CheckWord(current);
-            if (!wordExists)
-                return false;
-            CurrentDirection = Direction.Horizontal;
-            for (int j = globalStart; j <= globalEnd; j++)
-            {
-                FindWord(Field[j, CurrentTiles[0].Column], CurrentDirection, out currentStart, out currentEnd);
-                current = CreateWord(CurrentDirection, Field[j, currentStart], currentEnd);
-                wordExists = CheckWord(current);
+            case Direction.None:
+                bool wordFound = false;
+                FindWord(CurrentTiles[0], Direction.Horizontal, out globalStart, out globalEnd);
+                if (globalStart != globalEnd)
+                {
+                    current = CreateWord(Direction.Horizontal, Field[globalStart, CurrentTiles[0].Column], globalEnd);
+                    Debug.Log(current);
+                    wordExists = CheckWord(current);
+                    if (!wordExists)
+                        return false;
+                    wordFound = true;
+                }
+                FindWord(CurrentTiles[0], Direction.Vertical, out globalStart, out globalEnd);
+                if (globalStart != globalEnd)
+                {
+                    current = CreateWord(Direction.Vertical, Field[globalStart, CurrentTiles[0].Column], globalEnd);
+                    Debug.Log(current);
+                    wordExists = CheckWord(current);
+                    if (!wordExists)
+                        return false;
+                    wordFound = true;
+                }
+                return wordFound;
+            case Direction.Vertical:
+                FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
+                if(globalStart!=globalEnd)
+                {
+                    current = CreateWord(CurrentDirection, Field[globalStart, CurrentTiles[0].Column], globalEnd);
                 Debug.Log(current);
-            }
-        }
-        else
-        {
-            FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
-            current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, globalStart], globalEnd);
-            Debug.Log(current);
-            wordExists = CheckWord(current);
-            if (!wordExists)
-                return false;
-            CurrentDirection = Direction.Vertical;
-            for (int j = globalStart; j <= globalEnd; j++)
-            {
-                FindWord(Field[CurrentTiles[0].Row, j], CurrentDirection, out currentStart, out currentEnd);
-                current = CreateWord(CurrentDirection, Field[currentStart, j], currentEnd);
                 wordExists = CheckWord(current);
-                Debug.Log(current);
-            }
+                if (!wordExists)
+                    return false;
+                CurrentDirection = Direction.Horizontal;
+                }
+                else return false;
+                foreach (var tile in CurrentTiles)
+                {
+                    FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
+                    if (currentStart != currentEnd)
+                    {
+                        current = CreateWord(CurrentDirection, Field[tile.Row, currentStart], currentEnd);
+                        wordExists = CheckWord(current);
+                        if (!wordExists)
+                            return false;
+                        Debug.Log(current);
+                    }
+                }
+                break;
+            case Direction.Horizontal:
+                FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
+                if (globalStart != globalEnd)
+                {
+                    current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, globalStart], globalEnd);
+                    Debug.Log(current);
+                    wordExists = CheckWord(current);
+                    if (!wordExists)
+                        return false;
+                }
+                else return false;
+                CurrentDirection = Direction.Vertical;
+                foreach (var tile in CurrentTiles)
+                {
+                    FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
+                    if(currentStart!=currentEnd)
+                    {
+                        current = CreateWord(CurrentDirection, Field[currentStart, tile.Column], currentEnd);
+                        wordExists = CheckWord(current);
+                        if (!wordExists)
+                            return false;
+                        Debug.Log(current);
+                    }
+                }
+                break;
+            default:
+                return false;
         }
         return true;
     }
