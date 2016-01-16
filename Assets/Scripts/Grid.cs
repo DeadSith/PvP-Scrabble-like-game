@@ -2,8 +2,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
-using System.Data;
-using System.Linq;
 using Mono.Data.Sqlite;
 using UnityEngine.UI;
 
@@ -13,7 +11,6 @@ public class Grid : MonoBehaviour
     {
         Horizontal, Vertical, None
     }
-    //Todo: Implement points count
     #region Prefabs and materials
     public Tile TilePrefab;
     public Material StandardMaterial;
@@ -25,6 +22,7 @@ public class Grid : MonoBehaviour
     #endregion
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
+    private List<Tile> _wordsFound; 
     //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
@@ -34,7 +32,7 @@ public class Grid : MonoBehaviour
     public float DistanceBetweenTiles = 1.2f;
     public Tile[,] Field;
     public List<Tile> CurrentTiles;
-    private SqliteConnection dbConnection;
+    private SqliteConnection _dbConnection;
 
 
     void Start()
@@ -42,14 +40,9 @@ public class Grid : MonoBehaviour
         CurrentTiles = new List<Tile>();
         CreateField();
         var conection = @"URI=file:" + Application.dataPath + @"/words.db";
-        dbConnection = new SqliteConnection(conection);
-        dbConnection.Open();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        _dbConnection = new SqliteConnection(conection);
+        _dbConnection.Open();
+        _wordsFound = new List<Tile>();
     }
 
     void CreateField()
@@ -194,9 +187,11 @@ public class Grid : MonoBehaviour
 
     public void OnEndTurn()
     {
+        //Todo: finish point system
         if (CheckWords())
         {
             CurrentTurn++;
+            Debug.Log(CountPoints());
             if (CurrentPlayer == 1)
             {
                 Player1.ChangeBox(7-Player1.CurrentLetters.Count);
@@ -218,101 +213,165 @@ public class Grid : MonoBehaviour
             Debug.Log("Current player: " + CurrentPlayer);
         }
         else Debug.Log("Not exist");
+        _wordsFound = new List<Tile>();
     }
 
     bool CheckWords()
     {
-        //Todo: check nearby words(they should also be in dictionary)
-        int currentStart, currentEnd, globalStart, globalEnd;
-        string current;
-        bool wordExists;
+        //Todo: test
         switch (CurrentDirection)
         {
             case Direction.None:
                 bool wordFound = false;
-                FindWord(CurrentTiles[0], Direction.Horizontal, out globalStart, out globalEnd);
-                if (globalStart != globalEnd)
+                int currentStart;
+                int currentEnd;
+                FindWord(CurrentTiles[0], Direction.Horizontal, out currentStart, out currentEnd);
+                string current;
+                bool wordExists;
+                if (currentStart != currentEnd)
                 {
-                    current = CreateWord(Direction.Horizontal, Field[globalStart, CurrentTiles[0].Column], globalEnd);
+                    current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row,currentStart], currentEnd);
                     Debug.Log(current);
                     wordExists = CheckWord(current);
-                    if (!wordExists)
-                        return false;
+                    if (wordExists)
+                    {
+                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
+                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
+                    }
+                    else return false;
                     wordFound = true;
                 }
-                FindWord(CurrentTiles[0], Direction.Vertical, out globalStart, out globalEnd);
-                if (globalStart != globalEnd)
+                FindWord(CurrentTiles[0], Direction.Vertical, out currentStart, out currentEnd);
+                if (currentStart != currentEnd)
                 {
-                    current = CreateWord(Direction.Vertical, Field[globalStart, CurrentTiles[0].Column], globalEnd);
+                    current = CreateWord(Direction.Vertical, Field[currentStart, CurrentTiles[0].Column], currentEnd);
                     Debug.Log(current);
                     wordExists = CheckWord(current);
-                    if (!wordExists)
-                        return false;
+                    if (wordExists)
+                    {
+                        _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
+                        _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
+                    }
+                    else return false;
                     wordFound = true;
                 }
                 return wordFound;
             case Direction.Vertical:
-                FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
-                if(globalStart!=globalEnd)
-                {
-                    current = CreateWord(CurrentDirection, Field[globalStart, CurrentTiles[0].Column], globalEnd);
-                Debug.Log(current);
-                wordExists = CheckWord(current);
-                if (!wordExists)
-                    return false;
-                CurrentDirection = Direction.Horizontal;
-                }
-                else return false;
-                foreach (var tile in CurrentTiles)
-                {
-                    FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
-                    if (currentStart != currentEnd)
-                    {
-                        current = CreateWord(CurrentDirection, Field[tile.Row, currentStart], currentEnd);
-                        wordExists = CheckWord(current);
-                        if (!wordExists)
-                            return false;
-                        Debug.Log(current);
-                    }
-                }
-                break;
+                return CheckVertical();
             case Direction.Horizontal:
-                FindWord(CurrentTiles[0], CurrentDirection, out globalStart, out globalEnd);
-                if (globalStart != globalEnd)
-                {
-                    current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, globalStart], globalEnd);
-                    Debug.Log(current);
-                    wordExists = CheckWord(current);
-                    if (!wordExists)
-                        return false;
-                }
-                else return false;
-                CurrentDirection = Direction.Vertical;
-                foreach (var tile in CurrentTiles)
-                {
-                    FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
-                    if(currentStart!=currentEnd)
-                    {
-                        current = CreateWord(CurrentDirection, Field[currentStart, tile.Column], currentEnd);
-                        wordExists = CheckWord(current);
-                        if (!wordExists)
-                            return false;
-                        Debug.Log(current);
-                    }
-                }
-                break;
+                return CheckHorizontal();
             default:
                 return false;
+        }
+    }
+    bool CheckHorizontal()
+    {
+        int currentStart, currentEnd;
+        string current;
+        bool wordExists;
+        FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
+        if (currentStart != currentEnd)
+        {
+            current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, currentStart], currentEnd);
+            Debug.Log(current);
+            wordExists = CheckWord(current);
+            if (wordExists)
+            {
+                _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
+                _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
+            }
+            else return false;
+        }
+        else return false;
+        CurrentDirection = Direction.Vertical;
+        foreach (var tile in CurrentTiles)
+        {
+            FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
+            if (currentStart != currentEnd)
+            {
+                current = CreateWord(CurrentDirection, Field[currentStart, tile.Column], currentEnd);
+                wordExists = CheckWord(current);
+                if (wordExists)
+                {
+                    _wordsFound.Add(Field[currentStart, tile.Column]);
+                    _wordsFound.Add(Field[currentEnd, tile.Column]);
+                }
+                else return false;
+                Debug.Log(current);
+            }
+        }
+        return true;
+    }
+    bool CheckVertical()
+    {
+        int currentStart, currentEnd;
+        string current;
+        bool wordExists;
+        FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
+        if (currentStart != currentEnd)
+        {
+            current = CreateWord(CurrentDirection, Field[currentStart, CurrentTiles[0].Column], currentEnd);
+            Debug.Log(current);
+            wordExists = CheckWord(current);
+            if (wordExists)
+            {
+                _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
+                _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
+            }
+            else return false;
+            CurrentDirection = Direction.Horizontal;
+        }
+        else return false;
+        foreach (var tile in CurrentTiles)
+        {
+            FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
+            if (currentStart != currentEnd)
+            {
+                current = CreateWord(CurrentDirection, Field[tile.Row, currentStart], currentEnd);
+                wordExists = CheckWord(current);
+                if (wordExists)
+                {
+                    _wordsFound.Add(Field[tile.Row, currentStart]);
+                    _wordsFound.Add(Field[tile.Row, currentEnd]);
+                }
+                else return false;
+                Debug.Log(current);
+            }
         }
         return true;
     }
 
-    private void CountPoints(Tile start, Tile end)
+    private int CountPoints()
     {
-        //Todo
-        return;
+        var result = 0;
+        for (var i = 0; i < _wordsFound.Count; i += 2)
+        {
+            var tempRes = 0;
+            var wordMultiplier = 1;
+            if(_wordsFound[i].Row==_wordsFound[i+1].Row)
+                for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
+                {
+                    var tile = Field[_wordsFound[i].Row, j];
+                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text]*tile.LetterMultiplier;
+                    tile.LetterMultiplier = 1;
+                    wordMultiplier *= tile.WordMultiplier;
+                    tile.WordMultiplier = 1;
+                }
+            else
+            {
+                for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
+                {
+                    var tile = Field[j,_wordsFound[i].Column];
+                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    tile.LetterMultiplier = 1;
+                    wordMultiplier *= tile.WordMultiplier;
+                    tile.WordMultiplier = 1;
+                }
+            }
+            result += tempRes*wordMultiplier;
+        }
+        return result;
     }
-
     string CreateWord(Direction current, Tile start, int end)
     {
         var sb = new StringBuilder();
@@ -380,11 +439,10 @@ public class Grid : MonoBehaviour
             //Debug.Log(j);
         }
     }
-
     bool CheckWord(string word)
     {
         var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToUpper() + "\"";
-        var command = new SqliteCommand(sql, dbConnection);
+        var command = new SqliteCommand(sql, _dbConnection);
         var inp = command.ExecuteScalar();
         return Convert.ToInt32(inp) != 0;
     }

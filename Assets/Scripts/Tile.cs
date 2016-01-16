@@ -73,7 +73,6 @@ public class Tile : MonoBehaviour, IDropHandler
     void OnMouseDown()
     {
         var parent = transform.parent.gameObject.GetComponent<Grid>();
-        //Todo: Add direction checks
         if (parent.CurrentTiles.Contains(this))
         {
             HasLetter = false;

@@ -43,7 +43,8 @@ public class LetterBox : MonoBehaviour
             {"є", 8},
             {"й", 5},
             {"ї", 6},
-            {"ч", 5}
+            {"ч", 5},
+            {"*", 0}
         }; 
     private static List<string> _allLetters = new List<string>
     {
@@ -55,7 +56,7 @@ public class LetterBox : MonoBehaviour
     };
     #endregion
 
-    public List<Vector3> _freeCoordinates; 
+    private List<Vector3> _freeCoordinates; 
     public  List<Letter> CurrentLetters; 
     public Letter LetterPrefab;
     private Vector3 _pos;
@@ -128,7 +129,6 @@ public class LetterBox : MonoBehaviour
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
         var currentIndex = FindIndex(currentObject);
-        Debug.Log(currentIndex);
         Vector3 previousCoordinates = DragHandler.StartPosition;
         for (int j = currentIndex+1; j < CurrentLetters.Count; j++)
         {
