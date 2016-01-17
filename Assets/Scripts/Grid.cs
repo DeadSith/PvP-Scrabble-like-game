@@ -188,13 +188,14 @@ public class Grid : MonoBehaviour
     public void OnEndTurn()
     {
         //Todo: finish point system
-        if (CheckWords())
+        if (CurrentTiles.Count>0&&CheckWords())
         {
             CurrentTurn++;
             Debug.Log(CountPoints());
             if (CurrentPlayer == 1)
             {
                 Player1.ChangeBox(7-Player1.CurrentLetters.Count);
+                Player1.CanChangeLetters = true;
                 Player1.gameObject.SetActive(false);
                 Player2.gameObject.SetActive(true);
                 CurrentTiles = new List<Tile>();
@@ -204,6 +205,7 @@ public class Grid : MonoBehaviour
             else
             {
                 Player2.ChangeBox(7-Player2.CurrentLetters.Count);
+                Player2.CanChangeLetters = true;
                 Player1.gameObject.SetActive(true);
                 Player2.gameObject.SetActive(false);
                 CurrentPlayer = 1;
@@ -216,6 +218,33 @@ public class Grid : MonoBehaviour
         _wordsFound = new List<Tile>();
     }
 
+    public void OnChangeLetters()
+    {
+        if (CurrentPlayer == 1)
+        {
+            if(Player1.ChangeLetters())
+                CurrentTurn++;
+            else
+            {
+                return;
+            }
+            Player1.CanChangeLetters = true;
+            Player1.gameObject.SetActive(false);
+            Player2.gameObject.SetActive(true);
+            CurrentPlayer = 2;
+        }
+        else
+        {
+            if(Player2.ChangeLetters())
+                CurrentTurn++;
+            else return;
+            Player2.CanChangeLetters = true;
+            Player1.gameObject.SetActive(true);
+            Player2.gameObject.SetActive(false);
+            CurrentPlayer = 1;
+        }
+        Debug.Log("Current player: "+CurrentPlayer);
+    }
     bool CheckWords()
     {
         //Todo: test

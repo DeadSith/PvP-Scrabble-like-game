@@ -15,9 +15,13 @@ public class Tile : MonoBehaviour, IDropHandler
     public int Column;
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
+    private Grid parent;
+    void Start()
+    {
+        parent = transform.parent.gameObject.GetComponent<Grid>();
+    }
     public void OnDrop(PointerEventData eventData)
     {
-        var parent = gameObject.transform.parent.transform.GetComponent<Grid>();
         if (CanDrop&&!HasLetter)
         {
             if (parent.CurrentDirection==Grid.Direction.None ||
@@ -38,7 +42,8 @@ public class Tile : MonoBehaviour, IDropHandler
                 HasLetter = true;
                 CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
                 var letterPanel = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
-                letterPanel.ChangeLetter(CurrentLetter.text);
+                letterPanel.CanChangeLetters = false;
+                letterPanel.RemoveLetter();
                 if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
                 if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
@@ -51,7 +56,6 @@ public class Tile : MonoBehaviour, IDropHandler
     
     bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
     {
-        var parent = checkedTile.gameObject.transform.parent.transform.GetComponent<Grid>();
         if (checkedTile.Row != 0 && parent.Field[checkedTile.Row - 1, checkedTile.Column].HasLetter)
         {
             return true;
@@ -72,8 +76,7 @@ public class Tile : MonoBehaviour, IDropHandler
     }
     void OnMouseDown()
     {
-        var parent = transform.parent.gameObject.GetComponent<Grid>();
-        if (parent.CurrentTiles.Contains(this))
+        if (parent.CurrentTiles[parent.CurrentTiles.Count-1]==this)
         {
             HasLetter = false;
             if (parent.CurrentPlayer == 1)
@@ -89,6 +92,9 @@ public class Tile : MonoBehaviour, IDropHandler
             if(parent.CurrentTiles.Count==1) parent.CurrentDirection = Grid.Direction.None;
             if (parent.CurrentTiles.Count == 0)
             {
+                if (parent.CurrentPlayer == 1)
+                    parent.Player1.CanChangeLetters = true;
+                else parent.Player2.CanChangeLetters = true;
                 parent.CurrentDirection=Grid.Direction.None;
                 if (parent.CurrentTurn == 1)
                     parent.Field[7, 7].CanDrop = true;

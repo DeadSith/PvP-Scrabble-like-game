@@ -57,10 +57,11 @@ public class LetterBox : MonoBehaviour
     #endregion
 
     private List<Vector3> _freeCoordinates; 
-    public  List<Letter> CurrentLetters; 
+    public  List<Letter> CurrentLetters;
+    public Button ChangeLetterButton;
     public Letter LetterPrefab;
     private Vector3 _pos;
-    private int i = 0;
+    public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
     // Use this for initialization
@@ -74,17 +75,20 @@ public class LetterBox : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
-	}
+	void Update ()
+	{
+	    if (_allLetters.Count == 0)
+	        ChangeLetterButton.interactable = false;
+        else if (ChangeLetterButton.interactable != CanChangeLetters)
+            ChangeLetterButton.interactable = CanChangeLetters;
+    }
 
     
     public void ChangeBox(int numberOfLetters,string letter = null)
     {
         if (_freeCoordinates.Count == 0)
         {
-            int max = i + numberOfLetters;
-            for (; i < max; i++)
+            for (var i = 0; i < numberOfLetters; i++)
             {
                 AddLetter(_pos, letter);
                 _pos.x += DistanceBetweenLetters;
@@ -97,7 +101,7 @@ public class LetterBox : MonoBehaviour
         }
         else
         {
-            for (int j = 0; j < numberOfLetters; j++)
+            for (var j = 0; j < numberOfLetters; j++)
             {
                 AddLetter(_freeCoordinates[_freeCoordinates.Count-1], letter);
                 _freeCoordinates.RemoveAt(_freeCoordinates.Count-1);
@@ -125,7 +129,7 @@ public class LetterBox : MonoBehaviour
         }
     }
 
-    public void ChangeLetter(string input)
+    public void RemoveLetter()
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
         var currentIndex = FindIndex(currentObject);
@@ -140,6 +144,24 @@ public class LetterBox : MonoBehaviour
         CurrentLetters.Remove(currentObject);
     }
 
+    public bool ChangeLetters()
+    {
+        var successful = false;
+        foreach (Letter t in CurrentLetters)
+        {
+            if (t.isChecked)
+            {
+                _allLetters.Add(t.LetterText.text);
+                t.LetterText.text = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
+                t.isChecked = false;
+                t.gameObject.GetComponent<Image>().material = t.StandardMaterial;
+                successful = true;
+            }
+        }
+        Debug.Log(successful);
+        return successful;
+    }
+
     int FindIndex(Letter input)
     {
         int j = 0;
@@ -150,4 +172,5 @@ public class LetterBox : MonoBehaviour
         }
         return -1;
     }
+
 }
