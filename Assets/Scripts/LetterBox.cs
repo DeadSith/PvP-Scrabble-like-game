@@ -58,6 +58,7 @@ public class LetterBox : MonoBehaviour
 
     private List<Vector3> _freeCoordinates; 
     public  List<Letter> CurrentLetters;
+    public int Score = 0;
     public Button ChangeLetterButton;
     public Letter LetterPrefab;
     private Vector3 _pos;
@@ -164,7 +165,7 @@ public class LetterBox : MonoBehaviour
 
     int FindIndex(Letter input)
     {
-        int j = 0;
+        var j = 0;
         for (; j < CurrentLetters.Count; j++)
         {
             if (CurrentLetters[j] == input)

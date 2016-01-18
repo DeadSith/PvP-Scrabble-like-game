@@ -27,6 +27,7 @@ public class Grid : MonoBehaviour
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
+    private int _turnsSkipped = 0;
     public LetterBox Player2;
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
@@ -190,11 +191,14 @@ public class Grid : MonoBehaviour
         //Todo: finish point system
         if (CurrentTiles.Count>0&&CheckWords())
         {
+            _turnsSkipped = 0;
             CurrentTurn++;
-            Debug.Log(CountPoints());
+            int points;
+            Debug.Log(points = CountPoints());
             if (CurrentPlayer == 1)
             {
                 Player1.ChangeBox(7-Player1.CurrentLetters.Count);
+                Player1.Score += points;
                 Player1.CanChangeLetters = true;
                 Player1.gameObject.SetActive(false);
                 Player2.gameObject.SetActive(true);
@@ -205,6 +209,7 @@ public class Grid : MonoBehaviour
             else
             {
                 Player2.ChangeBox(7-Player2.CurrentLetters.Count);
+                Player2.Score += points;
                 Player2.CanChangeLetters = true;
                 Player1.gameObject.SetActive(true);
                 Player2.gameObject.SetActive(false);
@@ -228,6 +233,7 @@ public class Grid : MonoBehaviour
             {
                 return;
             }
+            _turnsSkipped = 0;
             Player1.CanChangeLetters = true;
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
@@ -238,6 +244,7 @@ public class Grid : MonoBehaviour
             if(Player2.ChangeLetters())
                 CurrentTurn++;
             else return;
+            _turnsSkipped = 0;
             Player2.CanChangeLetters = true;
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
@@ -245,7 +252,30 @@ public class Grid : MonoBehaviour
         }
         Debug.Log("Current player: "+CurrentPlayer);
     }
-    bool CheckWords()
+
+    public void OnSkipTurn()
+    {
+        CurrentTurn++;
+        if (CurrentPlayer == 1)
+        {
+            Player1.CanChangeLetters = true;
+            Player1.gameObject.SetActive(false);
+            Player2.gameObject.SetActive(true);
+            CurrentPlayer = 2;
+        }
+        else
+        {
+            Player2.CanChangeLetters = true;
+            Player1.gameObject.SetActive(true);
+            Player2.gameObject.SetActive(false);
+            CurrentPlayer = 1;
+        }
+        if (++_turnsSkipped == 4) ;
+        //EndGame();
+        else Debug.Log("Current player: " + CurrentPlayer);
+    }
+
+    private bool CheckWords()
     {
         //Todo: test
         switch (CurrentDirection)
@@ -293,7 +323,8 @@ public class Grid : MonoBehaviour
                 return false;
         }
     }
-    bool CheckHorizontal()
+
+    private bool CheckHorizontal()
     {
         int currentStart, currentEnd;
         string current;
@@ -331,7 +362,8 @@ public class Grid : MonoBehaviour
         }
         return true;
     }
-    bool CheckVertical()
+
+    private bool CheckVertical()
     {
         int currentStart, currentEnd;
         string current;
@@ -401,7 +433,8 @@ public class Grid : MonoBehaviour
         }
         return result;
     }
-    string CreateWord(Direction current, Tile start, int end)
+
+    private string CreateWord(Direction current, Tile start, int end)
     {
         var sb = new StringBuilder();
         if (current == Direction.Vertical)
@@ -427,7 +460,8 @@ public class Grid : MonoBehaviour
             return sb.ToString();
         }
     }
-    void FindWord(Tile currentTile, Direction current, out int startPosition, out int endPosition)
+
+    private void FindWord(Tile currentTile, Direction current, out int startPosition, out int endPosition)
     {
         if (current == Direction.Vertical)
         {
@@ -468,7 +502,8 @@ public class Grid : MonoBehaviour
             //Debug.Log(j);
         }
     }
-    bool CheckWord(string word)
+
+    private bool CheckWord(string word)
     {
         var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToUpper() + "\"";
         var command = new SqliteCommand(sql, _dbConnection);
@@ -477,4 +512,3 @@ public class Grid : MonoBehaviour
     }
 
     }
-
