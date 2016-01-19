@@ -65,6 +65,7 @@ public class LetterBox : MonoBehaviour
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
+    public UIController Controller;
     // Use this for initialization
 
     void Start () {
@@ -159,7 +160,6 @@ public class LetterBox : MonoBehaviour
                 successful = true;
             }
         }
-        Debug.Log(successful);
         return successful;
     }
 

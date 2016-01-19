@@ -11,13 +11,11 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         ObjectDragged = gameObject;
         StartPosition = transform.position;
         GetComponent<CanvasGroup>().blocksRaycasts = false;
-        //Debug.Log("OnBeginDrag");
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y,20));
-        //Debug.Log("OnDrag");
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -25,6 +23,5 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         ObjectDragged = null;
         transform.position = StartPosition;
         GetComponent<CanvasGroup>().blocksRaycasts = true;
-        //Debug.Log("OnEndDrag");
     }
 }

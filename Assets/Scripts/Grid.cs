@@ -34,7 +34,8 @@ public class Grid : MonoBehaviour
     public Tile[,] Field;
     public List<Tile> CurrentTiles;
     private SqliteConnection _dbConnection;
-
+    public UIController Controller;
+    public Button SkipTurnButton;
 
     void Start()
     {
@@ -46,6 +47,11 @@ public class Grid : MonoBehaviour
         _wordsFound = new List<Tile>();
     }
 
+    void Update()
+    {
+        if (SkipTurnButton.interactable != (CurrentTiles.Count == 0))
+            SkipTurnButton.interactable = CurrentTiles.Count == 0;
+    }
     void CreateField()
     {
         var xOffset = 0f;
@@ -189,37 +195,42 @@ public class Grid : MonoBehaviour
     public void OnEndTurn()
     {
         //Todo: finish point system
-        if (CurrentTiles.Count>0&&CheckWords())
+        if (CurrentTiles.Count > 0)
         {
-            _turnsSkipped = 0;
-            CurrentTurn++;
-            int points;
-            Debug.Log(points = CountPoints());
-            if (CurrentPlayer == 1)
+            if (CheckWords())
             {
-                Player1.ChangeBox(7-Player1.CurrentLetters.Count);
-                Player1.Score += points;
-                Player1.CanChangeLetters = true;
-                Player1.gameObject.SetActive(false);
-                Player2.gameObject.SetActive(true);
-                CurrentTiles = new List<Tile>();
-                CurrentDirection = Direction.None;
-                CurrentPlayer = 2;
+                _turnsSkipped = 0;
+                CurrentTurn++;
+                int points;
+                points = CountPoints();
+                if (CurrentPlayer == 1)
+                {
+                    Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
+                    Player1.Score += points;
+                    Player1.CanChangeLetters = true;
+                    Player1.gameObject.SetActive(false);
+                    Player2.gameObject.SetActive(true);
+                    CurrentTiles = new List<Tile>();
+                    CurrentDirection = Direction.None;
+                    CurrentPlayer = 2;
+                    Controller.InvalidatePlayer(2, Player2.Score);
+                }
+                else
+                {
+                    Player2.ChangeBox(7 - Player2.CurrentLetters.Count);
+                    Player2.Score += points;
+                    Player2.CanChangeLetters = true;
+                    Player1.gameObject.SetActive(true);
+                    Player2.gameObject.SetActive(false);
+                    CurrentDirection = Direction.None;
+                    CurrentTiles = new List<Tile>();
+                    CurrentPlayer = 1;
+                    Controller.InvalidatePlayer(1, Player1.Score);
+                }
             }
-            else
-            {
-                Player2.ChangeBox(7-Player2.CurrentLetters.Count);
-                Player2.Score += points;
-                Player2.CanChangeLetters = true;
-                Player1.gameObject.SetActive(true);
-                Player2.gameObject.SetActive(false);
-                CurrentPlayer = 1;
-                CurrentDirection = Direction.None;
-                CurrentTiles = new List<Tile>();
-            }
-            Debug.Log("Current player: " + CurrentPlayer);
+            else Controller.ShowNotExistError();
         }
-        else Debug.Log("Not exist");
+        else Controller.ShowZeroTilesError();
         _wordsFound = new List<Tile>();
     }
 
@@ -231,6 +242,7 @@ public class Grid : MonoBehaviour
                 CurrentTurn++;
             else
             {
+                Controller.ShowChangeLetterError();
                 return;
             }
             _turnsSkipped = 0;
@@ -238,19 +250,24 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
+            Controller.InvalidatePlayer(2, Player2.Score);
         }
         else
         {
-            if(Player2.ChangeLetters())
+            if (Player2.ChangeLetters())
                 CurrentTurn++;
-            else return;
+            else
+            {
+                Controller.ShowChangeLetterError();
+                return;
+            }
             _turnsSkipped = 0;
             Player2.CanChangeLetters = true;
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
+            Controller.InvalidatePlayer(1, Player1.Score);
         }
-        Debug.Log("Current player: "+CurrentPlayer);
     }
 
     public void OnSkipTurn()
@@ -262,6 +279,7 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
+            Controller.InvalidatePlayer(2,Player2.Score);
         }
         else
         {
@@ -269,10 +287,10 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
+            Controller.InvalidatePlayer(1,Player1.Score);
         }
         if (++_turnsSkipped == 4) ;
         //EndGame();
-        else Debug.Log("Current player: " + CurrentPlayer);
     }
 
     private bool CheckWords()
@@ -290,7 +308,6 @@ public class Grid : MonoBehaviour
                 if (currentStart != currentEnd)
                 {
                     current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row,currentStart], currentEnd);
-                    Debug.Log(current);
                     wordExists = CheckWord(current);
                     if (wordExists)
                     {
@@ -304,7 +321,6 @@ public class Grid : MonoBehaviour
                 if (currentStart != currentEnd)
                 {
                     current = CreateWord(Direction.Vertical, Field[currentStart, CurrentTiles[0].Column], currentEnd);
-                    Debug.Log(current);
                     wordExists = CheckWord(current);
                     if (wordExists)
                     {
@@ -333,7 +349,6 @@ public class Grid : MonoBehaviour
         if (currentStart != currentEnd)
         {
             current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, currentStart], currentEnd);
-            Debug.Log(current);
             wordExists = CheckWord(current);
             if (wordExists)
             {
@@ -357,7 +372,6 @@ public class Grid : MonoBehaviour
                     _wordsFound.Add(Field[currentEnd, tile.Column]);
                 }
                 else return false;
-                Debug.Log(current);
             }
         }
         return true;
@@ -372,7 +386,6 @@ public class Grid : MonoBehaviour
         if (currentStart != currentEnd)
         {
             current = CreateWord(CurrentDirection, Field[currentStart, CurrentTiles[0].Column], currentEnd);
-            Debug.Log(current);
             wordExists = CheckWord(current);
             if (wordExists)
             {
@@ -396,7 +409,6 @@ public class Grid : MonoBehaviour
                     _wordsFound.Add(Field[tile.Row, currentEnd]);
                 }
                 else return false;
-                Debug.Log(current);
             }
         }
         return true;
@@ -472,14 +484,12 @@ public class Grid : MonoBehaviour
             }
             j++;
             startPosition = j;
-            //Debug.Log(j);
             j = currentTile.Row;
             while (j < NumberOfRows && Field[j, currentTile.Column].HasLetter)
             {
                 j++;
             }
             j--;
-            //Debug.Log(j);
             endPosition = j;
         }
         else
@@ -490,7 +500,6 @@ public class Grid : MonoBehaviour
                 j--;
             }
             j++;
-            //Debug.Log(j);
             startPosition = j;
             j = currentTile.Column;
             while (j < NumberOfRows && Field[currentTile.Row, j].HasLetter)
@@ -499,7 +508,6 @@ public class Grid : MonoBehaviour
             }
             j--;
             endPosition = j;
-            //Debug.Log(j);
         }
     }
 

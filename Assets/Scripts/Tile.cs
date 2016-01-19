@@ -35,6 +35,7 @@ public class Tile : MonoBehaviour, IDropHandler
                     else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = Grid.Direction.Vertical;
                     else
                     {
+                        parent.Controller.ShowWrongTileError();
                         parent.CurrentTiles.RemoveAt(1);
                         return;
                     }
@@ -48,10 +49,11 @@ public class Tile : MonoBehaviour, IDropHandler
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
                 if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
                 if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
-                //Debug.Log(parent.CurrentDirection.ToString() + " " + DateTime.Now.ToString());
                 Destroy(DragHandler.ObjectDragged);
             }
+            else parent.Controller.ShowWrongTileError();
         }
+        else parent.Controller.ShowWrongTileError();
     }
     
     bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
@@ -76,29 +78,31 @@ public class Tile : MonoBehaviour, IDropHandler
     }
     void OnMouseDown()
     {
-        if (parent.CurrentTiles[parent.CurrentTiles.Count-1]==this)
+        if (parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)
         {
-            HasLetter = false;
+            parent.Controller.ShowDeleteError();
+            return;
+        }
+        HasLetter = false;
+        if (parent.CurrentPlayer == 1)
+            parent.Player1.ChangeBox(1, CurrentLetter.text);
+        else parent.Player2.ChangeBox(1,CurrentLetter.text);
+        CurrentLetter.text = "";
+        parent.CurrentTiles.Remove(this);
+        if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
+        if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
+        if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
+        if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
+        CanDrop = CheckTile(this);
+        if(parent.CurrentTiles.Count==1) parent.CurrentDirection = Grid.Direction.None;
+        if (parent.CurrentTiles.Count == 0)
+        {
             if (parent.CurrentPlayer == 1)
-                parent.Player1.ChangeBox(1, CurrentLetter.text);
-            else parent.Player2.ChangeBox(1,CurrentLetter.text);
-            CurrentLetter.text = "";
-            parent.CurrentTiles.Remove(this);
-            if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
-            if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
-            if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
-            if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
-            CanDrop = CheckTile(this);
-            if(parent.CurrentTiles.Count==1) parent.CurrentDirection = Grid.Direction.None;
-            if (parent.CurrentTiles.Count == 0)
-            {
-                if (parent.CurrentPlayer == 1)
-                    parent.Player1.CanChangeLetters = true;
-                else parent.Player2.CanChangeLetters = true;
-                parent.CurrentDirection=Grid.Direction.None;
-                if (parent.CurrentTurn == 1)
-                    parent.Field[7, 7].CanDrop = true;
-            }
+                parent.Player1.CanChangeLetters = true;
+            else parent.Player2.CanChangeLetters = true;
+            parent.CurrentDirection=Grid.Direction.None;
+            if (parent.CurrentTurn == 1)
+                parent.Field[7, 7].CanDrop = true;
         }
     }
 }
