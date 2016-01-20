@@ -201,12 +201,15 @@ public class Grid : MonoBehaviour
             {
                 _turnsSkipped = 0;
                 CurrentTurn++;
-                int points;
-                points = CountPoints();
+                var points = CountPoints();
                 if (CurrentPlayer == 1)
                 {
                     Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
                     Player1.Score += points;
+                    if (Player1.CurrentLetters.Count == 0)
+                    {
+                        EndGame(Player1);
+                    }
                     Player1.CanChangeLetters = true;
                     Player1.gameObject.SetActive(false);
                     Player2.gameObject.SetActive(true);
@@ -219,6 +222,8 @@ public class Grid : MonoBehaviour
                 {
                     Player2.ChangeBox(7 - Player2.CurrentLetters.Count);
                     Player2.Score += points;
+                    if(Player2.CurrentLetters.Count==0)
+                        EndGame(Player2);
                     Player2.CanChangeLetters = true;
                     Player1.gameObject.SetActive(true);
                     Player2.gameObject.SetActive(false);
@@ -289,8 +294,8 @@ public class Grid : MonoBehaviour
             CurrentPlayer = 1;
             Controller.InvalidatePlayer(1,Player1.Score);
         }
-        if (++_turnsSkipped == 4) ;
-        //EndGame();
+        if (++_turnsSkipped == 4)
+            EndGame(null);
     }
 
     private bool CheckWords()
@@ -519,4 +524,13 @@ public class Grid : MonoBehaviour
         return Convert.ToInt32(inp) != 0;
     }
 
+    private void EndGame(LetterBox playerOut)//Player, who ran out of letters is passed
+    {
+        var tempPoints = Player1.RemovePoints();
+        tempPoints += Player2.RemovePoints();
+        if (playerOut != null)
+        {
+            playerOut.Score += tempPoints;
+        }
     }
+}

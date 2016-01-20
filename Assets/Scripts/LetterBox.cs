@@ -88,6 +88,10 @@ public class LetterBox : MonoBehaviour
     
     public void ChangeBox(int numberOfLetters,string letter = null)
     {
+        if (numberOfLetters > _allLetters.Count)
+        {
+            numberOfLetters = _allLetters.Count;
+        }
         if (_freeCoordinates.Count == 0)
         {
             for (var i = 0; i < numberOfLetters; i++)
@@ -174,4 +178,14 @@ public class LetterBox : MonoBehaviour
         return -1;
     }
 
+    public int RemovePoints()
+    {
+        var result = 0;
+        foreach (var letter in CurrentLetters)
+        {
+            result += PointsDictionary[letter.LetterText.text];
+        }
+        Score -= result;
+        return result;
+    }
 }
