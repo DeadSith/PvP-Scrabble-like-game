@@ -78,7 +78,7 @@ public class Tile : MonoBehaviour, IDropHandler
     }
     void OnMouseDown()
     {
-        if (parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)
+        if (parent.CurrentTiles.Count!=0&&parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)
         {
             parent.Controller.ShowDeleteError();
             return;

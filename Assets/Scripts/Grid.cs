@@ -20,6 +20,8 @@ public class Grid : MonoBehaviour
     public Material LetterX2Material;
     public Material LetterX3Material;
     #endregion
+
+    public GameObject EndGameCanvas;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
     private List<Tile> _wordsFound; 
@@ -51,6 +53,8 @@ public class Grid : MonoBehaviour
     {
         if (SkipTurnButton.interactable != (CurrentTiles.Count == 0))
             SkipTurnButton.interactable = CurrentTiles.Count == 0;
+        if(Input.GetKeyDown(KeyCode.A))
+            EndGame(null);
     }
     void CreateField()
     {
@@ -114,7 +118,7 @@ public class Grid : MonoBehaviour
         Field[0, 3].GetComponent<Image>().material = LetterX2Material;
         Field[0, 11].GetComponent<Image>().material = LetterX2Material;
         Field[14, 3].GetComponent<Image>().material = LetterX2Material;
-        Field[14, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[14, 11].GetComponent<Image>().material = LetterX2Material;
         Field[2, 6].GetComponent<Image>().material = LetterX2Material;
         Field[2, 8].GetComponent<Image>().material = LetterX2Material;
         Field[12, 6].GetComponent<Image>().material = LetterX2Material;
@@ -168,7 +172,7 @@ public class Grid : MonoBehaviour
         Field[0, 3].LetterMultiplier = 2;
         Field[0, 11].LetterMultiplier = 2;
         Field[14, 3].LetterMultiplier = 2;
-        Field[14, 3].LetterMultiplier = 2;
+        Field[14,11].LetterMultiplier = 2;
         Field[2, 6].LetterMultiplier = 2;
         Field[2, 8].LetterMultiplier = 2;
         Field[12, 6].LetterMultiplier = 2;
@@ -277,7 +281,6 @@ public class Grid : MonoBehaviour
 
     public void OnSkipTurn()
     {
-        CurrentTurn++;
         if (CurrentPlayer == 1)
         {
             Player1.CanChangeLetters = true;
@@ -532,5 +535,11 @@ public class Grid : MonoBehaviour
         {
             playerOut.Score += tempPoints;
         }
+        EndGameCanvas.SetActive(true);
+        GameObject.FindGameObjectWithTag("Winner").GetComponent<Text>().text = Player1.Score > Player2.Score ? "1" : "2";
+        GameObject.FindGameObjectWithTag("Player1").GetComponent<Text>().text = Player1.Score.ToString();
+        GameObject.FindGameObjectWithTag("Player2").GetComponent<Text>().text = Player2.Score.ToString();
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
+        transform.parent.gameObject.SetActive(false);
     }
 }

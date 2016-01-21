@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 public class PauseBehaviour : MonoBehaviour
 {
@@ -7,7 +8,7 @@ public class PauseBehaviour : MonoBehaviour
     public GameObject PauseMenu;
     public GameObject Game;
     public bool paused = false;
-
+    public bool GameOver = false;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -15,12 +16,12 @@ public class PauseBehaviour : MonoBehaviour
             paused = !paused;
             NotImplementedGameObject.SetActive(false);
         }
-        if (paused)
+        if (!GameOver&&paused)
         {
             PauseMenu.SetActive(true);
             Game.SetActive(false);
         }
-        else
+        else if(!GameOver)
         {
             PauseMenu.SetActive(false);
             Game.SetActive(true);
@@ -30,7 +31,6 @@ public class PauseBehaviour : MonoBehaviour
     public void Resume()
     {
         paused = false;
-
         NotImplementedGameObject.SetActive(false);
     }
 
@@ -41,7 +41,7 @@ public class PauseBehaviour : MonoBehaviour
 
     public void MainMenu()
     {
-        NotImplementedGameObject.SetActive(true);
+        SceneManager.LoadScene(0);
     }
     public void Exit()
     {
