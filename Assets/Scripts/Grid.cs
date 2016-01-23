@@ -425,10 +425,10 @@ public class Grid : MonoBehaviour
     private int CountPoints()
     {
         var result = 0;
+        var wordMultiplier = 1;
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
             var tempRes = 0;
-            var wordMultiplier = 1;
             if(_wordsFound[i].Row==_wordsFound[i+1].Row)
                 for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
                 {
@@ -449,9 +449,9 @@ public class Grid : MonoBehaviour
                     tile.WordMultiplier = 1;
                 }
             }
-            result += tempRes*wordMultiplier;
+            result += tempRes;
         }
-        return result;
+        return result * wordMultiplier;
     }
 
     private string CreateWord(Direction current, Tile start, int end)

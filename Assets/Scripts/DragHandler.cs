@@ -16,6 +16,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y,20));
+        //transform.position  = new Vector3(Input.mousePosition.x,Input.mousePosition.y,20);
     }
 
     public void OnEndDrag(PointerEventData eventData)
