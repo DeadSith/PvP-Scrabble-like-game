@@ -45,18 +45,12 @@ public class LetterBox : MonoBehaviour
             {"ї", 6},
             {"ч", 5},
             {"*", 0}
-        }; 
-    private static List<string> _allLetters = new List<string>
-    {
-        "а","а","с","и","р","о","р","д","ш","и","и","и","ц","е","н","а","т","щ","л","к","ж",
-        "п","в","к","о","в","а","у","н","к","е","м","г","і","н","х","і","н","и","н","а","и",
-        "р","л","р","с","п","м","а","у","а","ю","м","с","б","в","я","м","т","ф","с","и","о",
-        "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
-        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","*","*","*"
-    };
+        };
+
+    private static List<string> _allLetters;
     #endregion
 
-    private List<Vector3> _freeCoordinates; 
+    public List<Vector3> _freeCoordinates; 
     public  List<Letter> CurrentLetters;
     public int Score = 0;
     public Button ChangeLetterButton;
@@ -65,11 +59,19 @@ public class LetterBox : MonoBehaviour
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
-    public UIController Controller;
     // Use this for initialization
 
     void Start () {
-        CurrentLetters= new List<Letter>();
+        if(_allLetters== null)
+            _allLetters = new List<string>
+    {
+        "а","а","с","и","р","о","р","д","ш","и","и","и","ц","е","н","а","т","щ","л","к","ж",
+        "п","в","к","о","в","а","у","н","к","е","м","г","і","н","х","і","н","и","н","а","и",
+        "р","л","р","с","п","м","а","у","а","ю","м","с","б","в","я","м","т","ф","с","и","о",
+        "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
+        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","*","*","*"
+    };
+        CurrentLetters = new List<Letter>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         _freeCoordinates = new List<Vector3>();
         _pos = new Vector3(transform.position.x, transform.position.y);
@@ -167,7 +169,7 @@ public class LetterBox : MonoBehaviour
         return successful;
     }
 
-    int FindIndex(Letter input)
+    public int FindIndex(Letter input)
     {
         var j = 0;
         for (; j < CurrentLetters.Count; j++)
@@ -181,6 +183,7 @@ public class LetterBox : MonoBehaviour
     public int RemovePoints()
     {
         var result = 0;
+        _allLetters = null;
         foreach (var letter in CurrentLetters)
         {
             result += PointsDictionary[letter.LetterText.text];

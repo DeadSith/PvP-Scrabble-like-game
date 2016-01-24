@@ -19,26 +19,23 @@ public class PauseBehaviour : MonoBehaviour
         if (!GameOver&&paused)
         {
             PauseMenu.SetActive(true);
-            Game.SetActive(false);
+            Game.GetComponent<Canvas>().enabled = false;
+            //Game.SetActive(false);
         }
         else if(!GameOver)
         {
             PauseMenu.SetActive(false);
-            Game.SetActive(true);
+            Game.GetComponent<Canvas>().enabled = true;
+            //Game.SetActive(true);
         }
     }
 
     public void Resume()
     {
         paused = false;
-        NotImplementedGameObject.SetActive(false);
     }
 
-    public void Save()
-    {
-        NotImplementedGameObject.SetActive(true);
-    }
-
+    
     public void MainMenu()
     {
         SceneManager.LoadScene(0);

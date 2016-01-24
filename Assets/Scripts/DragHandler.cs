@@ -8,6 +8,10 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public static Vector3 StartPosition;
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (ObjectDragged != null)
+        {
+            ObjectDragged.GetComponent<Letter>().Fix();
+        }
         ObjectDragged = gameObject;
         StartPosition = transform.position;
         GetComponent<CanvasGroup>().blocksRaycasts = false;
@@ -21,8 +25,8 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        ObjectDragged = null;
-        transform.position = StartPosition;
-        GetComponent<CanvasGroup>().blocksRaycasts = true;
+            ObjectDragged.transform.position = StartPosition;
+            ObjectDragged = null;
+            GetComponent<CanvasGroup>().blocksRaycasts = true;
     }
 }

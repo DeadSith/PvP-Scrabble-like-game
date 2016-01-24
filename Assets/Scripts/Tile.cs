@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine.UI;
 using  UnityEngine.EventSystems;
 
-public class Tile : MonoBehaviour, IDropHandler
+public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
 
     public Text CurrentLetter;
@@ -76,9 +76,11 @@ public class Tile : MonoBehaviour, IDropHandler
         }
         return false;
     }
-    void OnMouseDown()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        if (parent.CurrentTiles.Count!=0&&parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+        if ((parent.CurrentTiles.Count!=0&&parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)||parent.CurrentTiles.Count==0)
         {
             parent.Controller.ShowDeleteError();
             return;
