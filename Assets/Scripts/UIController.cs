@@ -4,15 +4,17 @@ using System.Collections;
 
 public class UIController : MonoBehaviour
 {
-
-    public Text CurrentPlayerText;
-    public Text PointsText;
+    
+    public Text Player1Text;
+    public Text Player2Text;
     public Text NotExistText;
     public Text DeleteText;
     public Text ChangeLetterText;
     public Text WrongTileText;
     public Text StartText;
     public Text ZeroTilesText;
+    public Material PlayerGlowMaterial;
+    public Material PlayerIdleMaterial;
     private static GameObject _currentObject;
 
     void Start()
@@ -22,8 +24,18 @@ public class UIController : MonoBehaviour
 
     public void InvalidatePlayer(int playerNumber, int score)
     {
-        CurrentPlayerText.text = playerNumber.ToString();
-        PointsText.text = score.ToString();
+        if (playerNumber == 1)
+        {
+            Player1Text.text = score.ToString();
+            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+        }
+        else
+        {
+            Player2Text.text = score.ToString();
+            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+        }
         _currentObject.SetActive(false);
         _currentObject = StartText.gameObject;
         _currentObject.SetActive(true);

@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
 using Mono.Data.Sqlite;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
@@ -21,32 +22,48 @@ public class Grid : MonoBehaviour
     public Material LetterX3Material;
     #endregion
 
+    public GameObject TimerImage;
+    public Text TimerText;
     public GameObject EndGameCanvas;
+    public UIController Controller;
+    public Button SkipTurnButton;
     public Direction CurrentDirection = Direction.None;
+
     public int CurrentTurn = 1;
-    private List<Tile> _wordsFound; 
+    public bool isFirstTurn = true;
     //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
-    private int _turnsSkipped = 0;
     public LetterBox Player2;
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
     public Tile[,] Field;
     public List<Tile> CurrentTiles;
+    
+
+    private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
-    public UIController Controller;
-    public Button SkipTurnButton;
+    private List<Tile> _wordsFound;
+    private bool _timerEnabled;
+    private int _timerLength;
+    private float _timeRemaining;
 
     void Start()
     {
         CurrentTiles = new List<Tile>();
         CreateField();
-        var conection = @"URI=file:" + Application.dataPath + @"/words.db";
+        var conection = @"URI=file:"+ Application.dataPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<Tile>();
+        _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
+        if (_timerEnabled)
+        {
+            TimerImage.SetActive(true);
+            _timerLength = PlayerPrefs.GetInt("Length");
+            _timeRemaining = (float) _timerLength + 1;
+        }
     }
 
     void Update()
@@ -55,6 +72,13 @@ public class Grid : MonoBehaviour
             SkipTurnButton.interactable = CurrentTiles.Count == 0;
         if(Input.GetKeyDown(KeyCode.A))
             EndGame(null);
+        if (_timerEnabled)
+        {
+            _timeRemaining -= Time.deltaTime;
+            TimerText.text = ((int) _timeRemaining - 1).ToString();
+            if(_timeRemaining<0)
+                OnEndTimer();
+        }
     }
     void CreateField()
     {
@@ -65,9 +89,7 @@ public class Grid : MonoBehaviour
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TilePrefab,
-                    new Vector2(transform.position.x + xOffset, transform.position.y + yOffset),
-                    transform.rotation) as Tile;
+                var newTile = Instantiate(TilePrefab) as Tile;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
@@ -196,9 +218,19 @@ public class Grid : MonoBehaviour
     }
     #endregion
 
+    void OnEndTimer()
+    {
+        _timeRemaining = (float)_timerLength + 1;
+        var currentPlayer = CurrentPlayer == 1 ? Player1 : Player2;
+        for (var i = CurrentTiles.Count - 1; i >= 0; i--)
+        {
+            CurrentTiles[i].RemoveTile();
+        }
+        OnSkipTurn();
+    }
+     
     public void OnEndTurn()
     {
-        //Todo: finish point system
         if (CurrentTiles.Count > 0)
         {
             if (CheckWords())
@@ -220,7 +252,8 @@ public class Grid : MonoBehaviour
                     CurrentTiles = new List<Tile>();
                     CurrentDirection = Direction.None;
                     CurrentPlayer = 2;
-                    Controller.InvalidatePlayer(2, Player2.Score);
+                    Controller.InvalidatePlayer(1, Player1.Score);
+                    isFirstTurn = false;
                 }
                 else
                 {
@@ -234,8 +267,11 @@ public class Grid : MonoBehaviour
                     CurrentDirection = Direction.None;
                     CurrentTiles = new List<Tile>();
                     CurrentPlayer = 1;
-                    Controller.InvalidatePlayer(1, Player1.Score);
+                    Controller.InvalidatePlayer(2, Player2.Score);
+                    isFirstTurn = false;
                 }
+                if(_timerEnabled)
+                    _timeRemaining = (float)_timerLength + 1;
             }
             else Controller.ShowNotExistError();
         }
@@ -277,6 +313,8 @@ public class Grid : MonoBehaviour
             CurrentPlayer = 1;
             Controller.InvalidatePlayer(1, Player1.Score);
         }
+        if (_timerEnabled)
+            _timeRemaining = (float)_timerLength + 1;
     }
 
     public void OnSkipTurn()
@@ -297,6 +335,8 @@ public class Grid : MonoBehaviour
             CurrentPlayer = 1;
             Controller.InvalidatePlayer(1,Player1.Score);
         }
+        if (_timerEnabled)
+            _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
             EndGame(null);
     }
@@ -521,10 +561,18 @@ public class Grid : MonoBehaviour
 
     private bool CheckWord(string word)
     {
-        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToUpper() + "\"";
+        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
         var command = new SqliteCommand(sql, _dbConnection);
         var inp = command.ExecuteScalar();
-        return Convert.ToInt32(inp) != 0;
+        if (Convert.ToInt32(inp) != 0)
+            return true;
+        else
+        {
+            sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
+            command = new SqliteCommand(sql, _dbConnection);
+            inp = command.ExecuteScalar();
+            return Convert.ToInt32(inp) != 0;
+        }
     }
 
     private void EndGame(LetterBox playerOut)//Player, who ran out of letters is passed

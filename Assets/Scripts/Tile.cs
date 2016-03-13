@@ -80,7 +80,12 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
-        if ((parent.CurrentTiles.Count!=0&&parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this)||parent.CurrentTiles.Count==0)
+        RemoveTile();
+    }
+
+    public void RemoveTile()
+    {
+        if ((parent.CurrentTiles.Count != 0 && parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this) || parent.CurrentTiles.Count == 0)
         {
             parent.Controller.ShowDeleteError();
             return;
@@ -88,7 +93,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         HasLetter = false;
         if (parent.CurrentPlayer == 1)
             parent.Player1.ChangeBox(1, CurrentLetter.text);
-        else parent.Player2.ChangeBox(1,CurrentLetter.text);
+        else parent.Player2.ChangeBox(1, CurrentLetter.text);
         CurrentLetter.text = "";
         parent.CurrentTiles.Remove(this);
         if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
@@ -96,13 +101,13 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
         if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
         CanDrop = CheckTile(this);
-        if(parent.CurrentTiles.Count==1) parent.CurrentDirection = Grid.Direction.None;
-        if (parent.CurrentTiles.Count == 0)
+        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = Grid.Direction.None;
+        if (parent.isFirstTurn)
         {
             if (parent.CurrentPlayer == 1)
                 parent.Player1.CanChangeLetters = true;
             else parent.Player2.CanChangeLetters = true;
-            parent.CurrentDirection=Grid.Direction.None;
+            parent.CurrentDirection = Grid.Direction.None;
             if (parent.CurrentTurn == 1)
                 parent.Field[7, 7].CanDrop = true;
         }
