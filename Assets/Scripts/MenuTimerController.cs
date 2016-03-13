@@ -1,27 +1,27 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
+
 public class MenuTimerController : MonoBehaviour
 {
-
     private bool _timerEnabled;
     private int _length;
     public Text ButtonText;
     public InputField LengthField;
-	// Use this for initialization
-	void Start () {
-	    if (PlayerPrefs.HasKey("TimerEnabled"))
-	    {
-	        _timerEnabled = PlayerPrefs.GetInt("TimerEnabled")==1;
+
+    // Use this for initialization
+    private void Start()
+    {
+        if (PlayerPrefs.HasKey("TimerEnabled"))
+        {
+            _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
             ChangeText();
-	    }
-	    else
-	    {
-	        PlayerPrefs.SetInt("TimerEnabled",0);
-	        _timerEnabled = false;
+        }
+        else
+        {
+            PlayerPrefs.SetInt("TimerEnabled", 0);
+            _timerEnabled = false;
             ChangeText();
-	    }
-        Debug.Log(_timerEnabled);
+        }
         if (PlayerPrefs.HasKey("Length"))
         {
             _length = PlayerPrefs.GetInt("Length");
@@ -36,10 +36,10 @@ public class MenuTimerController : MonoBehaviour
             _length = 60;
             LengthField.text = _length.ToString();
         }
-	    LengthField.text = _length.ToString();
-	}
+        LengthField.text = _length.ToString();
+    }
 
-    void ChangeText()
+    private void ChangeText()
     {
         ButtonText.text = _timerEnabled ? "Вимкнути таймер" : "Увімкнути таймер";
     }
@@ -47,8 +47,7 @@ public class MenuTimerController : MonoBehaviour
     public void OnLengthChanged()
     {
         var tempLength = int.Parse(LengthField.text);
-        Debug.Log(tempLength.ToString());
-        if (tempLength!=_length&&tempLength > 19 && tempLength < 301)
+        if (tempLength != _length && tempLength > 19 && tempLength < 301)
         {
             _length = tempLength;
             PlayerPrefs.SetInt("Length", _length);
@@ -64,6 +63,5 @@ public class MenuTimerController : MonoBehaviour
         _timerEnabled = !_timerEnabled;
         PlayerPrefs.SetInt("TimerEnabled", _timerEnabled ? 1 : 0);
         ChangeText();
-        Debug.Log(_timerEnabled);
     }
 }

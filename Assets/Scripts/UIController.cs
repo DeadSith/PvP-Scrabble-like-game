@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class UIController : MonoBehaviour
 {
-    
     public Text Player1Text;
     public Text Player2Text;
     public Text NotExistText;
@@ -17,24 +15,24 @@ public class UIController : MonoBehaviour
     public Material PlayerIdleMaterial;
     private static GameObject _currentObject;
 
-    void Start()
+    private void Start()
     {
         _currentObject = StartText.gameObject;
     }
 
-    public void InvalidatePlayer(int playerNumber, int score)
+    public void InvalidatePlayer(int playerNumber, int score)//Pass the player whose turn ended and his score
     {
         if (playerNumber == 1)
         {
             Player1Text.text = score.ToString();
-            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
-            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
         }
         else
         {
             Player2Text.text = score.ToString();
-            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
-            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+            Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+            Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
         }
         _currentObject.SetActive(false);
         _currentObject = StartText.gameObject;

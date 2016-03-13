@@ -5,6 +5,7 @@ public class MainMenu : MonoBehaviour
 {
     public GameObject HelpMenu;
     public GameObject SettingsMenu;
+
     public void OnStartGame()
     {
         SceneManager.LoadScene(1);

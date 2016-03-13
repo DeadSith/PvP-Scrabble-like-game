@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class HelpBehaviour : MonoBehaviour
 {
     public GameObject RulesMenu;
     public GameObject BonusMenu;
+
     public void OnRules()
     {
         RulesMenu.SetActive(true);

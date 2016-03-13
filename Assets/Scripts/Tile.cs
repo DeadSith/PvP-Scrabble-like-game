@@ -1,13 +1,9 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
-using System.Linq;
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using  UnityEngine.EventSystems;
 
 public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
-
     public Text CurrentLetter;
     public bool HasLetter;
     public bool CanDrop;
@@ -16,22 +12,24 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
     private Grid parent;
-    void Start()
+
+    private void Start()
     {
         parent = transform.parent.gameObject.GetComponent<Grid>();
     }
+
     public void OnDrop(PointerEventData eventData)
     {
-        if (CanDrop&&!HasLetter)
+        if (CanDrop && !HasLetter)
         {
-            if (parent.CurrentDirection==Grid.Direction.None ||
-                (parent.CurrentDirection==Grid.Direction.Horizontal&&Row ==parent.CurrentTiles[0].Row)||
-                (parent.CurrentDirection==Grid.Direction.Vertical&&Column==parent.CurrentTiles[0].Column))
+            if (parent.CurrentDirection == Grid.Direction.None ||
+                (parent.CurrentDirection == Grid.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
+                (parent.CurrentDirection == Grid.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
             {
                 parent.CurrentTiles.Add(this);
                 if (parent.CurrentTiles.Count == 2)
                 {
-                    if(parent.CurrentTiles[0].Row== Row) parent.CurrentDirection=Grid.Direction.Horizontal;
+                    if (parent.CurrentTiles[0].Row == Row) parent.CurrentDirection = Grid.Direction.Horizontal;
                     else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = Grid.Direction.Vertical;
                     else
                     {
@@ -55,8 +53,8 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         else parent.Controller.ShowWrongTileError();
     }
-    
-    bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
+
+    private bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
     {
         if (checkedTile.Row != 0 && parent.Field[checkedTile.Row - 1, checkedTile.Column].HasLetter)
         {
@@ -68,14 +66,15 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         if (checkedTile.Column != 0 && parent.Field[checkedTile.Row, checkedTile.Column - 1].HasLetter)
         {
-           return true;
+            return true;
         }
         if (checkedTile.Column != parent.NumberOfColumns - 1 && parent.Field[checkedTile.Row, checkedTile.Column + 1].HasLetter)
         {
-           return true;
+            return true;
         }
         return false;
     }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)

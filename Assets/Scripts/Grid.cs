@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using Mono.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Data.Sqlite;
-using UnityEngine.EventSystems;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Grid : MonoBehaviour
@@ -12,7 +11,9 @@ public class Grid : MonoBehaviour
     {
         Horizontal, Vertical, None
     }
+
     #region Prefabs and materials
+
     public Tile TilePrefab;
     public Material StandardMaterial;
     public Material StartMaterial;
@@ -20,7 +21,8 @@ public class Grid : MonoBehaviour
     public Material WordX3Material;
     public Material LetterX2Material;
     public Material LetterX3Material;
-    #endregion
+
+    #endregion Prefabs and materials
 
     public GameObject TimerImage;
     public Text TimerText;
@@ -31,8 +33,10 @@ public class Grid : MonoBehaviour
 
     public int CurrentTurn = 1;
     public bool isFirstTurn = true;
+
     //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
+
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
     public LetterBox Player2;
@@ -40,7 +44,6 @@ public class Grid : MonoBehaviour
     public float DistanceBetweenTiles = 1.2f;
     public Tile[,] Field;
     public List<Tile> CurrentTiles;
-    
 
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
@@ -48,12 +51,13 @@ public class Grid : MonoBehaviour
     private bool _timerEnabled;
     private int _timerLength;
     private float _timeRemaining;
+    private float _xOffset = 0;
+    private float _yOffset = 0;
 
-    void Start()
+    private void Start()
     {
         CurrentTiles = new List<Tile>();
-        CreateField();
-        var conection = @"URI=file:"+ Application.dataPath + @"/words.db";
+        var conection = @"URI=file:" + Application.dataPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<Tile>();
@@ -62,34 +66,45 @@ public class Grid : MonoBehaviour
         {
             TimerImage.SetActive(true);
             _timerLength = PlayerPrefs.GetInt("Length");
-            _timeRemaining = (float) _timerLength + 1;
+            _timeRemaining = (float)_timerLength + 1;
         }
+        var size = gameObject.GetComponent<RectTransform>().rect;
+        DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
+        TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
+        Player1.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
+        Player2.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
+        _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
+        _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
+        CreateField();
     }
 
-    void Update()
+    private void Update()
     {
         if (SkipTurnButton.interactable != (CurrentTiles.Count == 0))
             SkipTurnButton.interactable = CurrentTiles.Count == 0;
-        if(Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.A))
             EndGame(null);
         if (_timerEnabled)
         {
             _timeRemaining -= Time.deltaTime;
-            TimerText.text = ((int) _timeRemaining - 1).ToString();
-            if(_timeRemaining<0)
+            TimerText.text = ((int)_timeRemaining - 1).ToString();
+            if (_timeRemaining < 0)
                 OnEndTimer();
         }
     }
-    void CreateField()
+
+    private void CreateField()
     {
-        var xOffset = 0f;
-        var yOffset = 0f;
+        var xOffset = _xOffset;
+        var yOffset = _yOffset;
         Field = new Tile[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TilePrefab) as Tile;
+                var newTile = Instantiate(TilePrefab,
+                    new Vector2(transform.position.x + xOffset, transform.position.y + yOffset),
+                    transform.rotation) as Tile;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
@@ -98,17 +113,19 @@ public class Grid : MonoBehaviour
                 Field[i, j] = newTile;
                 xOffset += DistanceBetweenTiles;
             }
-            xOffset = 0;
+            xOffset = _xOffset;
             yOffset += DistanceBetweenTiles;
         }
         Field[7, 7].CanDrop = true;
-        Field[7, 7].GetComponent<Image>().material=StartMaterial;
+        Field[7, 7].GetComponent<Image>().material = StartMaterial;
         AssignMaterials();
         AssignMultipliers();
     }
+
     #region Some shitty code
+
     //Todo: rewrite to cycles
-    void AssignMaterials()
+    private void AssignMaterials()
     {
         Field[0, 0].GetComponent<Image>().material = WordX3Material;
         Field[0, 14].GetComponent<Image>().material = WordX3Material;
@@ -120,10 +137,10 @@ public class Grid : MonoBehaviour
         Field[14, 7].GetComponent<Image>().material = WordX3Material;
         for (var i = 1; i < 5; i++)
         {
-            Field[i,i].GetComponent<Image>().material = WordX2Material;
-            Field[i,NumberOfRows-i-1].GetComponent<Image>().material = WordX2Material;
-            Field[NumberOfRows - i-1, i].GetComponent<Image>().material = WordX2Material;
-            Field[NumberOfRows - i-1, NumberOfRows - i-1].GetComponent<Image>().material = WordX2Material;
+            Field[i, i].GetComponent<Image>().material = WordX2Material;
+            Field[i, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i - 1, i].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i - 1, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
         }
         Field[5, 1].GetComponent<Image>().material = LetterX3Material;
         Field[5, 5].GetComponent<Image>().material = LetterX3Material;
@@ -162,7 +179,8 @@ public class Grid : MonoBehaviour
         Field[7, 3].GetComponent<Image>().material = LetterX2Material;
         Field[7, 11].GetComponent<Image>().material = LetterX2Material;
     }
-    void AssignMultipliers()
+
+    private void AssignMultipliers()
     {
         Field[0, 0].WordMultiplier = 3;
         Field[0, 14].WordMultiplier = 3;
@@ -194,7 +212,7 @@ public class Grid : MonoBehaviour
         Field[0, 3].LetterMultiplier = 2;
         Field[0, 11].LetterMultiplier = 2;
         Field[14, 3].LetterMultiplier = 2;
-        Field[14,11].LetterMultiplier = 2;
+        Field[14, 11].LetterMultiplier = 2;
         Field[2, 6].LetterMultiplier = 2;
         Field[2, 8].LetterMultiplier = 2;
         Field[12, 6].LetterMultiplier = 2;
@@ -216,9 +234,10 @@ public class Grid : MonoBehaviour
         Field[7, 3].LetterMultiplier = 2;
         Field[7, 11].LetterMultiplier = 2;
     }
-    #endregion
 
-    void OnEndTimer()
+    #endregion Some shitty code
+
+    private void OnEndTimer()
     {
         _timeRemaining = (float)_timerLength + 1;
         var currentPlayer = CurrentPlayer == 1 ? Player1 : Player2;
@@ -228,7 +247,7 @@ public class Grid : MonoBehaviour
         }
         OnSkipTurn();
     }
-     
+
     public void OnEndTurn()
     {
         if (CurrentTiles.Count > 0)
@@ -259,7 +278,7 @@ public class Grid : MonoBehaviour
                 {
                     Player2.ChangeBox(7 - Player2.CurrentLetters.Count);
                     Player2.Score += points;
-                    if(Player2.CurrentLetters.Count==0)
+                    if (Player2.CurrentLetters.Count == 0)
                         EndGame(Player2);
                     Player2.CanChangeLetters = true;
                     Player1.gameObject.SetActive(true);
@@ -270,7 +289,7 @@ public class Grid : MonoBehaviour
                     Controller.InvalidatePlayer(2, Player2.Score);
                     isFirstTurn = false;
                 }
-                if(_timerEnabled)
+                if (_timerEnabled)
                     _timeRemaining = (float)_timerLength + 1;
             }
             else Controller.ShowNotExistError();
@@ -283,7 +302,7 @@ public class Grid : MonoBehaviour
     {
         if (CurrentPlayer == 1)
         {
-            if(Player1.ChangeLetters())
+            if (Player1.ChangeLetters())
                 CurrentTurn++;
             else
             {
@@ -295,7 +314,7 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
-            Controller.InvalidatePlayer(2, Player2.Score);
+            Controller.InvalidatePlayer(1, Player1.Score);
         }
         else
         {
@@ -311,7 +330,7 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
-            Controller.InvalidatePlayer(1, Player1.Score);
+            Controller.InvalidatePlayer(2, Player2.Score);
         }
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
@@ -325,7 +344,7 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
-            Controller.InvalidatePlayer(2,Player2.Score);
+            Controller.InvalidatePlayer(1, Player1.Score);
         }
         else
         {
@@ -333,7 +352,7 @@ public class Grid : MonoBehaviour
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
-            Controller.InvalidatePlayer(1,Player1.Score);
+            Controller.InvalidatePlayer(2, Player2.Score);
         }
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
@@ -343,7 +362,6 @@ public class Grid : MonoBehaviour
 
     private bool CheckWords()
     {
-        //Todo: test
         switch (CurrentDirection)
         {
             case Direction.None:
@@ -355,7 +373,7 @@ public class Grid : MonoBehaviour
                 bool wordExists;
                 if (currentStart != currentEnd)
                 {
-                    current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row,currentStart], currentEnd);
+                    current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row, currentStart], currentEnd);
                     wordExists = CheckWord(current);
                     if (wordExists)
                     {
@@ -379,10 +397,13 @@ public class Grid : MonoBehaviour
                     wordFound = true;
                 }
                 return wordFound;
+
             case Direction.Vertical:
                 return CheckVertical();
+
             case Direction.Horizontal:
                 return CheckHorizontal();
+
             default:
                 return false;
         }
@@ -469,11 +490,11 @@ public class Grid : MonoBehaviour
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
             var tempRes = 0;
-            if(_wordsFound[i].Row==_wordsFound[i+1].Row)
+            if (_wordsFound[i].Row == _wordsFound[i + 1].Row)
                 for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
                 {
                     var tile = Field[_wordsFound[i].Row, j];
-                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text]*tile.LetterMultiplier;
+                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
@@ -482,7 +503,7 @@ public class Grid : MonoBehaviour
             {
                 for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
                 {
-                    var tile = Field[j,_wordsFound[i].Column];
+                    var tile = Field[j, _wordsFound[i].Column];
                     tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
