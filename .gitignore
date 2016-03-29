@@ -3,10 +3,13 @@
 # =============== #
 [Tt]emp/
 [Oo]bj/
-[Bb]uild
+[Bb]uild/
 [Ll]ibrary/
+[Pp]rojectSettings/
 Scrabble_64_Data/
 scrabble_Data/
+*.meta
+*.pdb
 *.exe
 sysinfo.txt
 *.stackdump

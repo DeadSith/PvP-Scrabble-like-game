@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
-using System.Collections.Generic;
 
 //Todo: Add leters only in the end of the turn
 public class LetterBox : MonoBehaviour
 {
     #region Letters and scores
+
     public static Dictionary<string, int> PointsDictionary =
         new Dictionary<string, int>
         {
@@ -44,51 +45,60 @@ public class LetterBox : MonoBehaviour
             {"й", 5},
             {"ї", 6},
             {"ч", 5},
-            {"*", 0}
+            {"*", 0},
+            {"'", 0}
         };
 
     private static List<string> _allLetters;
-    #endregion
 
-    public List<Vector3> _freeCoordinates; 
-    public  List<Letter> CurrentLetters;
+    #endregion Letters and scores
+
+    public List<Vector3> _freeCoordinates;
+    public List<Letter> CurrentLetters;
     public int Score = 0;
     public Button ChangeLetterButton;
     public Letter LetterPrefab;
-    private Vector3 _pos;
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
-    // Use this for initialization
+    public Vector2 LetterSize;
 
-    void Start () {
-        if(_allLetters== null)
+    private Vector3 _pos;
+    private float _xOffset = 0;
+
+    private void Start()
+    {
+        if (_allLetters == null)
             _allLetters = new List<string>
     {
         "а","а","с","и","р","о","р","д","ш","и","и","и","ц","е","н","а","т","щ","л","к","ж",
         "п","в","к","о","в","а","у","н","к","е","м","г","і","н","х","і","н","и","н","а","и",
         "р","л","р","с","п","м","а","у","а","ю","м","с","б","в","я","м","т","ф","с","и","о",
         "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
-        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","*","*","*"
+        "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","'","*","*"
     };
         CurrentLetters = new List<Letter>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         _freeCoordinates = new List<Vector3>();
-        _pos = new Vector3(transform.position.x, transform.position.y);
+        var size = gameObject.GetComponent<RectTransform>().rect;
+        DistanceBetweenLetters = LetterSize.x;
+        LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
+        _xOffset = gameObject.transform.position.x - 2 * DistanceBetweenLetters;
+        var yOffset = gameObject.transform.position.y + DistanceBetweenLetters;
+        _pos = new Vector3(_xOffset, yOffset);
         ChangeBox(NumberOfLetters);
-	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-	    if (_allLetters.Count == 0)
-	        ChangeLetterButton.interactable = false;
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
+        if (_allLetters.Count == 0)
+            ChangeLetterButton.interactable = false;
         else if (ChangeLetterButton.interactable != CanChangeLetters)
             ChangeLetterButton.interactable = CanChangeLetters;
     }
 
-    
-    public void ChangeBox(int numberOfLetters,string letter = null)
+    public void ChangeBox(int numberOfLetters, string letter = null)
     {
         if (numberOfLetters > _allLetters.Count)
         {
@@ -100,9 +110,9 @@ public class LetterBox : MonoBehaviour
             {
                 AddLetter(_pos, letter);
                 _pos.x += DistanceBetweenLetters;
-                if (i%4 == 3)
+                if (i % 4 == 3)
                 {
-                    _pos.x = transform.position.x;
+                    _pos.x = _xOffset;
                     _pos.y -= DistanceBetweenLetters;
                 }
             }
@@ -111,16 +121,15 @@ public class LetterBox : MonoBehaviour
         {
             for (var j = 0; j < numberOfLetters; j++)
             {
-                AddLetter(_freeCoordinates[_freeCoordinates.Count-1], letter);
-                _freeCoordinates.RemoveAt(_freeCoordinates.Count-1);
+                AddLetter(_freeCoordinates[_freeCoordinates.Count - 1], letter);
+                _freeCoordinates.RemoveAt(_freeCoordinates.Count - 1);
             }
         }
     }
 
-    void AddLetter(Vector3 position, string letter)
+    private void AddLetter(Vector3 position, string letter)
     {
-        var newLetter = Instantiate(LetterPrefab,
-            position,
+        var newLetter = Instantiate(LetterPrefab, position,
             transform.rotation) as Letter;
         newLetter.transform.SetParent(gameObject.transform);
         if (String.IsNullOrEmpty(letter))
@@ -142,7 +151,7 @@ public class LetterBox : MonoBehaviour
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
         var currentIndex = FindIndex(currentObject);
         Vector3 previousCoordinates = DragHandler.StartPosition;
-        for (int j = currentIndex+1; j < CurrentLetters.Count; j++)
+        for (int j = currentIndex + 1; j < CurrentLetters.Count; j++)
         {
             var tempCoordinates = CurrentLetters[j].gameObject.transform.position;
             CurrentLetters[j].gameObject.transform.position = previousCoordinates;
