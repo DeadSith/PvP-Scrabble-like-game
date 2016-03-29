@@ -144,7 +144,7 @@ public class GridLAN : MonoBehaviour
         Field[0, 7].GetComponent<Image>().material = WordX3Material;
         Field[14, 7].GetComponent<Image>().material = WordX3Material;
         Field[7, 0].GetComponent<Image>().material = WordX3Material;
-        Field[14, 7].GetComponent<Image>().material = WordX3Material;
+        Field[7, 14].GetComponent<Image>().material = WordX3Material;
         for (var i = 1; i < 5; i++)
         {
             Field[i, i].GetComponent<Image>().material = WordX2Material;
@@ -199,7 +199,7 @@ public class GridLAN : MonoBehaviour
         Field[0, 7].WordMultiplier = 3;
         Field[14, 7].WordMultiplier = 3;
         Field[7, 0].WordMultiplier = 3;
-        Field[14, 7].WordMultiplier = 3;
+        Field[7, 14].WordMultiplier = 3;
         for (var i = 1; i < 5; i++)
         {
             Field[i, i].WordMultiplier = 2;
