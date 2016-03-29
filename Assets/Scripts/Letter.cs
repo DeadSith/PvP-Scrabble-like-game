@@ -8,14 +8,14 @@ public class Letter : MonoBehaviour, IPointerClickHandler
     public Material StandardMaterial;
     public Material CheckedMaterial;
     public bool isChecked = false;
-    private LetterBox parent;
+    private LetterBoxLAN parent;
     private Vector3 _startPosition;
 
     // Use this for initialization
     private void Start()
     {
         _startPosition = transform.position;
-        parent = gameObject.transform.parent.GetComponent<LetterBox>();
+        parent = gameObject.transform.parent.GetComponent<LetterBoxLAN>();
     }
 
     public void ChangeLetter(string input)
@@ -34,7 +34,7 @@ public class Letter : MonoBehaviour, IPointerClickHandler
 
     public void Fix()
     {
-        parent._freeCoordinates.Add(_startPosition);
+        parent.FreeCoordinates.Add(_startPosition);
         parent.ChangeBox(1, LetterText.text);
         var index = parent.FindIndex(this);
         parent.CurrentLetters[index] = parent.CurrentLetters[parent.CurrentLetters.Count - 1];
