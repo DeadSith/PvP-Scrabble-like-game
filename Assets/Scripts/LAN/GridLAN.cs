@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 
 public class GridLAN : MonoBehaviour
 {
@@ -12,7 +11,7 @@ public class GridLAN : MonoBehaviour
     {
         Horizontal, Vertical, None
     }
-    //Todo: assign tags on runtime, fix turn ending, fix all other
+    //Todo: fix turn ending
     #region Prefabs and materials
 
     public TileLAN TilePrefab;
@@ -29,13 +28,9 @@ public class GridLAN : MonoBehaviour
     public Text TimerText;
     public GameObject EndGameCanvas;
     public UIController Controller;
-    public Button SkipTurnButton;
     public Direction CurrentDirection = Direction.None;
-
     public int CurrentTurn = 1;
     public bool isFirstTurn = true;
-
-    //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
 
     public byte NumberOfColumns = 15;
@@ -45,7 +40,9 @@ public class GridLAN : MonoBehaviour
     public float DistanceBetweenTiles = 1.2f;
     public TileLAN[,] Field;
     public List<TileLAN> CurrentTiles;
+    public bool CanChangeLetters = true;
 
+    public int PlayerNumber;
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
     private List<TileLAN> _wordsFound;
@@ -54,6 +51,7 @@ public class GridLAN : MonoBehaviour
     private float _timeRemaining;
     private float _xOffset = 0;
     private float _yOffset = 0;
+    private bool _fixed;//Required to fix error with materials
 
     private void Start()
     {
@@ -73,16 +71,16 @@ public class GridLAN : MonoBehaviour
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
         TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        
+        CanChangeLetters = true;
         _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         CreateField();
+        _fixed = true;
     }
 
     private void Update()
     {
-        if (SkipTurnButton.interactable != (CurrentTiles.Count == 0))
-            SkipTurnButton.interactable = CurrentTiles.Count == 0;
+        Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
         if (Input.GetKeyDown(KeyCode.A))
             EndGame(null);
         if (_timerEnabled)
@@ -100,6 +98,10 @@ public class GridLAN : MonoBehaviour
                 Player1 = o.GetComponent<LetterBoxLAN>();
                 break;
             }
+        else if(Player1!=null)
+        {
+            Controller.SetChangeButtonActive(Player1.AllLetters.Count>0 && CanChangeLetters);
+        }
 
     }
 
@@ -133,8 +135,7 @@ public class GridLAN : MonoBehaviour
     }
 
     #region Some shitty code
-
-    //Todo: rewrite to cycles
+    
     private void AssignMaterials()
     {
         Field[0, 0].GetComponent<Image>().material = WordX3Material;
@@ -328,7 +329,7 @@ public class GridLAN : MonoBehaviour
             EndGame(null);
     }
 
-
+#region Words Checking
     private bool CheckWords()
     {
         switch (CurrentDirection)
@@ -564,7 +565,7 @@ public class GridLAN : MonoBehaviour
             return Convert.ToInt32(inp) != 0;
         }
     }
-
+#endregion
     //Todo: rewrite for networking
     private void EndGame(LetterBoxLAN playerOut)//Player, who ran out of letters is passed
     {
@@ -580,5 +581,14 @@ public class GridLAN : MonoBehaviour
         //GameObject.FindGameObjectWithTag("Player2").GetComponent<Text>().text = Player2.Score.ToString();
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         transform.parent.gameObject.SetActive(false);
+    }
+
+    public void InvalidatePlayer(int playerNumber)
+    {
+        //Todo: pass points
+        Controller.InvalidatePlayer(playerNumber,88,playerNumber==PlayerNumber);
+        if(_fixed)
+            Controller.FixFirstTurn();
+        _fixed = false;
     }
 }

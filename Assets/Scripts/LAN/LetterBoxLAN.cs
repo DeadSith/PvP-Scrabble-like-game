@@ -59,7 +59,6 @@ public class LetterBoxLAN : NetworkBehaviour
     public List<Vector3> FreeCoordinates;
     public List<Letter> CurrentLetters;
     public int Score = 0;
-    public Button ChangeLetterButton;
     public Letter LetterPrefab;
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
@@ -79,11 +78,22 @@ public class LetterBoxLAN : NetworkBehaviour
     [SyncVar(hook = "OnLetterDelete")]
     public string LetterToDelete;
 
+    [SyncVar]
+    public int GridX;
+
+    [SyncVar]
+    public int GridY;
+
+    [SyncVar(hook = "OnGridChanged")]
+    public string LetterToPlace;
+
+    [SyncVar(hook = "OnPlayerChange")]
+    public int CurrentPlayer;
+
     public override void OnStartClient()
     {
         var pref = Resources.Load("Letter", typeof(GameObject)) as GameObject;
         LetterPrefab = pref.GetComponent<Letter>();
-        ChangeLetterButton = GameObject.FindGameObjectWithTag("ChangeButton").GetComponent<Button>();
         NumberOfLettersText = GameObject.FindGameObjectWithTag("NumberOfLetters").GetComponent<Text>();
         CurrentLetters = new List<Letter>();
         transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -109,6 +119,12 @@ public class LetterBoxLAN : NetworkBehaviour
         AllLetters.AddRange(_allLetters);
         if (_currentGrid.PlayerToSendCommands == null)
             _currentGrid.PlayerToSendCommands = this;
+        if (isServer)
+            _currentGrid.PlayerNumber = 1;
+        else
+        {
+            _currentGrid.PlayerNumber = 2;
+        }
     }
 
     public override void OnStartAuthority()
@@ -119,21 +135,13 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         ChangeBox(NumberOfLetters);
         CmdStartClient(true);
+        ChangePlayer(1);
     }
 
-    private void Update()
-    {
-        if (!isLocalPlayer)
-            return;
-        if (_allLetters.Count == 0)
-            ChangeLetterButton.interactable = false;
-        else if (ChangeLetterButton.interactable != CanChangeLetters)
-            ChangeLetterButton.interactable = CanChangeLetters;
-    }
+    
 
     public void ChangeBox(int numberOfLetters, string letter = "")//Use to add letters
     {
-        Debug.LogError("is server= " + isServer);
         _lettersToDelete = new List<string>();
         if (numberOfLetters > AllLetters.Count)
         {
@@ -223,18 +231,22 @@ public class LetterBoxLAN : NetworkBehaviour
         foreach (Letter t in CurrentLetters.Where(t => t.isChecked))
         {
             lettersToAdd.Append(t.LetterText.text);
-            AllLetters.Add(t.LetterText.text);
         }
         CmdAddLetter(lettersToAdd.ToString());
+        var temp = new List<string>();
+        temp.AddRange(AllLetters);
+        var lettersToDelete = new StringBuilder();
         foreach (Letter t in CurrentLetters.Where(t => t.isChecked))
         {
-            var current = AllLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
-            CmdDeleteLetter(current);
+            var current = temp[UnityEngine.Random.Range(0, temp.Count - 1)];
+            lettersToDelete.Append(current);
+            temp.Remove(current);
             t.ChangeLetter(current);
             t.isChecked = false;
             t.gameObject.GetComponent<Image>().material = t.StandardMaterial;
             successful = true;
         }
+        CmdDeleteLetter(lettersToDelete.ToString());
         return successful;
     }
 
@@ -258,6 +270,16 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         Score -= result;
         return result;
+    }
+
+    public void ChangeGrid(int row, int column, string letter)
+    {
+        CmdChangeGrid(row,column,letter);
+    }
+
+    public void ChangePlayer(int playerNumber)
+    {
+        CmdChangeCurrentPlayer(playerNumber);
     }
 
     #region Commands
@@ -287,9 +309,17 @@ public class LetterBoxLAN : NetworkBehaviour
 
     
     [Command]
-    private void CmdAssignPlayer()
+    private void CmdChangeCurrentPlayer(int playerNumber)
     {
-        
+        CurrentPlayer = playerNumber;
+    }
+
+    [Command]
+    private void CmdChangeGrid(int row, int column, string letter)
+    {
+        GridX = row;
+        GridY = column;
+        LetterToPlace = letter;
     }
     #endregion Commands
 
@@ -319,8 +349,20 @@ public class LetterBoxLAN : NetworkBehaviour
         LetterToAdd = value;
         foreach (var letter in value)
         {
-            AllLetters.Remove(letter.ToString());
+            AllLetters.Add(letter.ToString());
         }
     }
-    
+
+    public void OnGridChanged(string value)
+    {
+        Debug.LogError(String.Format("{0} {1} {2}", GridX, GridY, value));
+        LetterToPlace = value;
+        _currentGrid.Field[GridX,GridY].ChangeLetter(value);
+    }
+
+    public void OnPlayerChange(int value)
+    {
+        CurrentPlayer = value;
+        _currentGrid.InvalidatePlayer(CurrentPlayer);
+    }
 }

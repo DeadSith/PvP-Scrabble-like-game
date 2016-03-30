@@ -40,20 +40,26 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
                         return;
                     }
                 }
-                HasLetter = true;
-                CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
+                var letter = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
                 var letterPanel = parent.Player1;
-                letterPanel.CanChangeLetters = false;
+                parent.CanChangeLetters = false;
                 letterPanel.RemoveLetter();
-                if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
-                if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
-                if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
-                if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
                 Destroy(DragHandler.ObjectDragged);
+                parent.Player1.ChangeGrid(Row, Column, letter);
             }
             else parent.Controller.ShowWrongTileError();
         }
         else parent.Controller.ShowWrongTileError();
+    }
+
+    public void ChangeLetter(string letter)
+    {
+        HasLetter = true;
+        CurrentLetter.text = letter;
+        if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
+        if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
+        if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
+        if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
     }
 
     private bool CheckTile(TileLAN checkedTile) //checks if one of the nearby tiles has letter

@@ -13,7 +13,12 @@ public class UIController : MonoBehaviour
     public Text ZeroTilesText;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
+    public Button NextTurnButton;
+    public Button SkipTurnButton;
+    public Button ChangeLettersButton;
+
     private static GameObject _currentObject;
+    private bool isLocalTurn;
 
     private void Start()
     {
@@ -72,5 +77,40 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(false);
         _currentObject = ZeroTilesText.gameObject;
         _currentObject.SetActive(true);
+    }
+
+    public void SetChangeButtonActive(bool active)
+    {
+        if (isLocalTurn&&ChangeLettersButton.interactable != active)
+            ChangeLettersButton.interactable = active;
+    }
+
+    public void SetSkipButtonActive(bool active)
+    {
+        if (isLocalTurn&&SkipTurnButton.interactable != active)
+            SkipTurnButton.interactable = active;
+    }
+
+    public void SetNextButtonActive(bool active)
+    {
+        if(isLocalTurn&&NextTurnButton.interactable!=active)
+            NextTurnButton.interactable = active;
+    }
+
+    public void InvalidatePlayer(int playerNumber, int score, bool isLocal)
+    {
+        InvalidatePlayer(playerNumber,score);
+        isLocalTurn = true;
+        SetChangeButtonActive(isLocal);
+        SetNextButtonActive(isLocal);
+        SetSkipButtonActive(isLocal);
+        isLocalTurn = isLocal;
+    }
+
+    public void FixFirstTurn()//Call on the first turn of server to fix materials
+    {
+
+        Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+        Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
     }
 }
