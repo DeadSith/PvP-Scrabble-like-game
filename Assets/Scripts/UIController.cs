@@ -99,6 +99,7 @@ public class UIController : MonoBehaviour
 
     public void InvalidatePlayer(int playerNumber, int score, bool isLocal)
     {
+        playerNumber = playerNumber == 1 ? 2 : 1;
         InvalidatePlayer(playerNumber,score);
         isLocalTurn = true;
         SetChangeButtonActive(isLocal);

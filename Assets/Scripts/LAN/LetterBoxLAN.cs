@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+//Todo: fix score updating before getting new score
 public class LetterBoxLAN : NetworkBehaviour
 {
     #region Letters and scores
@@ -58,7 +59,6 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public List<Vector3> FreeCoordinates;
     public List<Letter> CurrentLetters;
-    public int Score = 0;
     public Letter LetterPrefab;
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
@@ -69,26 +69,23 @@ public class LetterBoxLAN : NetworkBehaviour
     private float _xOffset = 0;
     private bool _isFirstTurn = true;
     public GridLAN _currentGrid;
-    [SyncVar(hook = "OnConnected")]
-    public bool ClientConnected = false;
 
-    [SyncVar(hook = "OnLetterAdd")]
-    public string LetterToAdd;
+    [SyncVar(hook = "OnConnected")] public bool ClientConnected = false;
 
-    [SyncVar(hook = "OnLetterDelete")]
-    public string LetterToDelete;
+    [SyncVar(hook = "OnLetterAdd")] public string LetterToAdd;
 
-    [SyncVar]
-    public int GridX;
+    [SyncVar(hook = "OnLetterDelete")]  public string LetterToDelete;
 
-    [SyncVar]
-    public int GridY;
+    [SyncVar]   public int GridX;
 
-    [SyncVar(hook = "OnGridChanged")]
-    public string LetterToPlace;
+    [SyncVar]   public int GridY;
 
-    [SyncVar(hook = "OnPlayerChange")]
-    public int CurrentPlayer;
+    [SyncVar(hook = "OnGridChanged")]   public string LetterToPlace;
+
+    [SyncVar(hook = "OnPlayerChange")]  public int CurrentPlayer;
+
+    [SyncVar] public int Player1Score;
+    [SyncVar] public int Player2Score;
 
     public override void OnStartClient()
     {
@@ -120,11 +117,14 @@ public class LetterBoxLAN : NetworkBehaviour
         if (_currentGrid.PlayerToSendCommands == null)
             _currentGrid.PlayerToSendCommands = this;
         if (isServer)
+        {
             _currentGrid.PlayerNumber = 1;
+        }
         else
         {
             _currentGrid.PlayerNumber = 2;
         }
+        
     }
 
     public override void OnStartAuthority()
@@ -135,7 +135,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         ChangeBox(NumberOfLetters);
         CmdStartClient(true);
-        ChangePlayer(1);
+        ChangePlayer(1,0);
     }
 
     
@@ -261,6 +261,7 @@ public class LetterBoxLAN : NetworkBehaviour
         return -1;
     }
 
+    //Todo: rewrite for network
     public int RemovePoints()//Called in the end of game to remove points for ech letter left in box
     {
         var result = 0;
@@ -268,7 +269,7 @@ public class LetterBoxLAN : NetworkBehaviour
         {
             result += PointsDictionary[letter.LetterText.text];
         }
-        Score -= result;
+        //Score -= result;
         return result;
     }
 
@@ -277,9 +278,11 @@ public class LetterBoxLAN : NetworkBehaviour
         CmdChangeGrid(row,column,letter);
     }
 
-    public void ChangePlayer(int playerNumber)
+    public void ChangePlayer(int nextPlayer, int score)//score of current player
     {
-        CmdChangeCurrentPlayer(playerNumber);
+        score += CurrentPlayer == 1 ? Player1Score : Player2Score;
+        CmdChangeScore(CurrentPlayer,score);
+        CmdChangeCurrentPlayer(nextPlayer);
     }
 
     #region Commands
@@ -301,12 +304,6 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         LetterToAdd = letter;
     }
-
-    [Command]
-    private void CmdEndTurn()
-    {
-    }
-
     
     [Command]
     private void CmdChangeCurrentPlayer(int playerNumber)
@@ -320,6 +317,15 @@ public class LetterBoxLAN : NetworkBehaviour
         GridX = row;
         GridY = column;
         LetterToPlace = letter;
+    }
+
+    [Command]
+    private void CmdChangeScore(int playerNumber, int score)
+    {
+        Debug.LogError("");
+        if (playerNumber == 1)
+            Player1Score =score;
+        else Player2Score =score;
     }
     #endregion Commands
 
@@ -363,6 +369,8 @@ public class LetterBoxLAN : NetworkBehaviour
     public void OnPlayerChange(int value)
     {
         CurrentPlayer = value;
-        _currentGrid.InvalidatePlayer(CurrentPlayer);
+        _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
+
+    
 }

@@ -98,9 +98,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
             return;
         }
         HasLetter = false;
-        if (parent.CurrentPlayer == 1)
             //parent.Player1.ChangeBox(1); //for testing
-            parent.Player1.ChangeBox(1, CurrentLetter.text);
+        parent.Player1.ChangeBox(1, CurrentLetter.text);
         Debug.LogError(parent.Player1.isServer);
         CurrentLetter.text = "";
         parent.CurrentTiles.Remove(this);

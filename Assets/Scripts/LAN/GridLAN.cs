@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+//Todo: disable render in the end of turn. Test letter changing
 public class GridLAN : MonoBehaviour
 {
     public enum Direction
@@ -36,7 +37,6 @@ public class GridLAN : MonoBehaviour
     public byte NumberOfColumns = 15;
     public LetterBoxLAN Player1;
     public LetterBoxLAN PlayerToSendCommands;
-    public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
     public TileLAN[,] Field;
     public List<TileLAN> CurrentTiles;
@@ -67,7 +67,7 @@ public class GridLAN : MonoBehaviour
             _timerLength = PlayerPrefs.GetInt("Length");
             _timeRemaining = (float)_timerLength + 1;
         }
-        
+
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
         TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
@@ -90,17 +90,17 @@ public class GridLAN : MonoBehaviour
             if (_timeRemaining < 0)
                 OnEndTimer();
         }
-        if(Player1==null&&PlayerToSendCommands!=null&&GameObject.FindGameObjectsWithTag("Player").Length>1)//Do not touch. It's a feature
+        if (Player1 == null && PlayerToSendCommands != null && GameObject.FindGameObjectsWithTag("Player").Length > 1)//Do not touch. It's a feature
             foreach (var o in GameObject.FindGameObjectsWithTag("Player"))
             {
-                if(o.GetComponent<LetterBoxLAN>()==PlayerToSendCommands)
+                if (o.GetComponent<LetterBoxLAN>() == PlayerToSendCommands)
                     continue;
                 Player1 = o.GetComponent<LetterBoxLAN>();
                 break;
             }
-        else if(Player1!=null)
+        else if (Player1 != null)
         {
-            Controller.SetChangeButtonActive(Player1.AllLetters.Count>0 && CanChangeLetters);
+            Controller.SetChangeButtonActive(Player1.AllLetters.Count > 0 && CanChangeLetters);
         }
 
     }
@@ -135,7 +135,7 @@ public class GridLAN : MonoBehaviour
     }
 
     #region Some shitty code
-    
+
     private void AssignMaterials()
     {
         Field[0, 0].GetComponent<Image>().material = WordX3Material;
@@ -247,7 +247,7 @@ public class GridLAN : MonoBehaviour
     }
 
     #endregion Some shitty code
-    
+
 
     void OnEndTimer()
     {
@@ -268,24 +268,20 @@ public class GridLAN : MonoBehaviour
                 _turnsSkipped = 0;
                 CurrentTurn++;
                 var points = CountPoints();
-                if (CurrentPlayer == 1)
-                {
-                    Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
-                    Player1.Score += points;
-                    if (Player1.CurrentLetters.Count == 0)
-                    {
-                        EndGame(Player1);
-                    }
-                    Player1.CanChangeLetters = true;
-                    //Player1.gameObject.SetActive(false);
-                    CurrentTiles = new List<TileLAN>();
-                    CurrentDirection = Direction.None;
-                    CurrentPlayer = 2;
-                    Controller.InvalidatePlayer(1, Player1.Score);
-                    isFirstTurn = false;
-                }
+                Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
+                Player1.CanChangeLetters = true;
+                //Player1.gameObject.SetActive(false);
+                CurrentTiles = new List<TileLAN>();
+                CurrentDirection = Direction.None;
+                //Controller.InvalidatePlayer(1, Player1.Score);
+                isFirstTurn = false;
                 if (_timerEnabled)
                     _timeRemaining = (float)_timerLength + 1;
+                Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, points);
+                if (Player1.CurrentLetters.Count == 0)
+                {
+                    EndGame(Player1);
+                }
             }
             else Controller.ShowNotExistError();
         }
@@ -295,41 +291,33 @@ public class GridLAN : MonoBehaviour
 
     public void OnChangeLetters()
     {
-        if (CurrentPlayer == 1)
+        if (Player1.ChangeLetters())
+            CurrentTurn++;
+        else
         {
-            if (Player1.ChangeLetters())
-                CurrentTurn++;
-            else
-            {
-                Controller.ShowChangeLetterError();
-                return;
-            }
-            _turnsSkipped = 0;
-            Player1.CanChangeLetters = true;
-            //Player1.gameObject.SetActive(false);
-            CurrentPlayer = 2;
-            Controller.InvalidatePlayer(1, Player1.Score);
+            Controller.ShowChangeLetterError();
+            return;
         }
+        _turnsSkipped = 0;
+        Player1.CanChangeLetters = true;
+        //Player1.gameObject.SetActive(false);
+        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
     }
 
     public void OnSkipTurn()
     {
-        if (CurrentPlayer == 1)
-        {
-            Player1.CanChangeLetters = true;
-            //Player1.gameObject.SetActive(false);
-            CurrentPlayer = 2;
-            Controller.InvalidatePlayer(1, Player1.Score);
-        }
+        Player1.CanChangeLetters = true;
+        //Player1.gameObject.SetActive(false);
+        Player1.ChangePlayer(PlayerNumber==1? 2:1,1);
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
             EndGame(null);
     }
 
-#region Words Checking
+    #region Words Checking
     private bool CheckWords()
     {
         switch (CurrentDirection)
@@ -565,29 +553,17 @@ public class GridLAN : MonoBehaviour
             return Convert.ToInt32(inp) != 0;
         }
     }
-#endregion
+    #endregion
     //Todo: rewrite for networking
     private void EndGame(LetterBoxLAN playerOut)//Player, who ran out of letters is passed
     {
-        var tempPoints = Player1.RemovePoints();
-        //tempPoints += Player2.RemovePoints();
-        if (playerOut != null)
-        {
-            playerOut.Score += tempPoints;
-        }
-        EndGameCanvas.SetActive(true);
-        //GameObject.FindGameObjectWithTag("Winner").GetComponent<Text>().text = Player1.Score > Player2.Score ? "1" : "2";
-        GameObject.FindGameObjectWithTag("Player1").GetComponent<Text>().text = Player1.Score.ToString();
-        //GameObject.FindGameObjectWithTag("Player2").GetComponent<Text>().text = Player2.Score.ToString();
-        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
-        transform.parent.gameObject.SetActive(false);
+        
     }
 
-    public void InvalidatePlayer(int playerNumber)
+    public void InvalidatePlayer(int playerNumber, int score)
     {
-        //Todo: pass points
-        Controller.InvalidatePlayer(playerNumber,88,playerNumber==PlayerNumber);
-        if(_fixed)
+        Controller.InvalidatePlayer(playerNumber, score, playerNumber == PlayerNumber);
+        if (_fixed)
             Controller.FixFirstTurn();
         _fixed = false;
     }
