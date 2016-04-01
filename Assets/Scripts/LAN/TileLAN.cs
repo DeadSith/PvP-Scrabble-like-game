@@ -24,6 +24,11 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (CanDrop && !HasLetter)
         {
+            if (parent.PlayerNumber != parent.Player1.CurrentPlayer)
+            {
+                parent.Controller.ShowWrongTurnError();
+                return;
+            }
             if (parent.CurrentDirection == GridLAN.Direction.None ||
                 (parent.CurrentDirection == GridLAN.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
                 (parent.CurrentDirection == GridLAN.Direction.Vertical && Column == parent.CurrentTiles[0].Column))

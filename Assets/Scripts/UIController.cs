@@ -10,6 +10,7 @@ public class UIController : MonoBehaviour
     public Text ChangeLetterText;
     public Text WrongTileText;
     public Text StartText;
+    public Text WrongTurnText;
     public Text ZeroTilesText;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
@@ -48,6 +49,13 @@ public class UIController : MonoBehaviour
     {
         _currentObject.SetActive(false);
         _currentObject = NotExistText.gameObject;
+        _currentObject.SetActive(true);
+    }
+
+    public void ShowWrongTurnError()
+    {
+        _currentObject.SetActive(false);
+        _currentObject = WrongTurnText.gameObject;
         _currentObject.SetActive(true);
     }
 
