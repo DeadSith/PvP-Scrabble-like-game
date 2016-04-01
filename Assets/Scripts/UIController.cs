@@ -87,8 +87,10 @@ public class UIController : MonoBehaviour
 
     public void SetSkipButtonActive(bool active)
     {
-        if (isLocalTurn&&SkipTurnButton.interactable != active)
+        if (isLocalTurn && SkipTurnButton.interactable != active)
+        {
             SkipTurnButton.interactable = active;
+        }
     }
 
     public void SetNextButtonActive(bool active)

@@ -40,7 +40,6 @@ public class GridLAN : MonoBehaviour
     public float DistanceBetweenTiles = 1.2f;
     public TileLAN[,] Field;
     public List<TileLAN> CurrentTiles;
-    public bool CanChangeLetters = true;
 
     public int PlayerNumber;
     private int _turnsSkipped = 0;
@@ -71,7 +70,6 @@ public class GridLAN : MonoBehaviour
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
         TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        CanChangeLetters = true;
         _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         CreateField();
@@ -100,7 +98,7 @@ public class GridLAN : MonoBehaviour
             }
         else if (Player1 != null)
         {
-            Controller.SetChangeButtonActive(Player1.AllLetters.Count > 0 && CanChangeLetters);
+            Controller.SetChangeButtonActive(Player1.AllLetters.Count > 0 && Player1.CanChangeLetters);
         }
 
     }
@@ -254,7 +252,7 @@ public class GridLAN : MonoBehaviour
         _timeRemaining = (float)_timerLength + 1;
         for (var i = CurrentTiles.Count - 1; i >= 0; i--)
         {
-            CurrentTiles[i].RemoveTile();
+            CurrentTiles[i].RemoveOnClick();
         }
         OnSkipTurn();
     }

@@ -84,8 +84,8 @@ public class LetterBoxLAN : NetworkBehaviour
 
     [SyncVar(hook = "OnPlayerChange")]  public int CurrentPlayer;
 
-    [SyncVar] public int Player1Score;
-    [SyncVar] public int Player2Score;
+    [SyncVar(hook = "OnPlayer1ScoreChange")] public int Player1Score;
+    [SyncVar(hook = "OnPlayer2ScoreChange")] public int Player2Score;
 
     public override void OnStartClient()
     {
@@ -138,7 +138,15 @@ public class LetterBoxLAN : NetworkBehaviour
         ChangePlayer(1,0);
     }
 
-    
+    public void Update()
+    {
+        if (_currentGrid.PlayerNumber == CurrentPlayer && CurrentLetters.Count == 7)
+            CanChangeLetters = true;
+        else
+        {
+            CanChangeLetters = false;
+        }
+    }
 
     public void ChangeBox(int numberOfLetters, string letter = "")//Use to add letters
     {
@@ -363,7 +371,13 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         Debug.LogError(String.Format("{0} {1} {2}", GridX, GridY, value));
         LetterToPlace = value;
+        if(!String.IsNullOrEmpty(value))
         _currentGrid.Field[GridX,GridY].ChangeLetter(value);
+        else
+        {
+            Debug.LogError("Delete");
+            _currentGrid.Field[GridX,GridY].Remove();
+        }
     }
 
     public void OnPlayerChange(int value)
@@ -372,5 +386,21 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
 
-    
+#region Workaroung to incorrect syncing
+    public void OnPlayer1ScoreChange(int value)
+    {
+        Player1Score = value;
+        if(isServer)
+            return;
+        _currentGrid.InvalidatePlayer(CurrentPlayer, value);
+    }
+
+    public void OnPlayer2ScoreChange(int value)
+    {
+        Player2Score = value;
+        if(isServer)
+            return;
+        _currentGrid.InvalidatePlayer(CurrentPlayer, value);
+    }
+#endregion
 }
