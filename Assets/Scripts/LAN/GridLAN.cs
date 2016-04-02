@@ -81,7 +81,7 @@ public class GridLAN : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A))
         {
             Debug.LogError("End update");
-            Player1.EndGame(0);
+            Player1.EndGame(-14);
         }
         if (_timerEnabled)
         {
@@ -314,7 +314,7 @@ public class GridLAN : MonoBehaviour
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
-            Player1.EndGame(0);
+            Player1.EndGame(-14);
     }
 
     #region Words Checking

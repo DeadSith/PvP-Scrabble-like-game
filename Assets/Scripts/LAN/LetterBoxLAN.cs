@@ -288,6 +288,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void ChangeGrid(int row, int column, string letter)
     {
+        Debug.LogError(String.Format("{0} {1}", row, column));
         CmdChangeGrid(row, column, letter);
     }
 
@@ -415,8 +416,7 @@ public class LetterBoxLAN : NetworkBehaviour
         CurrentPlayer = value;
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
-
-    //Todo: rewrite for network
+   
     public void OnEndGame(int value)//Called in the end of game to remove points for ech letter left in box
     {
         Winner = value;

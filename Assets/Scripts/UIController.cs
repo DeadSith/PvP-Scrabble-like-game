@@ -138,6 +138,6 @@ public class UIController : MonoBehaviour
         Winner.text = winner.ToString();
         Player1EndText.text = player1Score.ToString();
         Player2EndText.text = player2Score.ToString();
-        gameObject.GetComponent<Renderer>().enabled = false;
+        gameObject.GetComponent<Canvas>().enabled = false;
     }
 }

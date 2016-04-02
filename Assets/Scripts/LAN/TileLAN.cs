@@ -49,6 +49,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
                 var letterPanel = parent.Player1;
                 letterPanel.RemoveLetter();
                 Destroy(DragHandler.ObjectDragged);
+                Debug.LogError(letter);
                 parent.Player1.ChangeGrid(Row, Column, letter);
             }
             else parent.Controller.ShowWrongTileError();
