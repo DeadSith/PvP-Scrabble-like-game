@@ -12,7 +12,7 @@ public class GridLAN : MonoBehaviour
     {
         Horizontal, Vertical, None
     }
-    
+
     #region Prefabs and materials
 
     public TileLAN TilePrefab;
@@ -80,7 +80,6 @@ public class GridLAN : MonoBehaviour
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Debug.LogError("End update");
             Player1.EndGame(-14);
         }
         if (_timerEnabled)
@@ -102,7 +101,6 @@ public class GridLAN : MonoBehaviour
         {
             Controller.SetChangeButtonActive(Player1.AllLetters.Count > 0 && Player1.CanChangeLetters);
         }
-
     }
 
     private void CreateField()
@@ -249,7 +247,7 @@ public class GridLAN : MonoBehaviour
     #endregion Some shitty code
 
     //Todo: test
-    void OnEndTimer()
+    private void OnEndTimer()
     {
         _timeRemaining = (float)_timerLength + 1;
         for (var i = CurrentTiles.Count - 1; i >= 0; i--)
@@ -310,7 +308,7 @@ public class GridLAN : MonoBehaviour
     {
         Player1.CanChangeLetters = true;
         //Player1.gameObject.SetActive(false);
-        Player1.ChangePlayer(PlayerNumber==1? 2:1,1);
+        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 1);
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
@@ -318,6 +316,7 @@ public class GridLAN : MonoBehaviour
     }
 
     #region Words Checking
+
     private bool CheckWords()
     {
         switch (CurrentDirection)
@@ -553,11 +552,11 @@ public class GridLAN : MonoBehaviour
             return Convert.ToInt32(inp) != 0;
         }
     }
-    #endregion
-    //Todo: rewrite for networking
+
+    #endregion Words Checking
+
     public void EndGame(int winner, int player1Score, int player2Score)//Player, who ran out of letters is passed
     {
-        Debug.LogError("Grid");
         Controller.SetWinner(winner, player1Score, player2Score);
     }
 

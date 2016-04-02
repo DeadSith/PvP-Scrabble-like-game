@@ -94,7 +94,7 @@ public class UIController : MonoBehaviour
 
     public void SetChangeButtonActive(bool active)
     {
-        if (isLocalTurn&&ChangeLettersButton.interactable != active)
+        if (isLocalTurn && ChangeLettersButton.interactable != active)
             ChangeLettersButton.interactable = active;
     }
 
@@ -108,14 +108,14 @@ public class UIController : MonoBehaviour
 
     public void SetNextButtonActive(bool active)
     {
-        if(isLocalTurn&&NextTurnButton.interactable!=active)
+        if (isLocalTurn && NextTurnButton.interactable != active)
             NextTurnButton.interactable = active;
     }
 
     public void InvalidatePlayer(int playerNumber, int score, bool isLocal)
     {
         playerNumber = playerNumber == 1 ? 2 : 1;
-        InvalidatePlayer(playerNumber,score);
+        InvalidatePlayer(playerNumber, score);
         isLocalTurn = true;
         SetChangeButtonActive(isLocal);
         SetNextButtonActive(isLocal);
@@ -125,14 +125,12 @@ public class UIController : MonoBehaviour
 
     public void FixFirstTurn()//Call on the first turn of server to fix materials
     {
-
         Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
         Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
     }
 
     public void SetWinner(int winner, int player1Score, int player2Score)
     {
-
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         EndGameCanvas.gameObject.SetActive(true);
         Winner.text = winner.ToString();

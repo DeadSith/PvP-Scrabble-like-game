@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 
 public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
@@ -17,7 +16,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     private void Start()
     {
-            parent = transform.parent.gameObject.GetComponent<GridLAN>();
+        parent = transform.parent.gameObject.GetComponent<GridLAN>();
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -49,7 +48,6 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
                 var letterPanel = parent.Player1;
                 letterPanel.RemoveLetter();
                 Destroy(DragHandler.ObjectDragged);
-                Debug.LogError(letter);
                 parent.Player1.ChangeGrid(Row, Column, letter);
             }
             else parent.Controller.ShowWrongTileError();
@@ -102,13 +100,12 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
             parent.Controller.ShowDeleteError();
             return;
         }
-            //parent.Player1.ChangeBox(1); //for testing
+        //parent.Player1.ChangeBox(1); //for testing
         parent.Player1.ChangeBox(1, CurrentLetter.text);
         Remove();
         parent.CurrentTiles.Remove(this);
-        parent.Player1.ChangeGrid(Row, Column,"");
+        parent.Player1.ChangeGrid(Row, Column, "");
         if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = GridLAN.Direction.None;
-        
     }
 
     public void Remove()
