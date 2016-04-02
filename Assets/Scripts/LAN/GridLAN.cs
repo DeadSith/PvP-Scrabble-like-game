@@ -5,14 +5,14 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-//Todo: disable render in the end of turn. Test letter changing
+//Todo: endgame
 public class GridLAN : MonoBehaviour
 {
     public enum Direction
     {
         Horizontal, Vertical, None
     }
-    //Todo: fix turn ending
+    
     #region Prefabs and materials
 
     public TileLAN TilePrefab;
@@ -27,7 +27,6 @@ public class GridLAN : MonoBehaviour
 
     public GameObject TimerImage;
     public Text TimerText;
-    public GameObject EndGameCanvas;
     public UIController Controller;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
@@ -80,7 +79,10 @@ public class GridLAN : MonoBehaviour
     {
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
         if (Input.GetKeyDown(KeyCode.A))
-            EndGame(null);
+        {
+            Debug.LogError("End update");
+            Player1.EndGame(0);
+        }
         if (_timerEnabled)
         {
             _timeRemaining -= Time.deltaTime;
@@ -246,7 +248,7 @@ public class GridLAN : MonoBehaviour
 
     #endregion Some shitty code
 
-
+    //Todo: test
     void OnEndTimer()
     {
         _timeRemaining = (float)_timerLength + 1;
@@ -278,7 +280,7 @@ public class GridLAN : MonoBehaviour
                 Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, points);
                 if (Player1.CurrentLetters.Count == 0)
                 {
-                    EndGame(Player1);
+                    Player1.EndGame(PlayerNumber);
                 }
             }
             else Controller.ShowNotExistError();
@@ -312,7 +314,7 @@ public class GridLAN : MonoBehaviour
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
-            EndGame(null);
+            Player1.EndGame(0);
     }
 
     #region Words Checking
@@ -553,9 +555,10 @@ public class GridLAN : MonoBehaviour
     }
     #endregion
     //Todo: rewrite for networking
-    private void EndGame(LetterBoxLAN playerOut)//Player, who ran out of letters is passed
+    public void EndGame(int winner, int player1Score, int player2Score)//Player, who ran out of letters is passed
     {
-        
+        Debug.LogError("Grid");
+        Controller.SetWinner(winner, player1Score, player2Score);
     }
 
     public void InvalidatePlayer(int playerNumber, int score)

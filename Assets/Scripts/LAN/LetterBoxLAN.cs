@@ -53,7 +53,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     private List<String> _allLetters = new List<string>();
     public List<String> AllLetters = new List<string>();
-    private List<String> _lettersToDelete = new List<string>(); 
+    private List<String> _lettersToDelete = new List<string>();
 
     #endregion Letters and scores
 
@@ -70,22 +70,39 @@ public class LetterBoxLAN : NetworkBehaviour
     private bool _isFirstTurn = true;
     public GridLAN _currentGrid;
 
-    [SyncVar(hook = "OnConnected")] public bool ClientConnected = false;
+    [SyncVar(hook = "OnConnected")]
+    public bool ClientConnected = false;
 
-    [SyncVar(hook = "OnLetterAdd")] public string LetterToAdd;
+    [SyncVar(hook = "OnLetterAdd")]
+    public string LetterToAdd;
 
-    [SyncVar(hook = "OnLetterDelete")]  public string LetterToDelete;
+    [SyncVar(hook = "OnLetterDelete")]
+    public string LetterToDelete;
 
-    [SyncVar]   public int GridX;
+    [SyncVar]
+    public int GridX;
 
-    [SyncVar]   public int GridY;
+    [SyncVar]
+    public int GridY;
 
-    [SyncVar(hook = "OnGridChanged")]   public string LetterToPlace;
+    [SyncVar(hook = "OnGridChanged")]
+    public string LetterToPlace;
 
-    [SyncVar(hook = "OnPlayerChange")]  public int CurrentPlayer;
+    [SyncVar(hook = "OnPlayerChange")]
+    public int CurrentPlayer;
 
-    [SyncVar(hook = "OnPlayer1ScoreChange")] public int Player1Score;
-    [SyncVar(hook = "OnPlayer2ScoreChange")] public int Player2Score;
+    [SyncVar(hook = "OnPlayer1ScoreChange")]
+    public int Player1Score;
+
+    [SyncVar(hook = "OnPlayer2ScoreChange")]
+    public int Player2Score;
+
+    [SyncVar(hook = "OnEndGame")] public int Winner;
+
+    [SyncVar]
+    public int BonusScore = 0;
+
+    [SyncVar(hook = "OnShowEnd")] public bool End = false;
 
     public override void OnStartClient()
     {
@@ -124,7 +141,7 @@ public class LetterBoxLAN : NetworkBehaviour
         {
             _currentGrid.PlayerNumber = 2;
         }
-        
+
     }
 
     public override void OnStartAuthority()
@@ -135,7 +152,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         ChangeBox(NumberOfLetters);
         CmdStartClient(true);
-        ChangePlayer(1,0);
+        ChangePlayer(1, 0);
     }
 
     public void Update()
@@ -188,7 +205,7 @@ public class LetterBoxLAN : NetworkBehaviour
         NumberOfLettersText.text = AllLetters.Count.ToString();
         _isFirstTurn = false;
     }
-    
+
     private void AddLetter(Vector3 position, string letter)//Creates new letter
     {
         var newLetter = Instantiate(LetterPrefab, position,
@@ -199,8 +216,8 @@ public class LetterBoxLAN : NetworkBehaviour
             var current = AllLetters[UnityEngine.Random.Range(0, AllLetters.Count - 1)];
             //CmdDeleteLetter(current);
             _lettersToDelete.Add(current);
-            if(_isFirstTurn)
-            AllLetters.Remove(current);
+            if (_isFirstTurn)
+                AllLetters.Remove(current);
             newLetter.ChangeLetter(current);
             CurrentLetters.Add(newLetter);
         }
@@ -231,7 +248,7 @@ public class LetterBoxLAN : NetworkBehaviour
         FreeCoordinates.Add(previousCoordinates);
         CurrentLetters.Remove(currentObject);
     }
-   
+
     public bool ChangeLetters()//Used to change letters on field
     {
         var successful = false;
@@ -269,28 +286,22 @@ public class LetterBoxLAN : NetworkBehaviour
         return -1;
     }
 
-    //Todo: rewrite for network
-    public int RemovePoints()//Called in the end of game to remove points for ech letter left in box
-    {
-        var result = 0;
-        foreach (var letter in CurrentLetters)
-        {
-            result += PointsDictionary[letter.LetterText.text];
-        }
-        //Score -= result;
-        return result;
-    }
-
     public void ChangeGrid(int row, int column, string letter)
     {
-        CmdChangeGrid(row,column,letter);
+        CmdChangeGrid(row, column, letter);
     }
 
     public void ChangePlayer(int nextPlayer, int score)//score of current player
     {
         score += CurrentPlayer == 1 ? Player1Score : Player2Score;
-        CmdChangeScore(CurrentPlayer,score);
+        CmdChangeScore(CurrentPlayer, score);
         CmdChangeCurrentPlayer(nextPlayer);
+    }
+
+    public void EndGame(int winner)
+    {
+        Debug.LogError("EndGame called");
+        CmdEndGame(winner);
     }
 
     #region Commands
@@ -312,7 +323,7 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         LetterToAdd = letter;
     }
-    
+
     [Command]
     private void CmdChangeCurrentPlayer(int playerNumber)
     {
@@ -330,11 +341,31 @@ public class LetterBoxLAN : NetworkBehaviour
     [Command]
     private void CmdChangeScore(int playerNumber, int score)
     {
-        Debug.LogError("");
         if (playerNumber == 1)
-            Player1Score =score;
-        else Player2Score =score;
+            Player1Score = score;
+        else Player2Score = score;
     }
+
+    [Command]
+    private void CmdEndGame(int winner)
+    {
+        Debug.LogError("Entered comamnd");
+        Winner = winner;
+    }
+
+    [Command]
+    private void CmdAddBonusScore(int score)
+    {
+        BonusScore = BonusScore + score;
+        Debug.LogError("Bonus");
+    }
+
+    [Command]
+    private void CmdShowEnd(bool value)
+    {
+        End = value;
+    }
+
     #endregion Commands
 
     public void OnConnected(bool value)
@@ -371,12 +402,11 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         Debug.LogError(String.Format("{0} {1} {2}", GridX, GridY, value));
         LetterToPlace = value;
-        if(!String.IsNullOrEmpty(value))
-        _currentGrid.Field[GridX,GridY].ChangeLetter(value);
+        if (!String.IsNullOrEmpty(value))
+            _currentGrid.Field[GridX, GridY].ChangeLetter(value);
         else
         {
-            Debug.LogError("Delete");
-            _currentGrid.Field[GridX,GridY].Remove();
+            _currentGrid.Field[GridX, GridY].Remove();
         }
     }
 
@@ -386,11 +416,46 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
 
-#region Workaroung to incorrect syncing
+    //Todo: rewrite for network
+    public void OnEndGame(int value)//Called in the end of game to remove points for ech letter left in box
+    {
+        Winner = value;
+        Debug.LogError("OnEnd");
+        var result = 0;
+        foreach (var letter in CurrentLetters)
+        {
+            result += PointsDictionary[letter.LetterText.text];
+        }
+        CmdAddBonusScore(result);
+        if (_currentGrid.PlayerNumber == 1)
+            CmdChangeScore(1, Player1Score - result);
+        else
+        {
+            CmdChangeScore(2, Player2Score - result);
+        }
+        Debug.LogError("");
+        if (isServer)
+        {
+            Debug.LogError("server");
+            return;
+        }
+        Debug.LogError("Got");
+        if (AllLetters.Count == 0)
+        {
+            if (CurrentLetters.Count == 0)
+                CmdChangeScore(2, Player2Score + BonusScore);
+            else
+            {
+                CmdChangeScore(1, Player1Score + BonusScore);
+            }
+        }
+        CmdShowEnd(true);
+    }
+    #region Workaroung to incorrect syncing
     public void OnPlayer1ScoreChange(int value)
     {
         Player1Score = value;
-        if(isServer)
+        if (isServer)
             return;
         _currentGrid.InvalidatePlayer(CurrentPlayer, value);
     }
@@ -398,9 +463,18 @@ public class LetterBoxLAN : NetworkBehaviour
     public void OnPlayer2ScoreChange(int value)
     {
         Player2Score = value;
-        if(isServer)
+        if (isServer)
             return;
         _currentGrid.InvalidatePlayer(CurrentPlayer, value);
     }
-#endregion
+
+
+    #endregion
+
+    public void OnShowEnd(bool value)
+    {
+        Debug.LogError("ShowEnd");
+        End = value;
+        _currentGrid.EndGame(Winner, Player1Score, Player2Score);
+    }
 }

@@ -18,6 +18,11 @@ public class UIController : MonoBehaviour
     public Button SkipTurnButton;
     public Button ChangeLettersButton;
 
+    public Canvas EndGameCanvas;
+    public Text Player1EndText;
+    public Text Player2EndText;
+    public Text Winner;
+
     private static GameObject _currentObject;
     private bool isLocalTurn;
 
@@ -123,5 +128,16 @@ public class UIController : MonoBehaviour
 
         Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
         Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+    }
+
+    public void SetWinner(int winner, int player1Score, int player2Score)
+    {
+
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
+        EndGameCanvas.gameObject.SetActive(true);
+        Winner.text = winner.ToString();
+        Player1EndText.text = player1Score.ToString();
+        Player2EndText.text = player2Score.ToString();
+        gameObject.GetComponent<Renderer>().enabled = false;
     }
 }
