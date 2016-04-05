@@ -57,17 +57,17 @@ public class LetterBoxLAN : NetworkBehaviour
     #endregion Letters and scores
 
     public List<Vector3> FreeCoordinates;
-    public List<Letter> CurrentLetters;
-    public Letter LetterPrefab;
+    public List<LetterLAN> CurrentLetters;
+    public LetterLAN LetterPrefab;
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
     public Vector2 LetterSize;
     public Text NumberOfLettersText;
     private Vector3 _pos;
-    private float _xOffset = 0;
+    private float _xOffset;
     private bool _isFirstTurn = true;
-    public GridLAN _currentGrid;
+    private GridLAN _currentGrid;
 
     [SyncVar(hook = "OnConnected")]
     public bool ClientConnected = false;
@@ -107,10 +107,10 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        var pref = Resources.Load("Letter", typeof(GameObject)) as GameObject;
-        LetterPrefab = pref.GetComponent<Letter>();
+        var pref = Resources.Load("LetterLAN", typeof(GameObject)) as GameObject;
+        LetterPrefab = pref.GetComponent<LetterLAN>();
         NumberOfLettersText = GameObject.FindGameObjectWithTag("NumberOfLetters").GetComponent<Text>();
-        CurrentLetters = new List<Letter>();
+        CurrentLetters = new List<LetterLAN>();
         transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
         gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
         gameObject.transform.localPosition = new Vector3(0, 0);
@@ -209,7 +209,7 @@ public class LetterBoxLAN : NetworkBehaviour
     private void AddLetter(Vector3 position, string letter)//Creates new letter
     {
         var newLetter = Instantiate(LetterPrefab, position,
-            transform.rotation) as Letter;
+            transform.rotation) as LetterLAN;
         newLetter.transform.SetParent(gameObject.transform);
         if (String.IsNullOrEmpty(letter))
         {
@@ -236,7 +236,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void RemoveLetter()//Is called when letter is dropped
     {
-        var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
+        var currentObject = DragHandler.ObjectDragged.GetComponent<LetterLAN>();
         var currentIndex = FindIndex(currentObject);
         Vector3 previousCoordinates = DragHandler.StartPosition;
         for (int j = currentIndex + 1; j < CurrentLetters.Count; j++)
@@ -253,7 +253,7 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         var successful = false;
         var lettersToAdd = new StringBuilder();
-        foreach (Letter t in CurrentLetters.Where(t => t.isChecked))
+        foreach (LetterLAN t in CurrentLetters.Where(t => t.isChecked))
         {
             lettersToAdd.Append(t.LetterText.text);
         }
@@ -261,7 +261,7 @@ public class LetterBoxLAN : NetworkBehaviour
         var temp = new List<string>();
         temp.AddRange(AllLetters);
         var lettersToDelete = new StringBuilder();
-        foreach (Letter t in CurrentLetters.Where(t => t.isChecked))
+        foreach (LetterLAN t in CurrentLetters.Where(t => t.isChecked))
         {
             var current = temp[UnityEngine.Random.Range(0, temp.Count - 1)];
             lettersToDelete.Append(current);
@@ -275,7 +275,7 @@ public class LetterBoxLAN : NetworkBehaviour
         return successful;
     }
 
-    public int FindIndex(Letter input)
+    public int FindIndex(LetterLAN input)
     {
         var j = 0;
         for (; j < CurrentLetters.Count; j++)
@@ -466,6 +466,8 @@ public class LetterBoxLAN : NetworkBehaviour
     public void OnShowEnd(bool value)
     {
         End = value;
-        _currentGrid.EndGame(Winner, Player1Score, Player2Score);
+        if(Winner==-14)
+            _currentGrid.EndGame(0,Player1Score,Player2Score);
+        else _currentGrid.EndGame(Winner, Player1Score, Player2Score);
     }
 }

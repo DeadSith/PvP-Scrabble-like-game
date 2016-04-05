@@ -44,7 +44,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
                         return;
                     }
                 }
-                var letter = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
+                var letter = DragHandler.ObjectDragged.GetComponent<LetterLAN>().LetterText.text;
                 var letterPanel = parent.Player1;
                 letterPanel.RemoveLetter();
                 Destroy(DragHandler.ObjectDragged);

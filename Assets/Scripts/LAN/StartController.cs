@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Collections;
@@ -13,6 +14,7 @@ public class StartController : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
+        Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         Manager.networkPort = 7777;
         AdressText.text = Manager.networkAddress;
     }
@@ -48,7 +50,14 @@ public class StartController : MonoBehaviour
 
     public void Stop()
     {
-        Manager.StopHost();
+        try
+        {
+            Manager.StopHost();
+        }
+        catch (Exception ex)
+        {
+            // ignored
+        }
         SceneManager.LoadScene(0);
     }
 }

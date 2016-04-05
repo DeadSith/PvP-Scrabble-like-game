@@ -2,20 +2,20 @@
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Letter : MonoBehaviour, IPointerClickHandler
+public class LetterLAN : MonoBehaviour, IPointerClickHandler
 {
     public Text LetterText;
     public Material StandardMaterial;
     public Material CheckedMaterial;
     public bool isChecked = false;
-    private LetterBox parent;
+    private LetterBoxLAN parent;
     private Vector3 _startPosition;
 
     // Use this for initialization
     private void Start()
     {
         _startPosition = transform.position;
-        parent = gameObject.transform.parent.GetComponent<LetterBox>();
+        parent = gameObject.transform.parent.GetComponent<LetterBoxLAN>();
     }
 
     public void ChangeLetter(string input)

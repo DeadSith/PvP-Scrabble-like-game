@@ -308,10 +308,10 @@ public class GridLAN : MonoBehaviour
     {
         Player1.CanChangeLetters = true;
         //Player1.gameObject.SetActive(false);
-        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 1);
+        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
             _timeRemaining = (float)_timerLength + 1;
-        if (++_turnsSkipped == 4)
+        if (++_turnsSkipped == 3)
             Player1.EndGame(-14);
     }
 
