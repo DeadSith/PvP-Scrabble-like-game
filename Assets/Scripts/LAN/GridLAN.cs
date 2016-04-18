@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-//Todo: endgame
+//Todo: test timer
 public class GridLAN : MonoBehaviour
 {
     public enum Direction
@@ -239,15 +239,18 @@ public class GridLAN : MonoBehaviour
     }
 
     #endregion Some shitty code
-
-    //Todo: test
+    
     private void OnEndTimer()
     {
         TimeRemaining = (float)_timerLength + 1;
+        var sb = new StringBuilder();
         for (var i = CurrentTiles.Count - 1; i >= 0; i--)
         {
-            CurrentTiles[i].RemoveOnClick();
+            sb.Append(CurrentTiles[i].Row + " " + CurrentTiles[i].Column + " ");
         }
+        if (sb.Length != 0)
+            sb.Append(Player1.CurrentPlayer);
+        Player1.DeleteOnSkip(sb.ToString().Trim());
         OnSkipTurn();
     }
 
@@ -561,7 +564,8 @@ public class GridLAN : MonoBehaviour
 
     public void SetTimer(bool enabled, int length = 0)
     {
-        Debug.LogError(enabled);
+        //isFirstTurn = Player1.IsFirstTurn;
+        Debug.LogError(isFirstTurn);
         _timerEnabled = enabled;
         _timerLength = length;
         if (_timerEnabled)

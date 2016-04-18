@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+//Todo: sync number of skipped turns
 public class LetterBoxLAN : NetworkBehaviour
 {
     #region Letters and scores
@@ -55,59 +56,97 @@ public class LetterBoxLAN : NetworkBehaviour
     private List<String> _lettersToDelete = new List<string>();
 
     #endregion Letters and scores
-
+    [HideInInspector]
     public List<Vector3> FreeCoordinates;
+
+    private GameObject _waitTextGameObject;
     public List<LetterLAN> CurrentLetters;
     public LetterLAN LetterPrefab;
     public bool CanChangeLetters = true;
+
+    [HideInInspector]
     public byte NumberOfLetters = 7;
+
+    [HideInInspector]
     public float DistanceBetweenLetters = 1.2f;
+
+    [HideInInspector]
     public Vector2 LetterSize;
+
     public Text NumberOfLettersText;
     private Vector3 _pos;
     private float _xOffset;
     private bool _isFirstTurn = true;
     private GridLAN _currentGrid;
 
+    [HideInInspector]
     [SyncVar(hook = "OnConnected")]
     public bool ClientConnected = false;
 
+    [HideInInspector]
     [SyncVar(hook = "OnLetterAdd")]
     public string LetterToAdd;
 
+    [HideInInspector]
     [SyncVar(hook = "OnLetterDelete")]
     public string LetterToDelete;
 
+    [HideInInspector]
     [SyncVar]
     public int GridX;
 
+    [HideInInspector]
     [SyncVar]
     public int GridY;
 
+    [HideInInspector]
     [SyncVar(hook = "OnGridChanged")]
     public string LetterToPlace;
 
+    [HideInInspector]
     [SyncVar(hook = "OnPlayerChange")]
     public int CurrentPlayer;
 
+    [HideInInspector]
     [SyncVar(hook = "OnPlayer1ScoreChange")]
     public int Player1Score;
 
+    [HideInInspector]
     [SyncVar(hook = "OnPlayer2ScoreChange")]
     public int Player2Score;
 
+    [HideInInspector]
     [SyncVar(hook = "OnEndGame")]
     public int Winner;
 
+    [HideInInspector]
     [SyncVar]
     public int BonusScore = 0;
 
+    [HideInInspector]
     [SyncVar(hook = "OnShowEnd")]
     public bool End = false;
 
+    [HideInInspector]
     [SyncVar] public bool TimerEnabled;
-    [SyncVar(hook = "OnLengthChanged")] public int TimerLength;
-    [SyncVar(hook = "OnSync")] public float TimeReamining;
+
+
+    [HideInInspector]
+    [SyncVar(hook = "OnLengthChanged")]
+    public int TimerLength;
+
+
+    [HideInInspector]
+    [SyncVar(hook = "OnSync")]
+    public float TimeReamining;
+
+    [HideInInspector]
+    [SyncVar]
+    public bool IsFirstTurn;
+
+    [HideInInspector]
+    [SyncVar(hook = "OnSkip")]
+    public string TilesToDelete;
 
     public override void OnStartClient()
     {
@@ -140,7 +179,9 @@ public class LetterBoxLAN : NetworkBehaviour
             _currentGrid.PlayerToSendCommands = this;
         if (isServer)
         {
+            _waitTextGameObject = GameObject.FindWithTag("Wait");
             _currentGrid.PlayerNumber = 1;
+            _waitTextGameObject.GetComponent<Text>().enabled = true;
         }
         else
         {
@@ -232,7 +273,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
-    private void Delay(int delay)
+    public void Delay(int delay)
     {
         int t = Environment.TickCount;
         while ((Environment.TickCount - t) < delay) ;
@@ -303,6 +344,8 @@ public class LetterBoxLAN : NetworkBehaviour
         {
             _currentGrid.TimeRemaining = TimeReamining;
         }
+        if(_currentGrid.isFirstTurn&&score!=0)
+            CmdSetFirstTurn();
         score += CurrentPlayer == 1 ? Player1Score : Player2Score;
         CmdChangeScore(CurrentPlayer, score);
         CmdChangeCurrentPlayer(nextPlayer);
@@ -313,7 +356,17 @@ public class LetterBoxLAN : NetworkBehaviour
         CmdEndGame(winner);
     }
 
+    public void DeleteOnSkip(string tilesToDelete)
+    {
+        CmdSkip(tilesToDelete);
+    }
+
     #region Commands
+    [Command]
+    private void CmdSkip(string value)
+    {
+        TilesToDelete = value;
+    }
 
     [Command]
     private void CmdStartClient(bool connected)
@@ -382,6 +435,12 @@ public class LetterBoxLAN : NetworkBehaviour
     }
 
     [Command]
+    private void CmdSetFirstTurn()
+    {
+        IsFirstTurn = true;
+    }
+
+    [Command]
     private void CmdSetTimeRemaining(float remaining)
     {
         TimeReamining = remaining;
@@ -393,7 +452,7 @@ public class LetterBoxLAN : NetworkBehaviour
         ClientConnected = value;
         if (isServer)
         {
-            Debug.Log("connected");
+            _waitTextGameObject.SetActive(false);
             var enabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
             var length = PlayerPrefs.GetInt("Length");
             CmdSetTimer(enabled, length);
@@ -439,7 +498,7 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
 
-    public void OnEndGame(int value)//Called in the end of game to remove points for ech letter left in box
+    public void OnEndGame(int value)//Called in the end of game to remove points for each letter left in box
     {
         Winner = value;
         var result = 0;
@@ -510,5 +569,25 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.TimeRemaining = value;
         if (!isServer)
             _currentGrid.TimeRemaining += 2;
+    }
+
+    public void OnSkip(string value)
+    {
+        if(String.IsNullOrEmpty(value))
+            return;
+        var letters = value.Split(' ');
+        var player = int.Parse(letters[letters.Length - 1]);
+        Debug.LogError(value);
+        for (int i = 0; i < letters.Length-1; i++)
+        {
+            var row = int.Parse(letters[i]);
+            var column = int.Parse(letters[++i]);
+            if(_currentGrid.PlayerNumber==player)
+                _currentGrid.Field[row,column].RemoveOnClick(true);
+            else
+            {
+                _currentGrid.Field[row, column].Remove();
+            }
+        }
     }
 }

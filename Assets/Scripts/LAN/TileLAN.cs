@@ -93,8 +93,9 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         RemoveOnClick();
     }
 
-    public void RemoveOnClick()
+    public void RemoveOnClick(bool skip = false)
     {
+        Debug.Log("");
         if ((parent.CurrentTiles.Count != 0 && parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this) || parent.CurrentTiles.Count == 0)
         {
             parent.Controller.ShowDeleteError();
@@ -104,16 +105,20 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent.Player1.ChangeBox(1, CurrentLetter.text);
         Remove();
         parent.CurrentTiles.Remove(this);
-        parent.Player1.ChangeGrid(Row, Column, "");
+        if(!skip)
+            parent.Player1.ChangeGrid(Row, Column, "");
         if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = GridLAN.Direction.None;
     }
 
     public void Remove()
     {
         if (String.IsNullOrEmpty(CurrentLetter.text))
+        {
             return;
+        }
         HasLetter = false;
         CurrentLetter.text = "";
+        Debug.Log("");
         if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
         if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);

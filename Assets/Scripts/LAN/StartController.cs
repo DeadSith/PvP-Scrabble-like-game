@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
-//Todo: show connection status
+
 public class StartController : MonoBehaviour
 {
 
