@@ -105,6 +105,10 @@ public class LetterBoxLAN : NetworkBehaviour
     [SyncVar(hook = "OnShowEnd")]
     public bool End = false;
 
+    [SyncVar] public bool TimerEnabled;
+    [SyncVar(hook = "OnLengthChanged")] public int TimerLength;
+    [SyncVar(hook = "OnSync")] public float TimeReamining;
+
     public override void OnStartClient()
     {
         var pref = Resources.Load("LetterLAN", typeof(GameObject)) as GameObject;
@@ -293,6 +297,12 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void ChangePlayer(int nextPlayer, int score)//score of current player
     {
+        if (CurrentPlayer==_currentGrid.PlayerNumber)
+            CmdSetTimeRemaining(TimerLength);
+        else
+        {
+            _currentGrid.TimeRemaining = TimeReamining;
+        }
         score += CurrentPlayer == 1 ? Player1Score : Player2Score;
         CmdChangeScore(CurrentPlayer, score);
         CmdChangeCurrentPlayer(nextPlayer);
@@ -363,6 +373,19 @@ public class LetterBoxLAN : NetworkBehaviour
         End = value;
     }
 
+
+    [Command]
+    private void CmdSetTimer(bool enabled, int lenght)
+    {
+        TimerEnabled = enabled;
+        TimerLength = lenght;
+    }
+
+    [Command]
+    private void CmdSetTimeRemaining(float remaining)
+    {
+        TimeReamining = remaining;
+    }
     #endregion Commands
 
     public void OnConnected(bool value)
@@ -371,6 +394,10 @@ public class LetterBoxLAN : NetworkBehaviour
         if (isServer)
         {
             Debug.Log("connected");
+            var enabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
+            var length = PlayerPrefs.GetInt("Length");
+            CmdSetTimer(enabled, length);
+            _currentGrid.SetTimer(enabled,length);
             ChangeBox(NumberOfLetters);
         }
     }
@@ -469,5 +496,19 @@ public class LetterBoxLAN : NetworkBehaviour
         if(Winner==-14)
             _currentGrid.EndGame(0,Player1Score,Player2Score);
         else _currentGrid.EndGame(Winner, Player1Score, Player2Score);
+    }
+
+    public void OnLengthChanged(int value)
+    {
+        TimerLength = value;
+        _currentGrid.SetTimer(TimerEnabled,value);
+    }
+
+    public void OnSync(float value)
+    {
+        TimeReamining = 1;
+        _currentGrid.TimeRemaining = value;
+        if (!isServer)
+            _currentGrid.TimeRemaining += 2;
     }
 }

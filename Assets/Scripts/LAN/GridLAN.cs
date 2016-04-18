@@ -46,7 +46,7 @@ public class GridLAN : MonoBehaviour
     private List<TileLAN> _wordsFound;
     private bool _timerEnabled;
     private int _timerLength;
-    private float _timeRemaining;
+    public float TimeRemaining;
     private float _xOffset = 0;
     private float _yOffset = 0;
     private bool _fixed;//Required to fix error with materials
@@ -58,14 +58,6 @@ public class GridLAN : MonoBehaviour
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<TileLAN>();
-        _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
-        if (_timerEnabled)
-        {
-            TimerImage.SetActive(true);
-            _timerLength = PlayerPrefs.GetInt("Length");
-            _timeRemaining = (float)_timerLength + 1;
-        }
-
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
         TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
@@ -84,9 +76,11 @@ public class GridLAN : MonoBehaviour
         }
         if (_timerEnabled)
         {
-            _timeRemaining -= Time.deltaTime;
-            TimerText.text = ((int)_timeRemaining - 1).ToString();
-            if (_timeRemaining < 0)
+            TimeRemaining -= Time.deltaTime;
+            var value = Player1.isServer ? (int)TimeRemaining : (int)TimeRemaining - 2;
+            if (value < 0) value = 0;
+            TimerText.text = value.ToString();
+            if (TimeRemaining < 0)
                 OnEndTimer();
         }
         if (Player1 == null && PlayerToSendCommands != null && GameObject.FindGameObjectsWithTag("Player").Length > 1)//Do not touch. It's a feature
@@ -249,7 +243,7 @@ public class GridLAN : MonoBehaviour
     //Todo: test
     private void OnEndTimer()
     {
-        _timeRemaining = (float)_timerLength + 1;
+        TimeRemaining = (float)_timerLength + 1;
         for (var i = CurrentTiles.Count - 1; i >= 0; i--)
         {
             CurrentTiles[i].RemoveOnClick();
@@ -268,13 +262,11 @@ public class GridLAN : MonoBehaviour
                 var points = CountPoints();
                 Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
                 Player1.CanChangeLetters = true;
-                //Player1.gameObject.SetActive(false);
                 CurrentTiles = new List<TileLAN>();
                 CurrentDirection = Direction.None;
-                //Controller.InvalidatePlayer(1, Player1.Score);
                 isFirstTurn = false;
                 if (_timerEnabled)
-                    _timeRemaining = (float)_timerLength + 1;
+                    TimeRemaining = (float)_timerLength + 1;
                 Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, points);
                 if (Player1.CurrentLetters.Count == 0)
                 {
@@ -301,16 +293,15 @@ public class GridLAN : MonoBehaviour
         //Player1.gameObject.SetActive(false);
         Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
-            _timeRemaining = (float)_timerLength + 1;
+            TimeRemaining = (float)_timerLength + 1;
     }
 
     public void OnSkipTurn()
     {
         Player1.CanChangeLetters = true;
-        //Player1.gameObject.SetActive(false);
         Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
-            _timeRemaining = (float)_timerLength + 1;
+            TimeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 3)
             Player1.EndGame(-14);
     }
@@ -567,4 +558,17 @@ public class GridLAN : MonoBehaviour
             Controller.FixFirstTurn();
         _fixed = false;
     }
+
+    public void SetTimer(bool enabled, int length = 0)
+    {
+        Debug.LogError(enabled);
+        _timerEnabled = enabled;
+        _timerLength = length;
+        if (_timerEnabled)
+        {
+            TimerImage.SetActive(true);
+            TimeRemaining = (float)_timerLength + 1;
+        }
+    }
+    
 }

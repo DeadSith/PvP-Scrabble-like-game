@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
 
+//Todo: show connection status
 public class StartController : MonoBehaviour
 {
 
@@ -16,7 +17,8 @@ public class StartController : MonoBehaviour
     {
         Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         Manager.networkPort = 7777;
-        AdressText.text = Manager.networkAddress;
+        //AdressText.text = Manager.networkAddress;
+        AdressText.text = Network.player.ipAddress;
     }
 
     // Update is called once per frame
@@ -33,13 +35,20 @@ public class StartController : MonoBehaviour
         }
         else
         {
-            Manager.networkAddress = AdressText.text;
+            var adress = Manager.networkAddress;
+            try
+            {
+                Manager.networkAddress = AdressText.text;
+            }
+            catch (Exception)
+            {
+                Manager.networkAddress = adress;
+            }
         }
     }
 
     public void StartServer()
     {
-        Debug.LogError("Server started");
         Manager.StartHost();
     }
 
