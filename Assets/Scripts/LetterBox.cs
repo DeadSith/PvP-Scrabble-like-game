@@ -53,7 +53,7 @@ public class LetterBox : MonoBehaviour
 
     #endregion Letters and scores
 
-    public List<Vector3> _freeCoordinates;
+    public List<Vector3> FreeCoordinates;
     public List<Letter> CurrentLetters;
     public int Score = 0;
     public Button ChangeLetterButton;
@@ -79,7 +79,7 @@ public class LetterBox : MonoBehaviour
     };
         CurrentLetters = new List<Letter>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
-        _freeCoordinates = new List<Vector3>();
+        FreeCoordinates = new List<Vector3>();
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenLetters = LetterSize.x;
         LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
@@ -104,7 +104,7 @@ public class LetterBox : MonoBehaviour
         {
             numberOfLetters = _allLetters.Count;
         }
-        if (_freeCoordinates.Count == 0)
+        if (FreeCoordinates.Count == 0)
         {
             for (var i = 0; i < numberOfLetters; i++)
             {
@@ -121,8 +121,8 @@ public class LetterBox : MonoBehaviour
         {
             for (var j = 0; j < numberOfLetters; j++)
             {
-                AddLetter(_freeCoordinates[_freeCoordinates.Count - 1], letter);
-                _freeCoordinates.RemoveAt(_freeCoordinates.Count - 1);
+                AddLetter(FreeCoordinates[FreeCoordinates.Count - 1], letter);
+                FreeCoordinates.RemoveAt(FreeCoordinates.Count - 1);
             }
         }
     }
@@ -157,7 +157,7 @@ public class LetterBox : MonoBehaviour
             CurrentLetters[j].gameObject.transform.position = previousCoordinates;
             previousCoordinates = tempCoordinates;
         }
-        _freeCoordinates.Add(previousCoordinates);
+        FreeCoordinates.Add(previousCoordinates);
         CurrentLetters.Remove(currentObject);
     }
 

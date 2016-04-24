@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
@@ -10,10 +11,22 @@ public class UIController : MonoBehaviour
     public Text ChangeLetterText;
     public Text WrongTileText;
     public Text StartText;
+    public Text WrongTurnText;
     public Text ZeroTilesText;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
+    public Button NextTurnButton;
+    public Button SkipTurnButton;
+    public Button ChangeLettersButton;
+
+    public Canvas EndGameCanvas;
+    public Text Player1EndText;
+    public Text Player2EndText;
+    public Text Winner;
+
+    public GameObject DisconnectedMenu;
     private static GameObject _currentObject;
+    private bool isLocalTurn;
 
     private void Start()
     {
@@ -46,6 +59,13 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
+    public void ShowWrongTurnError()
+    {
+        _currentObject.SetActive(false);
+        _currentObject = WrongTurnText.gameObject;
+        _currentObject.SetActive(true);
+    }
+
     public void ShowDeleteError()
     {
         _currentObject.SetActive(false);
@@ -72,5 +92,60 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(false);
         _currentObject = ZeroTilesText.gameObject;
         _currentObject.SetActive(true);
+    }
+
+    public void SetChangeButtonActive(bool active)
+    {
+        if (isLocalTurn && ChangeLettersButton.interactable != active)
+            ChangeLettersButton.interactable = active;
+    }
+
+    public void SetSkipButtonActive(bool active)
+    {
+        if (isLocalTurn && SkipTurnButton.interactable != active)
+        {
+            SkipTurnButton.interactable = active;
+        }
+    }
+
+    public void SetNextButtonActive(bool active)
+    {
+        if (isLocalTurn && NextTurnButton.interactable != active)
+            NextTurnButton.interactable = active;
+    }
+
+    public void InvalidatePlayer(int playerNumber, int score, bool isLocal)
+    {
+        playerNumber = playerNumber == 1 ? 2 : 1;
+        InvalidatePlayer(playerNumber, score);
+        isLocalTurn = true;
+        SetChangeButtonActive(isLocal);
+        SetNextButtonActive(isLocal);
+        SetSkipButtonActive(isLocal);
+        isLocalTurn = isLocal;
+    }
+
+    public void FixFirstTurn()//Call on the first turn of server to fix materials
+    {
+        Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
+        Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
+    }
+
+    public void SetWinner(int winner, int player1Score, int player2Score)
+    {
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
+        EndGameCanvas.gameObject.SetActive(true);
+        Winner.text = winner.ToString();
+        Player1EndText.text = player1Score.ToString();
+        Player2EndText.text = player2Score.ToString();
+        gameObject.GetComponent<Canvas>().enabled = false;
+    }
+
+    public void ShowConnectionError()
+    {
+        var manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
+        manager.StopHost();
+        DisconnectedMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
 }
