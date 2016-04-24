@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
@@ -23,6 +24,7 @@ public class UIController : MonoBehaviour
     public Text Player2EndText;
     public Text Winner;
 
+    public GameObject DisconnectedMenu;
     private static GameObject _currentObject;
     private bool isLocalTurn;
 
@@ -137,5 +139,13 @@ public class UIController : MonoBehaviour
         Player1EndText.text = player1Score.ToString();
         Player2EndText.text = player2Score.ToString();
         gameObject.GetComponent<Canvas>().enabled = false;
+    }
+
+    public void ShowConnectionError()
+    {
+        var manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
+        manager.StopHost();
+        DisconnectedMenu.SetActive(true);
+        gameObject.SetActive(false);
     }
 }

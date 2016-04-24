@@ -95,13 +95,11 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     public void RemoveOnClick(bool skip = false)
     {
-        Debug.Log("");
         if ((parent.CurrentTiles.Count != 0 && parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this) || parent.CurrentTiles.Count == 0)
         {
             parent.Controller.ShowDeleteError();
             return;
         }
-        //parent.Player1.ChangeBox(1); //for testing
         parent.Player1.ChangeBox(1, CurrentLetter.text);
         Remove();
         parent.CurrentTiles.Remove(this);

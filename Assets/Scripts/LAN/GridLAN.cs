@@ -24,7 +24,7 @@ public class GridLAN : MonoBehaviour
     public Material LetterX3Material;
 
     #endregion Prefabs and materials
-
+    
     public GameObject TimerImage;
     public Text TimerText;
     public UIController Controller;
@@ -32,14 +32,12 @@ public class GridLAN : MonoBehaviour
     public int CurrentTurn = 1;
     public bool isFirstTurn = true;
     public byte NumberOfRows = 15;
-
     public byte NumberOfColumns = 15;
     public LetterBoxLAN Player1;
     public LetterBoxLAN PlayerToSendCommands;
     public float DistanceBetweenTiles = 1.2f;
     public TileLAN[,] Field;
     public List<TileLAN> CurrentTiles;
-
     public int PlayerNumber;
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
@@ -50,6 +48,7 @@ public class GridLAN : MonoBehaviour
     private float _xOffset = 0;
     private float _yOffset = 0;
     private bool _fixed;//Required to fix error with materials
+    private bool _gameStarted;
 
     private void Start()
     {
@@ -69,6 +68,8 @@ public class GridLAN : MonoBehaviour
 
     private void Update()
     {
+        if(_gameStarted&&Player1==null)
+            Controller.ShowConnectionError();
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -77,6 +78,8 @@ public class GridLAN : MonoBehaviour
         if (_timerEnabled)
         {
             TimeRemaining -= Time.deltaTime;
+            if(Player1==null)
+                return;
             var value = Player1.isServer ? (int)TimeRemaining : (int)TimeRemaining - 2;
             if (value < 0) value = 0;
             TimerText.text = value.ToString();
@@ -89,6 +92,7 @@ public class GridLAN : MonoBehaviour
                 if (o.GetComponent<LetterBoxLAN>() == PlayerToSendCommands)
                     continue;
                 Player1 = o.GetComponent<LetterBoxLAN>();
+                _gameStarted = true;
                 break;
             }
         else if (Player1 != null)
@@ -565,7 +569,6 @@ public class GridLAN : MonoBehaviour
     public void SetTimer(bool enabled, int length = 0)
     {
         //isFirstTurn = Player1.IsFirstTurn;
-        Debug.LogError(isFirstTurn);
         _timerEnabled = enabled;
         _timerLength = length;
         if (_timerEnabled)

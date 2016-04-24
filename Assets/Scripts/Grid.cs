@@ -87,7 +87,10 @@ public class Grid : MonoBehaviour
         if (_timerEnabled)
         {
             _timeRemaining -= Time.deltaTime;
-            TimerText.text = ((int)_timeRemaining - 1).ToString();
+            var timerValue = (int) _timeRemaining - 1;
+            if (timerValue < 0)
+                timerValue = 0;
+            TimerText.text = timerValue.ToString();
             if (_timeRemaining < 0)
                 OnEndTimer();
         }

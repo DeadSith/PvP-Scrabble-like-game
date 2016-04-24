@@ -198,6 +198,8 @@ public class LetterBoxLAN : NetworkBehaviour
         ChangeBox(NumberOfLetters);
         CmdStartClient(true);
         ChangePlayer(1, 0);
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameStarted = true;
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
     }
 
     public void Update()
@@ -452,6 +454,8 @@ public class LetterBoxLAN : NetworkBehaviour
         ClientConnected = value;
         if (isServer)
         {
+            GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameStarted = true;
+            GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
             _waitTextGameObject.SetActive(false);
             var enabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
             var length = PlayerPrefs.GetInt("Length");
@@ -482,7 +486,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void OnGridChanged(string value)
     {
-        Debug.LogError(String.Format("{0} {1} {2}", GridX, GridY, value));
+        //Debug.LogError(String.Format("{0} {1} {2}", GridX, GridY, value));
         LetterToPlace = "xyz";
         if (!String.IsNullOrEmpty(value))
             _currentGrid.Field[GridX, GridY].ChangeLetter(value);
