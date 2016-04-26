@@ -11,6 +11,7 @@ public class PauseBehaviour : MonoBehaviour
 
     //Used only for multiplayer
     public GameObject StartMenu;
+
     public bool GameStarted;
 
     private void Update()
@@ -23,14 +24,14 @@ public class PauseBehaviour : MonoBehaviour
         if (!GameOver && _paused)
         {
             PauseMenu.GetComponent<Canvas>().enabled = true;
-            if (StartMenu!=null&&!GameStarted)
+            if (StartMenu != null && !GameStarted)
                 StartMenu.GetComponent<Canvas>().enabled = false;
             Game.GetComponent<Canvas>().enabled = false;
         }
         else if (!GameOver)
         {
             PauseMenu.GetComponent<Canvas>().enabled = false;
-            if (StartMenu != null&&!GameStarted)
+            if (StartMenu != null && !GameStarted)
             {
                 StartMenu.GetComponent<Canvas>().enabled = true;
             }

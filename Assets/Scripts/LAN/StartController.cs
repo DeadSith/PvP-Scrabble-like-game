@@ -1,19 +1,40 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.UI;
-using System.Collections;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.UI;
 
 public class StartController : MonoBehaviour
 {
-
-    public NetworkManager Manager;
     public InputField AdressText;
+    public NetworkManager Manager;
     public GameObject SettingsCanvas;
+
+    public void StartClient()
+    {
+        Manager.StartClient();
+    }
+
+    public void StartServer()
+    {
+        Manager.StartHost();
+    }
+
+    public void Stop()
+    {
+        try
+        {
+            Manager.StopHost();
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+        SceneManager.LoadScene(0);
+    }
+
     // Use this for initialization
-    void Awake()
+    private void Awake()
     {
         Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         Manager.networkPort = 7777;
@@ -22,7 +43,7 @@ public class StartController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (NetworkClient.active && !ClientScene.ready)
         {
@@ -45,28 +66,5 @@ public class StartController : MonoBehaviour
                 Manager.networkAddress = adress;
             }
         }
-    }
-
-    public void StartServer()
-    {
-        Manager.StartHost();
-    }
-
-    public void StartClient()
-    {
-        Manager.StartClient();
-    }
-
-    public void Stop()
-    {
-        try
-        {
-            Manager.StopHost();
-        }
-        catch (Exception ex)
-        {
-            // ignored
-        }
-        SceneManager.LoadScene(0);
     }
 }

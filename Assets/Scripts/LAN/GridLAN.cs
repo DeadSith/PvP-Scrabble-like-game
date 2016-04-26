@@ -24,13 +24,13 @@ public class GridLAN : MonoBehaviour
     public Material LetterX3Material;
 
     #endregion Prefabs and materials
-    
+
     public GameObject TimerImage;
     public Text TimerText;
     public UIController Controller;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
-    public bool isFirstTurn = true;
+    public bool IsFirstTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
     public LetterBoxLAN Player1;
@@ -39,6 +39,7 @@ public class GridLAN : MonoBehaviour
     public TileLAN[,] Field;
     public List<TileLAN> CurrentTiles;
     public int PlayerNumber;
+
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
     private List<TileLAN> _wordsFound;
@@ -68,17 +69,17 @@ public class GridLAN : MonoBehaviour
 
     private void Update()
     {
-        if(_gameStarted&&Player1==null)
+        if (_gameStarted && Player1 == null)
             Controller.ShowConnectionError();
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Player1.EndGame(-14);
+            Player1.EndGame();
         }
         if (_timerEnabled)
         {
             TimeRemaining -= Time.deltaTime;
-            if(Player1==null)
+            if (Player1 == null)
                 return;
             var value = Player1.isServer ? (int)TimeRemaining : (int)TimeRemaining - 2;
             if (value < 0) value = 0;
@@ -243,7 +244,7 @@ public class GridLAN : MonoBehaviour
     }
 
     #endregion Some shitty code
-    
+
     private void OnEndTimer()
     {
         TimeRemaining = (float)_timerLength + 1;
@@ -271,13 +272,13 @@ public class GridLAN : MonoBehaviour
                 Player1.CanChangeLetters = true;
                 CurrentTiles = new List<TileLAN>();
                 CurrentDirection = Direction.None;
-                isFirstTurn = false;
+                IsFirstTurn = false;
                 if (_timerEnabled)
                     TimeRemaining = (float)_timerLength + 1;
                 Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, points);
                 if (Player1.CurrentLetters.Count == 0)
                 {
-                    Player1.EndGame(PlayerNumber);
+                    Player1.EndGame();
                 }
             }
             else Controller.ShowNotExistError();
@@ -310,7 +311,9 @@ public class GridLAN : MonoBehaviour
         if (_timerEnabled)
             TimeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 3)
-            Player1.EndGame(-14);
+        {
+            Player1.EndGame();
+        }
     }
 
     #region Words Checking
@@ -577,5 +580,4 @@ public class GridLAN : MonoBehaviour
             TimeRemaining = (float)_timerLength + 1;
         }
     }
-    
 }

@@ -25,8 +25,9 @@ public class UIController : MonoBehaviour
     public Text Winner;
 
     public GameObject DisconnectedMenu;
+
     private static GameObject _currentObject;
-    private bool isLocalTurn;
+    private bool _isLocalTurn;
 
     private void Start()
     {
@@ -96,13 +97,13 @@ public class UIController : MonoBehaviour
 
     public void SetChangeButtonActive(bool active)
     {
-        if (isLocalTurn && ChangeLettersButton.interactable != active)
+        if (_isLocalTurn && ChangeLettersButton.interactable != active)
             ChangeLettersButton.interactable = active;
     }
 
     public void SetSkipButtonActive(bool active)
     {
-        if (isLocalTurn && SkipTurnButton.interactable != active)
+        if (_isLocalTurn && SkipTurnButton.interactable != active)
         {
             SkipTurnButton.interactable = active;
         }
@@ -110,7 +111,7 @@ public class UIController : MonoBehaviour
 
     public void SetNextButtonActive(bool active)
     {
-        if (isLocalTurn && NextTurnButton.interactable != active)
+        if (_isLocalTurn && NextTurnButton.interactable != active)
             NextTurnButton.interactable = active;
     }
 
@@ -118,11 +119,11 @@ public class UIController : MonoBehaviour
     {
         playerNumber = playerNumber == 1 ? 2 : 1;
         InvalidatePlayer(playerNumber, score);
-        isLocalTurn = true;
+        _isLocalTurn = true;
         SetChangeButtonActive(isLocal);
         SetNextButtonActive(isLocal);
         SetSkipButtonActive(isLocal);
-        isLocalTurn = isLocal;
+        _isLocalTurn = isLocal;
     }
 
     public void FixFirstTurn()//Call on the first turn of server to fix materials
@@ -143,6 +144,12 @@ public class UIController : MonoBehaviour
 
     public void ShowConnectionError()
     {
+        var pause = GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver;
+        if (pause)
+        {
+            gameObject.SetActive(false);
+            return;
+        }
         var manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         manager.StopHost();
         DisconnectedMenu.SetActive(true);

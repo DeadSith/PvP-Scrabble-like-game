@@ -87,7 +87,7 @@ public class Grid : MonoBehaviour
         if (_timerEnabled)
         {
             _timeRemaining -= Time.deltaTime;
-            var timerValue = (int) _timeRemaining - 1;
+            var timerValue = (int)_timeRemaining - 1;
             if (timerValue < 0)
                 timerValue = 0;
             TimerText.text = timerValue.ToString();
@@ -305,9 +305,7 @@ public class Grid : MonoBehaviour
     {
         if (CurrentPlayer == 1)
         {
-            if (Player1.ChangeLetters())
-                CurrentTurn++;
-            else
+            if (!Player1.ChangeLetters())
             {
                 Controller.ShowChangeLetterError();
                 return;
@@ -321,9 +319,7 @@ public class Grid : MonoBehaviour
         }
         else
         {
-            if (Player2.ChangeLetters())
-                CurrentTurn++;
-            else
+            if (!Player2.ChangeLetters())
             {
                 Controller.ShowChangeLetterError();
                 return;

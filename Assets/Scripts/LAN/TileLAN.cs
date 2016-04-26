@@ -103,7 +103,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent.Player1.ChangeBox(1, CurrentLetter.text);
         Remove();
         parent.CurrentTiles.Remove(this);
-        if(!skip)
+        if (!skip)
             parent.Player1.ChangeGrid(Row, Column, "");
         if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = GridLAN.Direction.None;
     }
@@ -122,7 +122,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
         if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
         CanDrop = CheckTile(this);
-        if (parent.isFirstTurn)
+        if (parent.IsFirstTurn)
         {
             parent.Player1.CanChangeLetters = true;
             parent.CurrentDirection = GridLAN.Direction.None;
