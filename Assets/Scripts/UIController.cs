@@ -18,6 +18,7 @@ public class UIController : MonoBehaviour
     public Button NextTurnButton;
     public Button SkipTurnButton;
     public Button ChangeLettersButton;
+    public Button ReturnAllButton;
 
     public Canvas EndGameCanvas;
     public Text Player1EndText;
@@ -112,7 +113,10 @@ public class UIController : MonoBehaviour
     public void SetNextButtonActive(bool active)
     {
         if (_isLocalTurn && NextTurnButton.interactable != active)
+        {
             NextTurnButton.interactable = active;
+            ReturnAllButton.interactable = active;
+        }
     }
 
     public void InvalidatePlayer(int playerNumber, int score, bool isLocal)

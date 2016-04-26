@@ -248,14 +248,7 @@ public class GridLAN : MonoBehaviour
     private void OnEndTimer()
     {
         TimeRemaining = (float)_timerLength + 1;
-        var sb = new StringBuilder();
-        for (var i = CurrentTiles.Count - 1; i >= 0; i--)
-        {
-            sb.Append(CurrentTiles[i].Row + " " + CurrentTiles[i].Column + " ");
-        }
-        if (sb.Length != 0)
-            sb.Append(Player1.CurrentPlayer);
-        Player1.DeleteOnSkip(sb.ToString().Trim());
+        OnRemoveAll();
         OnSkipTurn();
     }
 
@@ -314,6 +307,18 @@ public class GridLAN : MonoBehaviour
         {
             Player1.EndGame();
         }
+    }
+
+    public void OnRemoveAll()
+    {
+        var sb = new StringBuilder();
+        for (var i = CurrentTiles.Count - 1; i >= 0; i--)
+        {
+            sb.Append(CurrentTiles[i].Row + " " + CurrentTiles[i].Column + " ");
+        }
+        if (sb.Length != 0)
+            sb.Append(Player1.CurrentPlayer);
+        Player1.DeleteOnSkip(sb.ToString().Trim());
     }
 
     #region Words Checking

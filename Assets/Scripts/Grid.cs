@@ -244,10 +244,7 @@ public class Grid : MonoBehaviour
     {
         _timeRemaining = (float)_timerLength + 1;
         var currentPlayer = CurrentPlayer == 1 ? Player1 : Player2;
-        for (var i = CurrentTiles.Count - 1; i >= 0; i--)
-        {
-            CurrentTiles[i].RemoveTile();
-        }
+        OnRemoveAll();
         OnSkipTurn();
     }
 
@@ -357,6 +354,14 @@ public class Grid : MonoBehaviour
             _timeRemaining = (float)_timerLength + 1;
         if (++_turnsSkipped == 4)
             EndGame(null);
+    }
+
+    public void OnRemoveAll()
+    {
+        for (var i = CurrentTiles.Count - 1; i >= 0; i--)
+        {
+            CurrentTiles[i].RemoveTile();
+        }
     }
 
     private bool CheckWords()
