@@ -1,10 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
+    public Text PointsText;
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
@@ -110,5 +112,21 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
             if (parent.CurrentTurn == 1)
                 parent.Field[7, 7].CanDrop = true;
         }
+    }
+
+    public void OnMouseEnter()
+    {
+        if (!String.IsNullOrEmpty(CurrentLetter.text))
+        {
+            PointsText.enabled = true;
+            PointsText.text = LetterBox.PointsDictionary[CurrentLetter.text].ToString();
+            CurrentLetter.enabled = false;
+        }
+    }
+
+    public void OnMouseExit()
+    {
+        PointsText.enabled = false;
+        CurrentLetter.enabled = true;
     }
 }
