@@ -46,7 +46,7 @@ public class LetterBox : MonoBehaviour
             {"ї", 6},
             {"ч", 5},
             {"*", 0},
-            {"'", 0}
+            {"'", 10}
         };
 
     private static List<string> _allLetters;
@@ -134,7 +134,7 @@ public class LetterBox : MonoBehaviour
         newLetter.transform.SetParent(gameObject.transform);
         if (String.IsNullOrEmpty(letter))
         {
-            var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
+            var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
             newLetter.ChangeLetter(current);
             _allLetters.Remove(current);
             CurrentLetters.Add(newLetter);
@@ -169,8 +169,10 @@ public class LetterBox : MonoBehaviour
         {
             if (t.isChecked)
             {
-                _allLetters.Add(t.LetterText.text);
-                t.LetterText.text = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count - 1)];
+                var text = t.LetterText.text;
+                t.LetterText.text = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
+                _allLetters.Add(text);
+                _allLetters.Remove(t.LetterText.text);
                 t.isChecked = false;
                 t.gameObject.GetComponent<Image>().material = t.StandardMaterial;
                 successful = true;

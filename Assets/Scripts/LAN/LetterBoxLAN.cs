@@ -48,7 +48,7 @@ public class LetterBoxLAN : NetworkBehaviour
             {"ї", 6},
             {"ч", 5},
             {"*", 0},
-            {"'", 0}
+            {"'", 10}
         };
 
     private List<String> _allLetters = new List<string>();
@@ -255,7 +255,7 @@ public class LetterBoxLAN : NetworkBehaviour
         newLetter.transform.SetParent(gameObject.transform);
         if (String.IsNullOrEmpty(letter))
         {
-            var current = AllLetters[UnityEngine.Random.Range(0, AllLetters.Count - 1)];
+            var current = AllLetters[UnityEngine.Random.Range(0, AllLetters.Count)];
             //CmdDeleteLetter(current);
             _lettersToDelete.Add(current);
             if (_isFirstTurn)
@@ -305,7 +305,7 @@ public class LetterBoxLAN : NetworkBehaviour
         var lettersToDelete = new StringBuilder();
         foreach (LetterLAN t in CurrentLetters.Where(t => t.isChecked))
         {
-            var current = temp[UnityEngine.Random.Range(0, temp.Count - 1)];
+            var current = temp[UnityEngine.Random.Range(0, temp.Count)];
             lettersToDelete.Append(current);
             temp.Remove(current);
             t.ChangeLetter(current);

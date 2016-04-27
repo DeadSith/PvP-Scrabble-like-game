@@ -22,7 +22,6 @@ public class Letter : MonoBehaviour, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         LetterText.text = letter;
-        PointsText.text = LetterBox.PointsDictionary[letter].ToString();
         PointsText.enabled = false;
     }
 
@@ -43,6 +42,7 @@ public class Letter : MonoBehaviour, IPointerClickHandler
 
     public void OnMouseEnter()
     {
+        PointsText.text = LetterBox.PointsDictionary[LetterText.text].ToString();
         LetterText.enabled = false;
         PointsText.enabled = true;
     }
