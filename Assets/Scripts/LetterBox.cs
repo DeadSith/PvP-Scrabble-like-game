@@ -149,6 +149,7 @@ public class LetterBox : MonoBehaviour
     public void RemoveLetter()
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
+        //currentObject.transform.position = new Vector3(-1500,-1500);
         var currentIndex = FindIndex(currentObject);
         Vector3 previousCoordinates = DragHandler.StartPosition;
         for (int j = currentIndex + 1; j < CurrentLetters.Count; j++)

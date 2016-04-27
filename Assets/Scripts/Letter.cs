@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class Letter : MonoBehaviour, IPointerClickHandler
 {
     public Text LetterText;
+    public Text PointsText;
     public Material StandardMaterial;
     public Material CheckedMaterial;
     public bool isChecked = false;
@@ -18,9 +19,11 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         parent = gameObject.transform.parent.GetComponent<LetterBox>();
     }
 
-    public void ChangeLetter(string input)
+    public void ChangeLetter(string letter)
     {
-        LetterText.text = input;
+        LetterText.text = letter;
+        PointsText.text = LetterBox.PointsDictionary[letter].ToString();
+        PointsText.enabled = false;
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -32,6 +35,18 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void OnMouseExit()
+    {
+        LetterText.enabled = true;
+        PointsText.enabled = false;
+    }
+
+    public void OnMouseEnter()
+    {
+        LetterText.enabled = false;
+        PointsText.enabled = true;
+    }
+
     public void Fix()
     {
         parent.FreeCoordinates.Add(_startPosition);
@@ -39,6 +54,6 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         var index = parent.FindIndex(this);
         parent.CurrentLetters[index] = parent.CurrentLetters[parent.CurrentLetters.Count - 1];
         parent.CurrentLetters.RemoveAt(parent.CurrentLetters.Count - 1);
-        transform.position = new Vector3(-500, -500);
+        transform.position = new Vector3(-1500, -1500);
     }
 }

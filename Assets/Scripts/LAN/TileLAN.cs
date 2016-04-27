@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
+    public Text PointsText;
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
@@ -23,6 +24,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (CanDrop && !HasLetter)
         {
+            DragHandler.ObjectDragged.transform.position = new Vector3(-1500,-1500);
             if (parent.PlayerNumber != parent.Player1.CurrentPlayer)
             {
                 parent.Controller.ShowWrongTurnError();
@@ -124,9 +126,28 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         CanDrop = CheckTile(this);
         if (parent.IsFirstTurn)
         {
-            parent.Player1.CanChangeLetters = true;
             parent.CurrentDirection = GridLAN.Direction.None;
             parent.Field[7, 7].CanDrop = true;
         }
+        if (parent.CurrentTiles.Count == 0)
+        {
+            parent.Player1.CanChangeLetters = true;
+        }
+    }
+
+    public void OnMouseEnter()
+    {
+        if (!String.IsNullOrEmpty(CurrentLetter.text))
+        {
+            PointsText.enabled = true;
+            PointsText.text = LetterBoxLAN.PointsDictionary[CurrentLetter.text].ToString();
+            CurrentLetter.enabled = false;
+        }
+    }
+
+    public void OnMouseExit()
+    {
+        PointsText.enabled = false;
+        CurrentLetter.enabled = true;
     }
 }

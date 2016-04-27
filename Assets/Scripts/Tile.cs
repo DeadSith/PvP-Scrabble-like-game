@@ -24,6 +24,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (CanDrop && !HasLetter)
         {
+            DragHandler.ObjectDragged.transform.position = new Vector3(-1500,-1500);
             if (parent.CurrentDirection == Grid.Direction.None ||
                 (parent.CurrentDirection == Grid.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
                 (parent.CurrentDirection == Grid.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
@@ -105,12 +106,15 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = Grid.Direction.None;
         if (parent.isFirstTurn)
         {
-            if (parent.CurrentPlayer == 1)
-                parent.Player1.CanChangeLetters = true;
-            else parent.Player2.CanChangeLetters = true;
             parent.CurrentDirection = Grid.Direction.None;
             if (parent.CurrentTurn == 1)
                 parent.Field[7, 7].CanDrop = true;
+        }
+        if (parent.CurrentTiles.Count == 0)
+        {
+            if (parent.CurrentPlayer == 1)
+                parent.Player1.CanChangeLetters = true;
+            else parent.Player2.CanChangeLetters = true;
         }
     }
 

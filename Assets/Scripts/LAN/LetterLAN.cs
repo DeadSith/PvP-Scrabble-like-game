@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class LetterLAN : MonoBehaviour, IPointerClickHandler
 {
     public Text LetterText;
+    public Text PointsText;
     public Material StandardMaterial;
     public Material CheckedMaterial;
     public bool isChecked = false;
@@ -18,9 +19,11 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
         parent = gameObject.transform.parent.GetComponent<LetterBoxLAN>();
     }
 
-    public void ChangeLetter(string input)
+    public void ChangeLetter(string letter)
     {
-        LetterText.text = input;
+        LetterText.text = letter;
+        PointsText.text = LetterBoxLAN.PointsDictionary[letter].ToString();
+        PointsText.enabled = false;
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -30,6 +33,18 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
             gameObject.GetComponent<Image>().material = isChecked ? StandardMaterial : CheckedMaterial;
             isChecked = !isChecked;
         }
+    }
+
+    public void OnMouseExit()
+    {
+        LetterText.enabled = true;
+        PointsText.enabled = false;
+    }
+
+    public void OnMouseEnter()
+    {
+        LetterText.enabled = false;
+        PointsText.enabled = true;
     }
 
     public void Fix()
