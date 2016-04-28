@@ -7,12 +7,14 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+    public Text ScoreForWord;
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
     public int Column;
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
+
     private Grid parent;
 
     private void Start()
@@ -116,6 +118,12 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
                 parent.Player1.CanChangeLetters = true;
             else parent.Player2.CanChangeLetters = true;
         }
+    }
+
+    public void SetPoints(int score)
+    {
+        ScoreForWord.text = score.ToString();
+        //Todo: hide after 1.5 seconds
     }
 
     public void OnMouseEnter()

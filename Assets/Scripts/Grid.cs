@@ -123,8 +123,7 @@ public class Grid : MonoBehaviour
     }
 
     #region Some shitty code
-
-    //Todo: rewrite to cycles
+    
     private void AssignMaterials()
     {
         Field[0, 0].GetComponent<Image>().material = WordX3Material;
@@ -513,6 +512,7 @@ public class Grid : MonoBehaviour
                 }
             }
             result += tempRes;
+            Field[7,0].SetPoints(tempRes);
         }
         return result * wordMultiplier;
     }
