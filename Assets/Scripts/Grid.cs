@@ -29,14 +29,11 @@ public class Grid : MonoBehaviour
     public GameObject EndGameCanvas;
     public UIController Controller;
     public Button SkipTurnButton;
-    public Direction CurrentDirection = Direction.None;
 
+    public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
     public bool isFirstTurn = true;
-
-    //public bool isFirstCurrentTurn = true;
     public byte NumberOfRows = 15;
-
     public byte NumberOfColumns = 15;
     public LetterBox Player1;
     public LetterBox Player2;
@@ -364,6 +361,7 @@ public class Grid : MonoBehaviour
         }
     }
 
+    #region Word cheking
     private bool CheckWords()
     {
         switch (CurrentDirection)
@@ -589,7 +587,8 @@ public class Grid : MonoBehaviour
         var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
         var command = new SqliteCommand(sql, _dbConnection);
         var inp = command.ExecuteScalar();
-        if (Convert.ToInt32(inp) != 0)
+        return Convert.ToInt32(inp) != 0;
+        /*if (Convert.ToInt32(inp) != 0)
             return true;
         else
         {
@@ -597,8 +596,9 @@ public class Grid : MonoBehaviour
             command = new SqliteCommand(sql, _dbConnection);
             inp = command.ExecuteScalar();
             return Convert.ToInt32(inp) != 0;
-        }
+        }*/
     }
+    #endregion
 
     private void EndGame(LetterBox playerOut)//Player, who ran out of letters is passed
     {

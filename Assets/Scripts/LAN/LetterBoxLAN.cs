@@ -9,56 +9,13 @@ using UnityEngine.UI;
 //Todo: sync number of skipped turns
 public class LetterBoxLAN : NetworkBehaviour
 {
-    #region Letters and scores
-
-    public static Dictionary<string, int> PointsDictionary =
-        new Dictionary<string, int>
-        {
-            {"а", 1},
-            {"с", 2},
-            {"и", 1},
-            {"р", 1},
-            {"о", 1},
-            {"д", 2},
-            {"ш", 6},
-            {"ц", 6},
-            {"е", 1},
-            {"н", 1},
-            {"т", 1},
-            {"щ", 8},
-            {"к", 2},
-            {"ж", 6},
-            {"п", 2},
-            {"в", 1},
-            {"у", 3},
-            {"м", 2},
-            {"г", 4},
-            {"і", 1},
-            {"х", 5},
-            {"л", 2},
-            {"ю", 7},
-            {"б", 4},
-            {"я", 4},
-            {"ф", 8},
-            {"ь", 5},
-            {"ґ", 10},
-            {"з", 4},
-            {"є", 8},
-            {"й", 5},
-            {"ї", 6},
-            {"ч", 5},
-            {"*", 0},
-            {"'", 10}
-        };
-
+    #region Letters
     private List<String> _allLetters = new List<string>();
     public List<String> AllLetters = new List<string>();
     private List<String> _lettersToDelete = new List<string>();
-
-    #endregion Letters and scores
+    #endregion
 
     [HideInInspector] public List<Vector3> FreeCoordinates;
-    
     public List<LetterLAN> CurrentLetters;
     public LetterLAN LetterPrefab;
     public bool CanChangeLetters = true;
@@ -145,8 +102,8 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        var pref = Resources.Load("LetterLAN", typeof(GameObject)) as GameObject;
-        LetterPrefab = pref.GetComponent<LetterLAN>();
+        var prefab = Resources.Load("LetterLAN", typeof(GameObject)) as GameObject;
+        LetterPrefab = prefab.GetComponent<LetterLAN>();
         NumberOfLettersText = GameObject.FindGameObjectWithTag("NumberOfLetters").GetComponent<Text>();
         CurrentLetters = new List<LetterLAN>();
         transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -268,12 +225,6 @@ public class LetterBoxLAN : NetworkBehaviour
             newLetter.ChangeLetter(letter);
             CurrentLetters.Add(newLetter);
         }
-    }
-
-    public void Delay(int delay)
-    {
-        int t = Environment.TickCount;
-        while ((Environment.TickCount - t) < delay) ;
     }
 
     public void RemoveLetter()//Is called when letter is dropped
@@ -503,7 +454,7 @@ public class LetterBoxLAN : NetworkBehaviour
         var result = 0;
         foreach (var letter in CurrentLetters)
         {
-            result += PointsDictionary[letter.LetterText.text];
+            result += LetterBox.PointsDictionary[letter.LetterText.text];
         }
         CmdAddBonusScore(result);
         if (_currentGrid.PlayerNumber == 1)

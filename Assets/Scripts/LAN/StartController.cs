@@ -33,16 +33,15 @@ public class StartController : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    // Use this for initialization
+
     private void Awake()
     {
         Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         Manager.networkPort = 7777;
-        //AdressText.text = Manager.networkAddress;
         AdressText.text = Network.player.ipAddress;
     }
 
-    // Update is called once per frame
+
     private void Update()
     {
         if (NetworkClient.active && !ClientScene.ready)

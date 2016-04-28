@@ -22,7 +22,7 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         LetterText.text = letter;
-        PointsText.text = LetterBoxLAN.PointsDictionary[letter].ToString();
+        PointsText.text = LetterBox.PointsDictionary[letter].ToString();
         PointsText.enabled = false;
     }
 

@@ -13,6 +13,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     public int Column;
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
+
     private GridLAN parent;
 
     private void Start()
@@ -140,7 +141,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (!String.IsNullOrEmpty(CurrentLetter.text))
         {
             PointsText.enabled = true;
-            PointsText.text = LetterBoxLAN.PointsDictionary[CurrentLetter.text].ToString();
+            PointsText.text = LetterBox.PointsDictionary[CurrentLetter.text].ToString();
             CurrentLetter.enabled = false;
         }
     }

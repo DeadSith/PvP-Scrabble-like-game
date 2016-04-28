@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-//Todo: test timer
 public class GridLAN : MonoBehaviour
 {
     public enum Direction
@@ -43,13 +42,14 @@ public class GridLAN : MonoBehaviour
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
     private List<TileLAN> _wordsFound;
-    private bool _timerEnabled;
-    private int _timerLength;
-    public float TimeRemaining;
     private float _xOffset = 0;
     private float _yOffset = 0;
     private bool _fixed;//Required to fix error with materials
     private bool _gameStarted;
+
+    private bool _timerEnabled;
+    private int _timerLength;
+    public float TimeRemaining;
 
     private void Start()
     {
@@ -72,7 +72,7 @@ public class GridLAN : MonoBehaviour
         if (_gameStarted && Player1 == null)
             Controller.ShowConnectionError();
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.A)&&Player1!=null)
         {
             Player1.EndGame();
         }
@@ -131,7 +131,7 @@ public class GridLAN : MonoBehaviour
         AssignMultipliers();
     }
 
-    #region Some shitty code
+    #region Field generation
 
     private void AssignMaterials()
     {
@@ -291,7 +291,6 @@ public class GridLAN : MonoBehaviour
         }
         _turnsSkipped = 0;
         Player1.CanChangeLetters = true;
-        //Player1.gameObject.SetActive(false);
         Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
             TimeRemaining = (float)_timerLength + 1;
@@ -548,7 +547,8 @@ public class GridLAN : MonoBehaviour
         var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
         var command = new SqliteCommand(sql, _dbConnection);
         var inp = command.ExecuteScalar();
-        if (Convert.ToInt32(inp) != 0)
+        return Convert.ToInt32(inp) != 0;
+        /*if (Convert.ToInt32(inp) != 0)
             return true;
         else
         {
@@ -556,7 +556,7 @@ public class GridLAN : MonoBehaviour
             command = new SqliteCommand(sql, _dbConnection);
             inp = command.ExecuteScalar();
             return Convert.ToInt32(inp) != 0;
-        }
+        }*/
     }
 
     #endregion Words Checking
@@ -576,7 +576,6 @@ public class GridLAN : MonoBehaviour
 
     public void SetTimer(bool enabled, int length = 0)
     {
-        //isFirstTurn = Player1.IsFirstTurn;
         _timerEnabled = enabled;
         _timerLength = length;
         if (_timerEnabled)
