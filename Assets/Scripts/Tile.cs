@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -26,7 +27,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (CanDrop && !HasLetter)
         {
-            DragHandler.ObjectDragged.transform.position = new Vector3(-1500,-1500);
+            DragHandler.ObjectDragged.transform.position = new Vector3(-1500, -1500);
             if (parent.CurrentDirection == Grid.Direction.None ||
                 (parent.CurrentDirection == Grid.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
                 (parent.CurrentDirection == Grid.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
@@ -122,8 +123,9 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 
     public void SetPoints(int score)
     {
+        ScoreForWord.gameObject.SetActive(true);
         ScoreForWord.text = score.ToString();
-        //Todo: hide after 1.5 seconds
+        StartCoroutine(Fade());
     }
 
     public void OnMouseEnter()
@@ -140,5 +142,25 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         PointsText.enabled = false;
         CurrentLetter.enabled = true;
+    }
+
+    IEnumerator Fade()
+    {
+        var c = ScoreForWord.color;
+        var f = 3f;
+        for (; f >= 2; f -= 0.1f)
+        {
+            yield return new WaitForSeconds(.1f);
+        }
+        for (; f > 0; f -= 0.1f)
+        {
+            c.a = f*0.5f;
+            ScoreForWord.color = c;
+            yield return new WaitForSeconds(.1f);
+        }
+        c.a = 1;
+        ScoreForWord.color = c;
+        ScoreForWord.text=String.Empty;
+        ScoreForWord.gameObject.SetActive(false);
     }
 }

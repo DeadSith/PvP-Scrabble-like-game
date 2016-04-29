@@ -488,6 +488,7 @@ public class Grid : MonoBehaviour
     {
         var result = 0;
         var wordMultiplier = 1;
+        var start = 7+_wordsFound.Count/2;
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
             var tempRes = 0;
@@ -512,7 +513,8 @@ public class Grid : MonoBehaviour
                 }
             }
             result += tempRes;
-            Field[7,0].SetPoints(tempRes);
+            Field[start,0].SetPoints(tempRes);
+            start--;
         }
         return result * wordMultiplier;
     }
