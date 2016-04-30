@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class MenuTimerController : MonoBehaviour
+public class SettingsController : MonoBehaviour
 {
     private bool _timerEnabled;
     private int _length;
     public Text ButtonText;
     public InputField LengthField;
+    public InputField Player1Field;
+    public InputField Player2Field;
+
+
 
     // Use this for initialization
     private void Start()
@@ -63,5 +67,15 @@ public class MenuTimerController : MonoBehaviour
         _timerEnabled = !_timerEnabled;
         PlayerPrefs.SetInt("TimerEnabled", _timerEnabled ? 1 : 0);
         ChangeText();
+    }
+
+    public void OnPlayer1Changed()
+    {
+        PlayerPrefs.SetString("Player1",Player1Field.text);
+    }
+
+    public void OnPlayer2Changed()
+    {
+        PlayerPrefs.SetString("Player2",Player2Field.text);
     }
 }

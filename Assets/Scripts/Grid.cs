@@ -26,6 +26,8 @@ public class Grid : MonoBehaviour
 
     public GameObject TimerImage;
     public Text TimerText;
+    public Text Player1Text;
+    public Text Player2Text;
     public GameObject EndGameCanvas;
     public UIController Controller;
     public Button SkipTurnButton;
@@ -73,6 +75,8 @@ public class Grid : MonoBehaviour
         _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
         CreateField();
+        Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
+        Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
     }
 
     private void Update()
