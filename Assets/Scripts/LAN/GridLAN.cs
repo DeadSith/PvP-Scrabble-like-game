@@ -448,6 +448,7 @@ public class GridLAN : MonoBehaviour
     private int CountPoints()
     {
         var result = 0;
+        var score = new int[_wordsFound.Count/2];
         var wordMultiplier = 1;
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
@@ -473,6 +474,13 @@ public class GridLAN : MonoBehaviour
                 }
             }
             result += tempRes;
+            score[i/2] = tempRes;
+        }
+        var start = 7 + _wordsFound.Count / 2;
+        foreach (var i in score)
+        {
+            Field[start, 0].SetPoints(i*wordMultiplier);
+            start--;
         }
         return result * wordMultiplier;
     }

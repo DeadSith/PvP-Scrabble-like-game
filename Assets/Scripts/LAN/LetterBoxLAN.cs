@@ -29,6 +29,7 @@ public class LetterBoxLAN : NetworkBehaviour
     private bool _isFirstTurn = true;
     private GridLAN _currentGrid;
     private GameObject _waitTextGameObject;
+    private List<TileLAN> _currenTiles = new List<TileLAN>();
 
     #region SyncVars
     [HideInInspector]
@@ -436,15 +437,25 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         LetterToPlace = "xyz";
         if (!String.IsNullOrEmpty(value))
+        {
             _currentGrid.Field[GridX, GridY].ChangeLetter(value);
+            _currenTiles.Add(_currentGrid.Field[GridX, GridY]);
+        }
         else
         {
             _currentGrid.Field[GridX, GridY].Remove();
+            _currenTiles.Remove(_currentGrid.Field[GridX,GridY]);
         }
     }
 
     public void OnPlayerChange(int value)
     {
+        foreach (var tile in _currenTiles)
+        {
+            tile.WordMultiplier = 1;
+            tile.LetterMultiplier = 1;
+        }
+        _currenTiles.Clear();
         CurrentPlayer = value;
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }

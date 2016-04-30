@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,6 +8,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+    public Text ScoreForWord;
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
@@ -150,5 +152,33 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         PointsText.enabled = false;
         CurrentLetter.enabled = true;
+    }
+
+    public void SetPoints(int score)
+    {
+        ScoreForWord.gameObject.SetActive(true);
+        ScoreForWord.text = score.ToString();
+        StartCoroutine(Fade());
+    }
+
+    private IEnumerator Fade()
+    {
+        var c = ScoreForWord.color;
+        var f = 3f;
+        for (; f >= 2; f -= 0.1f)
+        {
+            Debug.Log(f);
+            yield return new WaitForSeconds(.1f);
+        }
+        for (; f > 0; f -= 0.1f)
+        {
+            c.a = f * 0.5f;
+            ScoreForWord.color = c;
+            yield return new WaitForSeconds(.1f);
+        }
+        c.a = 1;
+        ScoreForWord.color = c;
+        ScoreForWord.text = String.Empty;
+        ScoreForWord.gameObject.SetActive(false);
     }
 }

@@ -39,6 +39,8 @@ public class StartController : MonoBehaviour
         Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
         Manager.networkPort = 7777;
         AdressText.text = Network.player.ipAddress;
+        if (AdressText.text.Equals("0.0.0.0"))
+            AdressText.text = "localhost";
     }
 
 

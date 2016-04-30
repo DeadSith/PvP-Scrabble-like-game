@@ -144,7 +144,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         CurrentLetter.enabled = true;
     }
 
-    IEnumerator Fade()
+    private IEnumerator Fade()
     {
         var c = ScoreForWord.color;
         var f = 3f;
