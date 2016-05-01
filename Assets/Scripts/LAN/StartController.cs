@@ -33,7 +33,6 @@ public class StartController : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-
     private void Awake()
     {
         Manager = GameObject.FindGameObjectWithTag("Manager").GetComponent<NetworkManager>();
@@ -42,7 +41,6 @@ public class StartController : MonoBehaviour
         if (AdressText.text.Equals("0.0.0.0"))
             AdressText.text = "localhost";
     }
-
 
     private void Update()
     {

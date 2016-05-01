@@ -10,9 +10,6 @@ public class SettingsController : MonoBehaviour
     public InputField Player1Field;
     public InputField Player2Field;
 
-
-
-    // Use this for initialization
     private void Start()
     {
         if (PlayerPrefs.HasKey("TimerEnabled"))
@@ -71,11 +68,11 @@ public class SettingsController : MonoBehaviour
 
     public void OnPlayer1Changed()
     {
-        PlayerPrefs.SetString("Player1",Player1Field.text);
+        PlayerPrefs.SetString("Player1", Player1Field.text);
     }
 
     public void OnPlayer2Changed()
     {
-        PlayerPrefs.SetString("Player2",Player2Field.text);
+        PlayerPrefs.SetString("Player2", Player2Field.text);
     }
 }

@@ -10,17 +10,21 @@ using UnityEngine.UI;
 public class LetterBoxLAN : NetworkBehaviour
 {
     #region Letters
+
     private List<String> _allLetters = new List<string>();
     public List<String> AllLetters = new List<string>();
     private List<String> _lettersToDelete = new List<string>();
-    #endregion
 
-    [HideInInspector] public List<Vector3> FreeCoordinates;
+    #endregion Letters
+
+    [HideInInspector]
+    public List<Vector3> FreeCoordinates;
+
     public List<LetterLAN> CurrentLetters;
     public LetterLAN LetterPrefab;
     public bool CanChangeLetters = true;
     public Text NumberOfLettersText;
-   
+
     private const byte NumberOfLetters = 7;
     private float _distanceBetweenLetters = 1.2f;
     private Vector2 _letterSize;
@@ -32,6 +36,7 @@ public class LetterBoxLAN : NetworkBehaviour
     private List<TileLAN> _currenTiles = new List<TileLAN>();
 
     #region SyncVars
+
     [HideInInspector]
     [SyncVar(hook = "OnConnected")]
     public bool ClientConnected = false;
@@ -43,7 +48,7 @@ public class LetterBoxLAN : NetworkBehaviour
     [HideInInspector]
     [SyncVar(hook = "OnLetterDelete")]
     public string LetterToDelete;
-    
+
     [HideInInspector]
     [SyncVar]
     public int GridX;
@@ -99,7 +104,16 @@ public class LetterBoxLAN : NetworkBehaviour
     [HideInInspector]
     [SyncVar(hook = "OnSkip")]
     public string TilesToDelete;
-#endregion
+
+    [HideInInspector]
+    [SyncVar(hook = "OnPlayer1NameChanged")]
+    public string Player1Name;
+
+    [HideInInspector]
+    [SyncVar(hook = "OnPlayer2NameChanged")]
+    public string Player2Name;
+
+    #endregion SyncVars
 
     public override void OnStartClient()
     {
@@ -150,6 +164,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         ChangeBox(NumberOfLetters);
         CmdStartClient(true);
+        CmdSetPlayer2(PlayerPrefs.GetString("Player1", "Гравець 2"));
         ChangePlayer(1, 0);
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameStarted = true;
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
@@ -395,14 +410,29 @@ public class LetterBoxLAN : NetworkBehaviour
         TimeReamining = remaining;
     }
 
+    [Command]
+    private void CmdSetPlayer1(string name)
+    {
+        Player1Name = name;
+    }
+
+    [Command]
+    private void CmdSetPlayer2(string name)
+    {
+        Player2Name = name;
+    }
+
     #endregion Commands
 
     #region Hooks
+
     public void OnConnected(bool value)
     {
         ClientConnected = value;
         if (isServer)
         {
+            CmdSetPlayer1(PlayerPrefs.GetString("Player1", "Гравець 1"));
+            _currentGrid.SetName(1, PlayerPrefs.GetString("Player1", "Гравець 1"));
             GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameStarted = true;
             GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
             _waitTextGameObject.SetActive(false);
@@ -444,7 +474,7 @@ public class LetterBoxLAN : NetworkBehaviour
         else
         {
             _currentGrid.Field[GridX, GridY].Remove();
-            _currenTiles.Remove(_currentGrid.Field[GridX,GridY]);
+            _currenTiles.Remove(_currentGrid.Field[GridX, GridY]);
         }
     }
 
@@ -551,5 +581,16 @@ public class LetterBoxLAN : NetworkBehaviour
             }
         }
     }
-#endregion
+
+    public void OnPlayer1NameChanged(string value)
+    {
+        _currentGrid.SetName(1, value);
+    }
+
+    public void OnPlayer2NameChanged(string value)
+    {
+        _currentGrid.SetName(2, value);
+    }
+
+    #endregion Hooks
 }

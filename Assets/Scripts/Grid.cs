@@ -127,7 +127,7 @@ public class Grid : MonoBehaviour
     }
 
     #region Some shitty code
-    
+
     private void AssignMaterials()
     {
         Field[0, 0].GetComponent<Image>().material = WordX3Material;
@@ -365,6 +365,7 @@ public class Grid : MonoBehaviour
     }
 
     #region Word cheking
+
     private bool CheckWords()
     {
         switch (CurrentDirection)
@@ -517,7 +518,7 @@ public class Grid : MonoBehaviour
                 }
             }
             result += tempRes;
-            score[i/2] = tempRes;
+            score[i / 2] = tempRes;
         }
         var start = 7 + _wordsFound.Count / 2;
         foreach (var i in score)
@@ -609,7 +610,8 @@ public class Grid : MonoBehaviour
             return Convert.ToInt32(inp) != 0;
         }*/
     }
-    #endregion
+
+    #endregion Word cheking
 
     private void EndGame(LetterBox playerOut)//Player, who ran out of letters is passed
     {

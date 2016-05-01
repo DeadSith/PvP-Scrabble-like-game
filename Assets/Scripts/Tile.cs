@@ -154,13 +154,13 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         for (; f > 0; f -= 0.1f)
         {
-            c.a = f*0.5f;
+            c.a = f * 0.5f;
             ScoreForWord.color = c;
             yield return new WaitForSeconds(.1f);
         }
         c.a = 1;
         ScoreForWord.color = c;
-        ScoreForWord.text=String.Empty;
+        ScoreForWord.text = String.Empty;
         ScoreForWord.gameObject.SetActive(false);
     }
 }

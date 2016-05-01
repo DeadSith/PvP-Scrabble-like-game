@@ -27,7 +27,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     {
         if (CanDrop && !HasLetter)
         {
-            DragHandler.ObjectDragged.transform.position = new Vector3(-1500,-1500);
+            DragHandler.ObjectDragged.transform.position = new Vector3(-1500, -1500);
             if (parent.PlayerNumber != parent.Player1.CurrentPlayer)
             {
                 parent.Controller.ShowWrongTurnError();
@@ -167,7 +167,6 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         var f = 3f;
         for (; f >= 2; f -= 0.1f)
         {
-            Debug.Log(f);
             yield return new WaitForSeconds(.1f);
         }
         for (; f > 0; f -= 0.1f)

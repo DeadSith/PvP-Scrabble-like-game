@@ -26,6 +26,8 @@ public class GridLAN : MonoBehaviour
 
     public GameObject TimerImage;
     public Text TimerText;
+    public Text Player1Text;
+    public Text Player2Text;
     public UIController Controller;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
@@ -72,7 +74,7 @@ public class GridLAN : MonoBehaviour
         if (_gameStarted && Player1 == null)
             Controller.ShowConnectionError();
         Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
-        if (Input.GetKeyDown(KeyCode.A)&&Player1!=null)
+        if (Input.GetKeyDown(KeyCode.A) && Player1 != null)
         {
             Player1.EndGame();
         }
@@ -243,7 +245,7 @@ public class GridLAN : MonoBehaviour
         Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion Some shitty code
+    #endregion Field generation
 
     private void OnEndTimer()
     {
@@ -448,7 +450,7 @@ public class GridLAN : MonoBehaviour
     private int CountPoints()
     {
         var result = 0;
-        var score = new int[_wordsFound.Count/2];
+        var score = new int[_wordsFound.Count / 2];
         var wordMultiplier = 1;
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
@@ -474,12 +476,12 @@ public class GridLAN : MonoBehaviour
                 }
             }
             result += tempRes;
-            score[i/2] = tempRes;
+            score[i / 2] = tempRes;
         }
         var start = 7 + _wordsFound.Count / 2;
         foreach (var i in score)
         {
-            Field[start, 0].SetPoints(i*wordMultiplier);
+            Field[start, 0].SetPoints(i * wordMultiplier);
             start--;
         }
         return result * wordMultiplier;
@@ -591,5 +593,12 @@ public class GridLAN : MonoBehaviour
             TimerImage.SetActive(true);
             TimeRemaining = (float)_timerLength + 1;
         }
+    }
+
+    public void SetName(int playerNumber, string name)
+    {
+        if (playerNumber == 1)
+            Player1Text.text = name;
+        else Player2Text.text = name;
     }
 }
