@@ -95,7 +95,7 @@ public class LetterBox : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (_allLetters.Count == 0)
+        if (_allLetters==null||_allLetters.Count == 0)
             CanChangeLetters = false;
         else CanChangeLetters = _currentGrid.CurrentTiles.Count == 0;
         ChangeLetterButton.interactable = CanChangeLetters;

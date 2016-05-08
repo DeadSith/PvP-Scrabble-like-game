@@ -243,7 +243,6 @@ public class Grid : MonoBehaviour
     private void OnEndTimer()
     {
         _timeRemaining = (float)_timerLength + 1;
-        var currentPlayer = CurrentPlayer == 1 ? Player1 : Player2;
         OnRemoveAll();
         OnSkipTurn();
     }
@@ -615,11 +614,8 @@ public class Grid : MonoBehaviour
         {
             playerOut.Score += tempPoints;
         }
-        EndGameCanvas.SetActive(true);
-        GameObject.FindGameObjectWithTag("Winner").GetComponent<Text>().text = Player1.Score > Player2.Score ? "1" : "2";
-        GameObject.FindGameObjectWithTag("Player1").GetComponent<Text>().text = Player1.Score.ToString();
-        GameObject.FindGameObjectWithTag("Player2").GetComponent<Text>().text = Player2.Score.ToString();
-        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
-        transform.parent.gameObject.SetActive(false);
+        var winner = Player1.Score > Player2.Score ? 1 : 2;
+        Controller.SetWinner(winner,Player1.Score,Player2.Score, Player1Text.text,Player2Text.text);
+
     }
 }

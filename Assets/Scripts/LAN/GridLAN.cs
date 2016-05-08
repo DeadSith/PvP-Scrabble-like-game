@@ -570,7 +570,7 @@ public class GridLAN : MonoBehaviour
 
     public void EndGame(int winner, int player1Score, int player2Score)//Player, who ran out of letters is passed
     {
-        Controller.SetWinner(winner, player1Score, player2Score);
+        Controller.SetWinner(winner, player1Score, player2Score,Player1Text.text,Player2Text.text);
     }
 
     public void InvalidatePlayer(int playerNumber, int score)

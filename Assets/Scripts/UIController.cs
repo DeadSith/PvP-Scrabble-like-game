@@ -21,8 +21,10 @@ public class UIController : MonoBehaviour
     public Button ReturnAllButton;
 
     public Canvas EndGameCanvas;
-    public Text Player1EndText;
-    public Text Player2EndText;
+    public Text Player1Points;
+    public Text Player2Points;
+    public Text Player1Name;
+    public Text Player2Name;
     public Text Winner;
 
     public GameObject DisconnectedMenu;
@@ -136,13 +138,17 @@ public class UIController : MonoBehaviour
         Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
     }
 
-    public void SetWinner(int winner, int player1Score, int player2Score)
+    public void SetWinner(int winner, int player1Score, int player2Score,string player1Name, string player2Name)
     {
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         EndGameCanvas.gameObject.SetActive(true);
-        Winner.text = winner.ToString();
-        Player1EndText.text = player1Score.ToString();
-        Player2EndText.text = player2Score.ToString();
+        if (winner == 1)
+            Winner.text = player1Name;
+        else Winner.text = player2Name;
+        Player1Name.text = "Бали " + player1Name;
+        Player2Name.text = "Бали " + player2Name;
+        Player1Points.text = player1Score.ToString();
+        Player2Points.text = player2Score.ToString();
         gameObject.GetComponent<Canvas>().enabled = false;
     }
 

@@ -586,11 +586,13 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void OnPlayer1NameChanged(string value)
     {
+        Player1Name = value;
         _currentGrid.SetName(1, value);
     }
 
     public void OnPlayer2NameChanged(string value)
     {
+        Player2Name = value;
         _currentGrid.SetName(2, value);
     }
 
