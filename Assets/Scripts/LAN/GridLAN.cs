@@ -56,7 +56,7 @@ public class GridLAN : MonoBehaviour
     private void Start()
     {
         CurrentTiles = new List<TileLAN>();
-        var conection = @"URI=file:" + Application.dataPath + @"/words.db";
+        var conection = @"URI=file:" + Application.streamingAssetsPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<TileLAN>();

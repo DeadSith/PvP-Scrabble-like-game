@@ -172,7 +172,9 @@ public class LetterBoxLAN : NetworkBehaviour
 
     public void Update()
     {
-        if (_currentGrid.PlayerNumber == CurrentPlayer && CurrentLetters.Count == 7)
+        if (AllLetters.Count == 0)
+            CanChangeLetters = false;
+        else if (_currentGrid.PlayerNumber == CurrentPlayer && _currentGrid.CurrentTiles.Count == 0)
             CanChangeLetters = true;
         else
         {
@@ -258,7 +260,7 @@ public class LetterBoxLAN : NetworkBehaviour
         CurrentLetters.Remove(currentObject);
     }
 
-    public bool ChangeLetters()//Used to change letters on field
+    public bool ChangeLetters()//Use to change letters on field
     {
         var successful = false;
         var lettersToAdd = new StringBuilder();

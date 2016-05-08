@@ -56,7 +56,7 @@ public class Grid : MonoBehaviour
     private void Start()
     {
         CurrentTiles = new List<Tile>();
-        var conection = @"URI=file:" + Application.dataPath + @"/words.db";
+        var conection = @"URI=file:" + Application.streamingAssetsPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<Tile>();
@@ -126,7 +126,7 @@ public class Grid : MonoBehaviour
         AssignMultipliers();
     }
 
-    #region Some shitty code
+    #region Field generation
 
     private void AssignMaterials()
     {

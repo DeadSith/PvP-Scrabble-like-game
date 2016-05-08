@@ -37,6 +37,8 @@ public class SettingsController : MonoBehaviour
             _length = 60;
             LengthField.text = _length.ToString();
         }
+        Player1Field.text = PlayerPrefs.GetString("Player1", "Player1");
+        Player2Field.text = PlayerPrefs.GetString("Player2", "Player2");
         LengthField.text = _length.ToString();
     }
 

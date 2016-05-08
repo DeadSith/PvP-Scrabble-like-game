@@ -65,6 +65,7 @@ public class LetterBox : MonoBehaviour
 
     private Vector3 _pos;
     private float _xOffset = 0;
+    private Grid _currentGrid;
 
     private void Start()
     {
@@ -80,7 +81,7 @@ public class LetterBox : MonoBehaviour
         CurrentLetters = new List<Letter>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         FreeCoordinates = new List<Vector3>();
-        var size = gameObject.GetComponent<RectTransform>().rect;
+        _currentGrid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
         DistanceBetweenLetters = LetterSize.x;
         LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
         _xOffset = gameObject.transform.position.x - 2 * DistanceBetweenLetters;
@@ -94,8 +95,7 @@ public class LetterBox : MonoBehaviour
     {
         if (_allLetters.Count == 0)
             ChangeLetterButton.interactable = false;
-        else if (ChangeLetterButton.interactable != CanChangeLetters)
-            ChangeLetterButton.interactable = CanChangeLetters;
+        else ChangeLetterButton.interactable = _currentGrid.CurrentTiles.Count == 0;
     }
 
     public void ChangeBox(int numberOfLetters, string letter = null)
