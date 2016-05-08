@@ -132,10 +132,6 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
             parent.CurrentDirection = GridLAN.Direction.None;
             parent.Field[7, 7].CanDrop = true;
         }
-        if (parent.CurrentTiles.Count == 0)
-        {
-            parent.Player1.CanChangeLetters = true;
-        }
     }
 
     public void OnMouseEnter()

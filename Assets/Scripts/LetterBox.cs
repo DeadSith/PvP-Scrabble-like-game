@@ -67,6 +67,8 @@ public class LetterBox : MonoBehaviour
     private float _xOffset = 0;
     private Grid _currentGrid;
 
+    public Text NumberOfLettersText;//for testing only
+
     private void Start()
     {
         if (_allLetters == null)
@@ -94,13 +96,14 @@ public class LetterBox : MonoBehaviour
     private void Update()
     {
         if (_allLetters.Count == 0)
-            ChangeLetterButton.interactable = false;
-        else ChangeLetterButton.interactable = _currentGrid.CurrentTiles.Count == 0;
+            CanChangeLetters = false;
+        else CanChangeLetters = _currentGrid.CurrentTiles.Count == 0;
+        ChangeLetterButton.interactable = CanChangeLetters;
     }
 
     public void ChangeBox(int numberOfLetters, string letter = null)
     {
-        if (numberOfLetters > _allLetters.Count)
+        if (String.IsNullOrEmpty(letter) && numberOfLetters > _allLetters.Count)
         {
             numberOfLetters = _allLetters.Count;
         }
@@ -125,6 +128,7 @@ public class LetterBox : MonoBehaviour
                 FreeCoordinates.RemoveAt(FreeCoordinates.Count - 1);
             }
         }
+        NumberOfLettersText.text = _allLetters.Count.ToString();
     }
 
     private void AddLetter(Vector3 position, string letter)

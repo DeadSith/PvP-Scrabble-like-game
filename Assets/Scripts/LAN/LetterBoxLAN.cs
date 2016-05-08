@@ -185,7 +185,7 @@ public class LetterBoxLAN : NetworkBehaviour
     public void ChangeBox(int numberOfLetters, string letter = "")//Use to add letters
     {
         _lettersToDelete = new List<string>();
-        if (numberOfLetters > AllLetters.Count)
+        if (String.IsNullOrEmpty(letter) && numberOfLetters > AllLetters.Count)
         {
             numberOfLetters = AllLetters.Count;
         }

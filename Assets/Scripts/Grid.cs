@@ -238,7 +238,7 @@ public class Grid : MonoBehaviour
         Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion Some shitty code
+    #endregion Field generation
 
     private void OnEndTimer()
     {
@@ -265,7 +265,6 @@ public class Grid : MonoBehaviour
                     {
                         EndGame(Player1);
                     }
-                    Player1.CanChangeLetters = true;
                     Player1.gameObject.SetActive(false);
                     Player2.gameObject.SetActive(true);
                     CurrentTiles = new List<Tile>();
@@ -280,7 +279,6 @@ public class Grid : MonoBehaviour
                     Player2.Score += points;
                     if (Player2.CurrentLetters.Count == 0)
                         EndGame(Player2);
-                    Player2.CanChangeLetters = true;
                     Player1.gameObject.SetActive(true);
                     Player2.gameObject.SetActive(false);
                     CurrentDirection = Direction.None;
@@ -308,7 +306,6 @@ public class Grid : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
-            Player1.CanChangeLetters = true;
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
@@ -322,7 +319,6 @@ public class Grid : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
-            Player2.CanChangeLetters = true;
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
@@ -336,7 +332,6 @@ public class Grid : MonoBehaviour
     {
         if (CurrentPlayer == 1)
         {
-            Player1.CanChangeLetters = true;
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
@@ -344,7 +339,6 @@ public class Grid : MonoBehaviour
         }
         else
         {
-            Player2.CanChangeLetters = true;
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;

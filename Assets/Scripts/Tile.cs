@@ -47,7 +47,6 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
                 HasLetter = true;
                 CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
                 var letterPanel = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
-                letterPanel.CanChangeLetters = false;
                 letterPanel.RemoveLetter();
                 if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
                 if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
@@ -112,12 +111,6 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
             parent.CurrentDirection = Grid.Direction.None;
             if (parent.CurrentTurn == 1)
                 parent.Field[7, 7].CanDrop = true;
-        }
-        if (parent.CurrentTiles.Count == 0)
-        {
-            if (parent.CurrentPlayer == 1)
-                parent.Player1.CanChangeLetters = true;
-            else parent.Player2.CanChangeLetters = true;
         }
     }
 

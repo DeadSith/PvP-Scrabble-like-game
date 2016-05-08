@@ -9,7 +9,6 @@ public class Letter : MonoBehaviour, IPointerClickHandler
     public Material StandardMaterial;
     public Material CheckedMaterial;
     public bool isChecked = false;
-
     private LetterBox parent;
     private Vector3 _startPosition;
 

@@ -264,7 +264,6 @@ public class GridLAN : MonoBehaviour
                 CurrentTurn++;
                 var points = CountPoints();
                 Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
-                Player1.CanChangeLetters = true;
                 CurrentTiles = new List<TileLAN>();
                 CurrentDirection = Direction.None;
                 IsFirstTurn = false;
@@ -292,7 +291,6 @@ public class GridLAN : MonoBehaviour
             return;
         }
         _turnsSkipped = 0;
-        Player1.CanChangeLetters = true;
         Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
             TimeRemaining = (float)_timerLength + 1;
@@ -300,7 +298,6 @@ public class GridLAN : MonoBehaviour
 
     public void OnSkipTurn()
     {
-        Player1.CanChangeLetters = true;
         Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
             TimeRemaining = (float)_timerLength + 1;
