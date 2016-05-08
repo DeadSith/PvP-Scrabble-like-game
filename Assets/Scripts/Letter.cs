@@ -48,7 +48,7 @@ public class Letter : MonoBehaviour, IPointerClickHandler
 
     public void Fix()
     {
-        parent.FreeCoordinates.Add(_startPosition);
+        parent.FreeCoordinates.Add(DragHandler.StartPosition);
         parent.ChangeBox(1, LetterText.text);
         var index = parent.FindIndex(this);
         parent.CurrentLetters[index] = parent.CurrentLetters[parent.CurrentLetters.Count - 1];

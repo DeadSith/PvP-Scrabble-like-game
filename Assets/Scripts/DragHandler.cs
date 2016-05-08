@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -10,7 +11,14 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         if (ObjectDragged != null)
         {
-            ObjectDragged.GetComponent<Letter>().Fix();
+            try
+            {
+                ObjectDragged.GetComponent<Letter>().Fix();
+            }
+            catch (Exception)
+            {
+                ObjectDragged.GetComponent<LetterLAN>().Fix();
+            }
         }
         ObjectDragged = gameObject;
         StartPosition = transform.position;
