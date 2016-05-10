@@ -11,8 +11,8 @@ Unity3d 5.x, everything is done in GUI layer, supports drag&drop. Words are stor
 ![Latest version screenshot](http://i66.tinypic.com/nz4s60.png)
 Game is fully playable, though there still may be small bugs. Game has hot-seat and networking mode. There is no singlelayer. All the standard features, including letter changing, skipping turns and other are implemented.
 ###5. Rules:
-Game is based on partially changed rules of scrabble. Most notable change: you can continue your turn even if you submitted wrong word.
+Game is based on partially changed rules of scrabble. Most notable change: you can continue your turn even if you submitted a wrong word.
 ###6. More info:
-The game is fully in Ukrainian, but code and comments are in English. To build game you have to create new Unity project and copy all the files from this repo. The graphics are not very good, but I can't into making smth beautiful.
+The game is fully in Ukrainian, but code and comments are in English. To build the game you have to create a new Unity project and copy all the files from this repo. The graphics is not very good, but I can't make myself into smth beautiful.
 ###Known issues:
-Letters can become [stuck on field](https://github.com/DeadSith/PvP-Scrabble-like-game/issues/3). This is Unity issue, I made a workaround, but it not always works.
+Letters can become [stuck on field](https://github.com/DeadSith/PvP-Scrabble-like-game/issues/3). This is Unity issue, I made a workaround, but it does not always work.
