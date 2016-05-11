@@ -8,7 +8,6 @@
 [Pp]rojectSettings/
 Scrabble_64_Data/
 scrabble_Data/
-*.meta
 *.pdb
 *.exe
 sysinfo.txt
