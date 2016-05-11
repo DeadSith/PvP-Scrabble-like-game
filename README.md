@@ -22,6 +22,6 @@ Game is fully playable, though there still may be small bugs. Game has hot-seat 
 ###6. Rules:
 Game is based on partially changed rules of scrabble. Most notable change: you can continue your turn even if you submitted a wrong word.
 ###7. More info:
-The game is fully in Ukrainian, but code and comments are in English. To build the game you have to create a new Unity project and copy all the files from this repo. The graphics is not very good, but I can't into smth beautiful.
+The game is fully in Ukrainian, but code and comments are in English. To build the game you have to create a new Unity project and copy all the files from this repo. The graphics is not very good, but I [can't into](https://cdn.meme.am/instances/500x/62250317.jpg) smth beautiful.
 ###Known issues:
 Letters can become [stuck on field](https://github.com/DeadSith/PvP-Scrabble-like-game/issues/3). This is Unity issue, I made a workaround, but it does not always work.
