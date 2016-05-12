@@ -10,12 +10,9 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
     public Material CheckedMaterial;
     public bool isChecked = false;
     private LetterBoxLAN parent;
-    private Vector3 _startPosition;
 
-    // Use this for initialization
     private void Start()
     {
-        _startPosition = transform.position;
         parent = gameObject.transform.parent.GetComponent<LetterBoxLAN>();
     }
 
@@ -26,6 +23,7 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
         PointsText.enabled = false;
     }
 
+    //Mark Letter as checked
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right && parent.CanChangeLetters)
@@ -35,18 +33,21 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    //Hides points, shows letter
     public void OnMouseExit()
     {
         LetterText.enabled = true;
         PointsText.enabled = false;
     }
 
+    //Shows points for current letter
     public void OnMouseEnter()
     {
         LetterText.enabled = false;
         PointsText.enabled = true;
     }
 
+    //Removes stuck letter from field
     public void Fix()
     {
         parent.FreeCoordinates.Add(DragHandler.StartPosition);

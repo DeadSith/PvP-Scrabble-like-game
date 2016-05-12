@@ -8,7 +8,10 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+
+    //Is used to show points for single word in the end of turn
     public Text ScoreForWord;
+
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
@@ -23,6 +26,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent = transform.parent.gameObject.GetComponent<GridLAN>();
     }
 
+    //Checks if letter can be dropped, if it is, calls the method to change this Tile for both players
     public void OnDrop(PointerEventData eventData)
     {
         if (CanDrop && !HasLetter)
@@ -60,6 +64,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         else parent.Controller.ShowWrongTileError();
     }
 
+    //Is called from LetterBox
+    //Changes the current letter on this tile, makes checks for nearby Tiles
     public void ChangeLetter(string letter)
     {
         HasLetter = true;
@@ -70,7 +76,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
     }
 
-    private bool CheckTile(TileLAN checkedTile) //checks if one of the nearby tiles has letter
+    //checks if one of the nearby tiles has letter
+    private bool CheckTile(TileLAN checkedTile)
     {
         if (checkedTile.Row != 0 && parent.Field[checkedTile.Row - 1, checkedTile.Column].HasLetter)
         {
@@ -91,6 +98,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         return false;
     }
 
+    //Checks what button is pressed
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)
@@ -98,6 +106,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         RemoveOnClick();
     }
 
+    //Called only for local player
+    //Checks if letter can be removed and calls Remove()
     public void RemoveOnClick(bool skip = false)
     {
         if ((parent.CurrentTiles.Count != 0 && parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this) || parent.CurrentTiles.Count == 0)
@@ -113,6 +123,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = GridLAN.Direction.None;
     }
 
+    //Called for both players
+    //Removes letter from field and makes checks for nearby Tiles
     public void Remove()
     {
         if (String.IsNullOrEmpty(CurrentLetter.text))
@@ -134,6 +146,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
     }
 
+    //Shows points for current letter
     public void OnMouseEnter()
     {
         if (!String.IsNullOrEmpty(CurrentLetter.text))
@@ -144,12 +157,14 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
     }
 
+    //Hides points and shows letter
     public void OnMouseExit()
     {
         PointsText.enabled = false;
         CurrentLetter.enabled = true;
     }
 
+    //Sets score for word to show in the end of turn.
     public void SetPoints(int score)
     {
         ScoreForWord.gameObject.SetActive(true);
@@ -157,20 +172,22 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         StartCoroutine(Fade());
     }
 
+    //Visual effect for fading score for words in the end of turn
     private IEnumerator Fade()
     {
         var c = ScoreForWord.color;
         var f = 3f;
         for (; f >= 2; f -= 0.1f)
         {
-            yield return new WaitForSeconds(.1f);
+            yield return new WaitForSeconds(.1f);//Show score for 1 second
         }
-        for (; f > 0; f -= 0.1f)
+        for (; f > 0; f -= 0.1f)//Start slowly fading text
         {
             c.a = f * 0.5f;
             ScoreForWord.color = c;
             yield return new WaitForSeconds(.1f);
         }
+        //Resets all the values
         c.a = 1;
         ScoreForWord.color = c;
         ScoreForWord.text = String.Empty;

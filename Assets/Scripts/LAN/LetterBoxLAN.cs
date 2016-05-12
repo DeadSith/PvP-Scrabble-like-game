@@ -115,6 +115,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     #endregion SyncVars
 
+    //Finds all the necessary objects on field
     public override void OnStartClient()
     {
         var prefab = Resources.Load("LetterLAN", typeof(GameObject)) as GameObject;
@@ -156,6 +157,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
+    //On client: creates field and calls the function to create field on server
     public override void OnStartAuthority()
     {
         if (isServer)
@@ -170,6 +172,7 @@ public class LetterBoxLAN : NetworkBehaviour
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
     }
 
+    //Checks if Letters can be changed
     public void Update()
     {
         if (AllLetters.Count == 0)
@@ -182,7 +185,8 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
-    public void ChangeBox(int numberOfLetters, string letter = "")//Use to add letters
+    //Adds letters to the hand of player
+    public void ChangeBox(int numberOfLetters, string letter = "")
     {
         _lettersToDelete = new List<string>();
         if (String.IsNullOrEmpty(letter) && numberOfLetters > AllLetters.Count)
@@ -223,6 +227,7 @@ public class LetterBoxLAN : NetworkBehaviour
         _isFirstTurn = false;
     }
 
+    //Crates new Letter on field
     private void AddLetter(Vector3 position, string letter)//Creates new letter
     {
         var newLetter = Instantiate(LetterPrefab, position,
@@ -245,7 +250,8 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
-    public void RemoveLetter()//Is called when letter is dropped
+    //Removes letter from hand when it is dropped on grid
+    public void RemoveLetter()
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<LetterLAN>();
         var currentIndex = FindIndex(currentObject);
@@ -260,7 +266,8 @@ public class LetterBoxLAN : NetworkBehaviour
         CurrentLetters.Remove(currentObject);
     }
 
-    public bool ChangeLetters()//Use to change letters on field
+    //Changes letters for Letters player checked
+    public bool ChangeLetters()
     {
         var successful = false;
         var lettersToAdd = new StringBuilder();
@@ -286,6 +293,7 @@ public class LetterBoxLAN : NetworkBehaviour
         return successful;
     }
 
+    //Finds the index of Letter in CurrentLetters
     public int FindIndex(LetterLAN input)
     {
         var j = 0;
@@ -297,12 +305,16 @@ public class LetterBoxLAN : NetworkBehaviour
         return -1;
     }
 
+    #region Envelopes for commands
+
     public void ChangeGrid(int row, int column, string letter)
     {
         CmdChangeGrid(row, column, letter);
     }
 
-    public void ChangePlayer(int nextPlayer, int score)//score of current player
+    //Score received in a turn is passed
+    //Resets timer, calls commands to change player and score
+    public void ChangePlayer(int nextPlayer, int score)
     {
         if (CurrentPlayer == _currentGrid.PlayerNumber)
             CmdSetTimeRemaining(TimerLength);
@@ -326,6 +338,8 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         CmdSkip(tilesToDelete);
     }
+
+    #endregion Envelopes for commands
 
     #region Commands
 
@@ -428,6 +442,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     #region Hooks
 
+    //Creates hand and field on server
     public void OnConnected(bool value)
     {
         ClientConnected = value;
@@ -446,9 +461,10 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
+    //Removes letter from AllLetters on server and client
     public void OnLetterDelete(string value)
     {
-        LetterToDelete = value;
+        LetterToDelete = "qwe";
         foreach (var letter in value)
         {
             AllLetters.Remove(letter.ToString());
@@ -456,15 +472,17 @@ public class LetterBoxLAN : NetworkBehaviour
         NumberOfLettersText.text = AllLetters.Count.ToString();
     }
 
+    //Adds letter to AllLetter on server and client
     public void OnLetterAdd(string value)
     {
-        LetterToAdd = value;
+        LetterToAdd = "qwe";
         foreach (var letter in value)
         {
             AllLetters.Add(letter.ToString());
         }
     }
 
+    //Writes letter to cell in Grid
     public void OnGridChanged(string value)
     {
         LetterToPlace = "xyz";
@@ -480,6 +498,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
+    //Sync tile multipliers on client and server
     public void OnPlayerChange(int value)
     {
         foreach (var tile in _currenTiles)
@@ -492,7 +511,8 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
 
-    public void OnEndGame(int value)//Called in the end of game to remove points for each letter left in box
+    //Called in the end of game to remove points for each letter left in box
+    public void OnEndGame(int value)
     {
         var result = 0;
         foreach (var letter in CurrentLetters)
@@ -543,6 +563,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     #endregion Workaroung to incorrect syncing
 
+    //Called on client and server to show endgame canvas
     public void OnShowEnd(bool value)
     {
         End = value;
@@ -550,12 +571,14 @@ public class LetterBoxLAN : NetworkBehaviour
         _currentGrid.EndGame(winner, Player1Score, Player2Score);
     }
 
+    //Changes length of timer
     public void OnLengthChanged(int value)
     {
         TimerLength = value;
         _currentGrid.SetTimer(TimerEnabled, value);
     }
 
+    //Starts timer on client and server
     public void OnSync(float value)
     {
         TimeReamining = 1;
@@ -564,6 +587,8 @@ public class LetterBoxLAN : NetworkBehaviour
             _currentGrid.TimeRemaining += 2;
     }
 
+    //Called on server and client when turn is skipped
+    //Removes all the letters placed on field in the last turn
     public void OnSkip(string value)
     {
         if (String.IsNullOrEmpty(value))
@@ -584,6 +609,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
+    //Called on server and client in the beggining of the game to sync names of Players
     public void OnPlayer1NameChanged(string value)
     {
         Player1Name = value;

@@ -11,6 +11,8 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         if (ObjectDragged != null)
         {
+            //Removes stuck Letter from field
+            //To lazy to write it the right way
             try
             {
                 ObjectDragged.GetComponent<Letter>().Fix();
@@ -28,9 +30,9 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20));
-        //transform.position  = new Vector3(Input.mousePosition.x,Input.mousePosition.y,20);
     }
 
+    //Called when dropped in the wrong place
     public void OnEndDrag(PointerEventData eventData)
     {
         ObjectDragged.transform.position = StartPosition;

@@ -4,8 +4,13 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
+    //Score of player
     public Text Player1Text;
     public Text Player2Text;
+    public Material PlayerGlowMaterial;
+    public Material PlayerIdleMaterial;
+
+    //Error messages
     public Text NotExistText;
     public Text DeleteText;
     public Text ChangeLetterText;
@@ -13,13 +18,13 @@ public class UIController : MonoBehaviour
     public Text StartText;
     public Text WrongTurnText;
     public Text ZeroTilesText;
-    public Material PlayerGlowMaterial;
-    public Material PlayerIdleMaterial;
+
     public Button NextTurnButton;
     public Button SkipTurnButton;
     public Button ChangeLettersButton;
     public Button ReturnAllButton;
 
+    //Endgame fields
     public Canvas EndGameCanvas;
     public Text Player1Points;
     public Text Player2Points;
@@ -37,7 +42,9 @@ public class UIController : MonoBehaviour
         _currentObject = StartText.gameObject;
     }
 
-    public void InvalidatePlayer(int playerNumber, int score)//Pass the player whose turn ended and his score
+    //Makes current player glow, updates points
+    //Pass the player whose turn ended and his score
+    public void InvalidatePlayer(int playerNumber, int score)
     {
         if (playerNumber == 1)
         {
@@ -55,6 +62,8 @@ public class UIController : MonoBehaviour
         _currentObject = StartText.gameObject;
         _currentObject.SetActive(true);
     }
+
+    #region Error showing
 
     public void ShowNotExistError()
     {
@@ -98,6 +107,10 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
+    #endregion Error showing
+
+    #region Button activation
+
     public void SetChangeButtonActive(bool active)
     {
         if (_isLocalTurn && ChangeLettersButton.interactable != active)
@@ -121,6 +134,12 @@ public class UIController : MonoBehaviour
         }
     }
 
+    #endregion Button activation
+
+    #region Multiplayer only
+
+    //Multipalyer envelope for InvalidatePlayer
+    //_isLocalTurn is used here to set button active state
     public void InvalidatePlayer(int playerNumber, int score, bool isLocal)
     {
         playerNumber = playerNumber == 1 ? 2 : 1;
@@ -132,26 +151,14 @@ public class UIController : MonoBehaviour
         _isLocalTurn = isLocal;
     }
 
-    public void FixFirstTurn()//Call on the first turn of server to fix materials
+    //Call on the first turn of server to fix materials
+    public void FixFirstTurn()
     {
         Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
         Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
     }
 
-    public void SetWinner(int winner, int player1Score, int player2Score,string player1Name, string player2Name)
-    {
-        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
-        EndGameCanvas.gameObject.SetActive(true);
-        if (winner == 1)
-            Winner.text = player1Name;
-        else Winner.text = player2Name;
-        Player1Name.text = "Бали " + player1Name;
-        Player2Name.text = "Бали " + player2Name;
-        Player1Points.text = player1Score.ToString();
-        Player2Points.text = player2Score.ToString();
-        gameObject.GetComponent<Canvas>().enabled = false;
-    }
-
+    //Is showed when connection is lost
     public void ShowConnectionError()
     {
         var pause = GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver;
@@ -164,5 +171,22 @@ public class UIController : MonoBehaviour
         manager.StopHost();
         DisconnectedMenu.SetActive(true);
         gameObject.SetActive(false);
+    }
+
+    #endregion Multiplayer only
+
+    //Creates endgame field with player names and scores
+    public void SetWinner(int winner, int player1Score, int player2Score, string player1Name, string player2Name)
+    {
+        GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
+        EndGameCanvas.gameObject.SetActive(true);
+        if (winner == 1)
+            Winner.text = player1Name;
+        else Winner.text = player2Name;
+        Player1Name.text = "Бали " + player1Name;
+        Player2Name.text = "Бали " + player2Name;
+        Player1Points.text = player1Score.ToString();
+        Player2Points.text = player2Score.ToString();
+        gameObject.GetComponent<Canvas>().enabled = false;
     }
 }

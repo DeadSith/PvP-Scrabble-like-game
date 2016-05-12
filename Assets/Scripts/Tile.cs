@@ -8,7 +8,10 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+
+    //Is used to show points for single word in the end of turn
     public Text ScoreForWord;
+
     public bool HasLetter;
     public bool CanDrop;
     public int Row;
@@ -23,11 +26,12 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent = transform.parent.gameObject.GetComponent<Grid>();
     }
 
+    //Checks if letter can be dropped, if it is, writes letter in this Tile
     public void OnDrop(PointerEventData eventData)
     {
         if (CanDrop && !HasLetter)
         {
-            DragHandler.ObjectDragged.transform.position = new Vector3(-1500, -1500);
+            DragHandler.ObjectDragged.transform.position = new Vector3(-1500, -1500);//Prevents letter getting stuck on the field
             if (parent.CurrentDirection == Grid.Direction.None ||
                 (parent.CurrentDirection == Grid.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
                 (parent.CurrentDirection == Grid.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
@@ -59,7 +63,8 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         else parent.Controller.ShowWrongTileError();
     }
 
-    private bool CheckTile(Tile checkedTile) //checks if one of the nearby tiles has letter
+    //checks if one of the nearby tiles has letter
+    private bool CheckTile(Tile checkedTile)
     {
         if (checkedTile.Row != 0 && parent.Field[checkedTile.Row - 1, checkedTile.Column].HasLetter)
         {
@@ -80,6 +85,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         return false;
     }
 
+    //Checks what button is pressed and calls RemoveTile
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)
@@ -87,6 +93,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         RemoveTile();
     }
 
+    //Removes letter from this Tile and returns it to hand of the player who droped it
     public void RemoveTile()
     {
         if ((parent.CurrentTiles.Count != 0 && parent.CurrentTiles[parent.CurrentTiles.Count - 1] != this) || parent.CurrentTiles.Count == 0)
@@ -114,6 +121,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
     }
 
+    //Sets score for word to show in the end of turn.
     public void SetPoints(int score)
     {
         ScoreForWord.gameObject.SetActive(true);
@@ -121,6 +129,7 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         StartCoroutine(Fade());
     }
 
+    //Shows points for current letter
     public void OnMouseEnter()
     {
         if (!String.IsNullOrEmpty(CurrentLetter.text))
@@ -131,26 +140,29 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
     }
 
+    //Hides points and shows letter
     public void OnMouseExit()
     {
         PointsText.enabled = false;
         CurrentLetter.enabled = true;
     }
 
+    //Visual effect for fading score for words in the end of turn
     private IEnumerator Fade()
     {
         var c = ScoreForWord.color;
         var f = 3f;
-        for (; f >= 2; f -= 0.1f)
+        for (; f >= 2; f -= 0.1f) //Show score for 1 second
         {
             yield return new WaitForSeconds(.1f);
         }
-        for (; f > 0; f -= 0.1f)
+        for (; f > 0; f -= 0.1f) //Start slowly fading text
         {
             c.a = f * 0.5f;
             ScoreForWord.color = c;
             yield return new WaitForSeconds(.1f);
         }
+        //Resets all the values
         c.a = 1;
         ScoreForWord.color = c;
         ScoreForWord.text = String.Empty;

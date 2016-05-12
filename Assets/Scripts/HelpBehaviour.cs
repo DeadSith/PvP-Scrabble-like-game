@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+//Used for navigation in help menu
 public class HelpBehaviour : MonoBehaviour
 {
     public GameObject RulesMenu;

@@ -615,7 +615,6 @@ public class Grid : MonoBehaviour
             playerOut.Score += tempPoints;
         }
         var winner = Player1.Score > Player2.Score ? 1 : 2;
-        Controller.SetWinner(winner,Player1.Score,Player2.Score, Player1Text.text,Player2Text.text);
-
+        Controller.SetWinner(winner, Player1.Score, Player2.Score, Player1Text.text, Player2Text.text);
     }
 }

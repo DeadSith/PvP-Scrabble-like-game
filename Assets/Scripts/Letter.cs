@@ -24,6 +24,7 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         PointsText.enabled = false;
     }
 
+    //Mark Letter as checked
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right && parent.CanChangeLetters)
@@ -33,12 +34,14 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    //Hides points, shows letter
     public void OnMouseExit()
     {
         LetterText.enabled = true;
         PointsText.enabled = false;
     }
 
+    //Shows points for current letter
     public void OnMouseEnter()
     {
         PointsText.text = LetterBox.PointsDictionary[LetterText.text].ToString();
@@ -46,6 +49,7 @@ public class Letter : MonoBehaviour, IPointerClickHandler
         PointsText.enabled = true;
     }
 
+    //Removes stuck letter from field
     public void Fix()
     {
         parent.FreeCoordinates.Add(DragHandler.StartPosition);

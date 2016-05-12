@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+//Navigation in main menu
 public class MainMenu : MonoBehaviour
 {
     public GameObject HelpMenu;
