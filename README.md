@@ -1,5 +1,7 @@
 #[Latest version of words.db](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6237&authkey=!ADPaXttvgeZduSA&ithint=file%2czip)
-Place it in Assets/SharedAssets. **Link is constantly updated.**
+Place it in Assets/SharedAssets. 
+#[Latest built version x86](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6240&authkey=!AG8x7AoxwjhBzqw&ithint=file%2czip)
+**Links are constantly updated.**  
 # PvP-Scrabble-like-game
 ###1. What:
 Open-source version of games like scrabble with LAN and hot-seat multiplayer. Written fully in C#.
@@ -15,6 +17,7 @@ Unity3d 5.x, everything is done in GUI layer, supports drag&drop. Words are stor
   1.mainField  
   2.mainFieldLAN  
 4. Now game should build without any errors
+5. In Build Settings > Player Settings > API Compatibility Level, change to .NET 2.0
 
 ###5. What is done:
 ![Latest version screenshot](http://i66.tinypic.com/nz4s60.png)
