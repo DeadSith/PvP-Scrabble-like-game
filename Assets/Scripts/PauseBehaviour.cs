@@ -36,7 +36,6 @@ public class PauseBehaviour : MonoBehaviour
                 StartMenu.GetComponent<Canvas>().enabled = true;
             }
             Game.GetComponent<Canvas>().enabled = true;
-            //Game.SetActive(true);
         }
     }
 
@@ -47,6 +46,7 @@ public class PauseBehaviour : MonoBehaviour
 
     public void MainMenu()
     {
+        PlayerPrefs.SetInt("Exiting",1);
         SceneManager.LoadScene(0);
     }
 

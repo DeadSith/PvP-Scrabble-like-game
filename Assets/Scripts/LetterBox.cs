@@ -101,6 +101,16 @@ public class LetterBox : MonoBehaviour
         ChangeLetterButton.interactable = CanChangeLetters;
     }
 
+    //Clean _allLetters when exiting to main menu
+    private void OnDisable()
+    {
+        if (PlayerPrefs.GetInt("Exiting", 0) == 1)
+        {
+            PlayerPrefs.SetInt("Exiting", 0);
+            _allLetters = null;
+        }
+    }
+
     //Adds letters to the hand of player
     public void ChangeBox(int numberOfLetters, string letter = null)
     {
