@@ -126,7 +126,7 @@ public class LetterBoxLAN : NetworkBehaviour
         gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
         gameObject.transform.localPosition = new Vector3(0, 0);
         FreeCoordinates = new List<Vector3>();
-        _currentField = GameObject.FindGameObjectWithTag("GameField").GetComponent<FieldLAN>();
+        _currentField = GameObject.FindGameObjectWithTag("Field").GetComponent<FieldLAN>();
         _distanceBetweenLetters = _currentField.DistanceBetweenTiles;
         _letterSize = new Vector2(_distanceBetweenLetters, _distanceBetweenLetters);
         LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = _letterSize;
@@ -227,7 +227,7 @@ public class LetterBoxLAN : NetworkBehaviour
         _isFirstTurn = false;
     }
 
-    //Crates new Letter on field
+    //Crates new LetterH on field
     private void AddLetter(Vector3 position, string letter)//Creates new letter
     {
         var newLetter = Instantiate(LetterPrefab, position,
@@ -293,7 +293,7 @@ public class LetterBoxLAN : NetworkBehaviour
         return successful;
     }
 
-    //Finds the index of Letter in CurrentLetters
+    //Finds the index of LetterH in CurrentLetters
     public int FindIndex(LetterLAN input)
     {
         var j = 0;
@@ -482,7 +482,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
-    //Writes letter to cell in GameField
+    //Writes letter to cell in Field
     public void OnGridChanged(string value)
     {
         LetterToPlace = "xyz";
@@ -517,7 +517,7 @@ public class LetterBoxLAN : NetworkBehaviour
         var result = 0;
         foreach (var letter in CurrentLetters)
         {
-            result += LetterBox.PointsDictionary[letter.LetterText.text];
+            result += LetterBoxH.PointsDictionary[letter.LetterText.text];
         }
         CmdAddBonusScore(result);
         if (_currentField.PlayerNumber == 1)

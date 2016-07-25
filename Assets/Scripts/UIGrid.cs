@@ -6,7 +6,6 @@ public class UIGrid : MonoBehaviour
     public bool IsSquare = false;
     public int RowCount = 1;
     public int ColCount = 1;
-    public float Padding = 0;
     public GameObject CellPrefab;
 
     private void Start()
@@ -39,7 +38,7 @@ public class UIGrid : MonoBehaviour
         }
     }
 
-    public void AddElement(int row, int column, GameObject element, bool isSquare = false, float padding = 0)//element should have anchors in middle and centre
+    public void AddElement(int row, int column, GameObject element, float padding = 0, bool isSquare = false)//element should have anchors in middle and centre
     {
         element.transform.position = new Vector3(Items[row, column].transform.position.x, Items[row, column].transform.position.y);
         if (!isSquare)
@@ -57,7 +56,7 @@ public class UIGrid : MonoBehaviour
         }
     }
 
-    public void AddElement(int upperRow, int upperColumn, int lowerRow, int lowerColumn, GameObject element, bool isSquare = false, float padding = 0)
+    public void AddElement(int upperRow, int upperColumn, int lowerRow, int lowerColumn, GameObject element, float padding = 0, bool isSquare = false)
     {
         element.transform.position = new Vector3((Items[upperRow, upperColumn].transform.position.x + Items[lowerRow, lowerColumn].transform.position.x) / 2,
             (Items[upperRow, upperColumn].transform.position.y + Items[lowerRow, lowerColumn].transform.position.y) / 2);

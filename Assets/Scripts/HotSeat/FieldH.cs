@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Field : MonoBehaviour
+public class FieldH : MonoBehaviour
 {
     public enum Direction
     {
@@ -14,7 +14,7 @@ public class Field : MonoBehaviour
 
     #region Prefabs and materials
 
-    public Tile TilePrefab;
+    public TileH TileHPrefab;
     public Material StandardMaterial;
     public Material StartMaterial;
     public Material WordX2Material;
@@ -37,16 +37,16 @@ public class Field : MonoBehaviour
     public bool isFirstTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
-    public LetterBox Player1;
-    public LetterBox Player2;
+    public LetterBoxH Player1;
+    public LetterBoxH Player2;
     public byte CurrentPlayer = 1;
     public float DistanceBetweenTiles = 1.2f;
-    public Tile[,] GameField;
-    public List<Tile> CurrentTiles;
+    public TileH[,] Field;
+    public List<TileH> CurrentTiles;
 
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
-    private List<Tile> _wordsFound;
+    private List<TileH> _wordsFound;
     private bool _timerEnabled;
     private int _timerLength;
     private float _timeRemaining;
@@ -55,11 +55,11 @@ public class Field : MonoBehaviour
 
     private void Start()
     {
-        CurrentTiles = new List<Tile>();
+        CurrentTiles = new List<TileH>();
         var conection = @"URI=file:" + Application.streamingAssetsPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
-        _wordsFound = new List<Tile>();
+        _wordsFound = new List<TileH>();
         _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
         if (_timerEnabled)
         {
@@ -69,7 +69,7 @@ public class Field : MonoBehaviour
         }
         var size = gameObject.GetComponent<RectTransform>().rect;
         DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
-        TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
+        TileHPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
         Player1.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
         Player2.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
         _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
@@ -101,144 +101,144 @@ public class Field : MonoBehaviour
     {
         var xOffset = _xOffset;
         var yOffset = _yOffset;
-        GameField = new Tile[NumberOfRows, NumberOfColumns];
+        Field = new TileH[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TilePrefab,
+                var newTile = Instantiate(TileHPrefab,
                     new Vector2(transform.position.x + xOffset, transform.position.y + yOffset),
-                    transform.rotation) as Tile;
+                    transform.rotation) as TileH;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
                 render.material = StandardMaterial;
                 newTile.Row = i;
-                GameField[i, j] = newTile;
+                Field[i, j] = newTile;
                 xOffset += DistanceBetweenTiles;
             }
             xOffset = _xOffset;
             yOffset += DistanceBetweenTiles;
         }
-        GameField[7, 7].CanDrop = true;
-        GameField[7, 7].GetComponent<Image>().material = StartMaterial;
+        Field[7, 7].CanDrop = true;
+        Field[7, 7].GetComponent<Image>().material = StartMaterial;
         AssignMaterials();
         AssignMultipliers();
     }
 
-    #region GameField generation
+    #region Field generation
 
     private void AssignMaterials()
     {
-        GameField[0, 0].GetComponent<Image>().material = WordX3Material;
-        GameField[0, 14].GetComponent<Image>().material = WordX3Material;
-        GameField[14, 0].GetComponent<Image>().material = WordX3Material;
-        GameField[14, 14].GetComponent<Image>().material = WordX3Material;
-        GameField[0, 7].GetComponent<Image>().material = WordX3Material;
-        GameField[14, 7].GetComponent<Image>().material = WordX3Material;
-        GameField[7, 0].GetComponent<Image>().material = WordX3Material;
-        GameField[7, 14].GetComponent<Image>().material = WordX3Material;
+        Field[0, 0].GetComponent<Image>().material = WordX3Material;
+        Field[0, 14].GetComponent<Image>().material = WordX3Material;
+        Field[14, 0].GetComponent<Image>().material = WordX3Material;
+        Field[14, 14].GetComponent<Image>().material = WordX3Material;
+        Field[0, 7].GetComponent<Image>().material = WordX3Material;
+        Field[14, 7].GetComponent<Image>().material = WordX3Material;
+        Field[7, 0].GetComponent<Image>().material = WordX3Material;
+        Field[7, 14].GetComponent<Image>().material = WordX3Material;
         for (var i = 1; i < 5; i++)
         {
-            GameField[i, i].GetComponent<Image>().material = WordX2Material;
-            GameField[i, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
-            GameField[NumberOfRows - i - 1, i].GetComponent<Image>().material = WordX2Material;
-            GameField[NumberOfRows - i - 1, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
+            Field[i, i].GetComponent<Image>().material = WordX2Material;
+            Field[i, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i - 1, i].GetComponent<Image>().material = WordX2Material;
+            Field[NumberOfRows - i - 1, NumberOfRows - i - 1].GetComponent<Image>().material = WordX2Material;
         }
-        GameField[5, 1].GetComponent<Image>().material = LetterX3Material;
-        GameField[5, 5].GetComponent<Image>().material = LetterX3Material;
-        GameField[5, 9].GetComponent<Image>().material = LetterX3Material;
-        GameField[5, 13].GetComponent<Image>().material = LetterX3Material;
-        GameField[9, 1].GetComponent<Image>().material = LetterX3Material;
-        GameField[9, 5].GetComponent<Image>().material = LetterX3Material;
-        GameField[9, 9].GetComponent<Image>().material = LetterX3Material;
-        GameField[9, 13].GetComponent<Image>().material = LetterX3Material;
-        GameField[1, 5].GetComponent<Image>().material = LetterX3Material;
-        GameField[1, 9].GetComponent<Image>().material = LetterX3Material;
-        GameField[13, 5].GetComponent<Image>().material = LetterX3Material;
-        GameField[13, 9].GetComponent<Image>().material = LetterX3Material;
-        GameField[0, 3].GetComponent<Image>().material = LetterX2Material;
-        GameField[0, 11].GetComponent<Image>().material = LetterX2Material;
-        GameField[14, 3].GetComponent<Image>().material = LetterX2Material;
-        GameField[14, 11].GetComponent<Image>().material = LetterX2Material;
-        GameField[2, 6].GetComponent<Image>().material = LetterX2Material;
-        GameField[2, 8].GetComponent<Image>().material = LetterX2Material;
-        GameField[12, 6].GetComponent<Image>().material = LetterX2Material;
-        GameField[12, 8].GetComponent<Image>().material = LetterX2Material;
-        GameField[3, 0].GetComponent<Image>().material = LetterX2Material;
-        GameField[3, 7].GetComponent<Image>().material = LetterX2Material;
-        GameField[3, 14].GetComponent<Image>().material = LetterX2Material;
-        GameField[11, 0].GetComponent<Image>().material = LetterX2Material;
-        GameField[11, 7].GetComponent<Image>().material = LetterX2Material;
-        GameField[11, 14].GetComponent<Image>().material = LetterX2Material;
-        GameField[6, 2].GetComponent<Image>().material = LetterX2Material;
-        GameField[6, 6].GetComponent<Image>().material = LetterX2Material;
-        GameField[6, 8].GetComponent<Image>().material = LetterX2Material;
-        GameField[6, 12].GetComponent<Image>().material = LetterX2Material;
-        GameField[8, 2].GetComponent<Image>().material = LetterX2Material;
-        GameField[8, 6].GetComponent<Image>().material = LetterX2Material;
-        GameField[8, 8].GetComponent<Image>().material = LetterX2Material;
-        GameField[8, 12].GetComponent<Image>().material = LetterX2Material;
-        GameField[7, 3].GetComponent<Image>().material = LetterX2Material;
-        GameField[7, 11].GetComponent<Image>().material = LetterX2Material;
+        Field[5, 1].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[5, 13].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 1].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[9, 13].GetComponent<Image>().material = LetterX3Material;
+        Field[1, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[1, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[13, 5].GetComponent<Image>().material = LetterX3Material;
+        Field[13, 9].GetComponent<Image>().material = LetterX3Material;
+        Field[0, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[0, 11].GetComponent<Image>().material = LetterX2Material;
+        Field[14, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[14, 11].GetComponent<Image>().material = LetterX2Material;
+        Field[2, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[2, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[12, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[12, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 0].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 7].GetComponent<Image>().material = LetterX2Material;
+        Field[3, 14].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 0].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 7].GetComponent<Image>().material = LetterX2Material;
+        Field[11, 14].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 2].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[6, 12].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 2].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 6].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 8].GetComponent<Image>().material = LetterX2Material;
+        Field[8, 12].GetComponent<Image>().material = LetterX2Material;
+        Field[7, 3].GetComponent<Image>().material = LetterX2Material;
+        Field[7, 11].GetComponent<Image>().material = LetterX2Material;
     }
 
     private void AssignMultipliers()
     {
-        GameField[0, 0].WordMultiplier = 3;
-        GameField[0, 14].WordMultiplier = 3;
-        GameField[14, 0].WordMultiplier = 3;
-        GameField[14, 14].WordMultiplier = 3;
-        GameField[0, 7].WordMultiplier = 3;
-        GameField[14, 7].WordMultiplier = 3;
-        GameField[7, 0].WordMultiplier = 3;
-        GameField[7, 14].WordMultiplier = 3;
+        Field[0, 0].WordMultiplier = 3;
+        Field[0, 14].WordMultiplier = 3;
+        Field[14, 0].WordMultiplier = 3;
+        Field[14, 14].WordMultiplier = 3;
+        Field[0, 7].WordMultiplier = 3;
+        Field[14, 7].WordMultiplier = 3;
+        Field[7, 0].WordMultiplier = 3;
+        Field[7, 14].WordMultiplier = 3;
         for (var i = 1; i < 5; i++)
         {
-            GameField[i, i].WordMultiplier = 2;
-            GameField[i, NumberOfRows - i - 1].WordMultiplier = 2;
-            GameField[NumberOfRows - i - 1, i].WordMultiplier = 2;
-            GameField[NumberOfRows - i - 1, NumberOfRows - i - 1].WordMultiplier = 2;
+            Field[i, i].WordMultiplier = 2;
+            Field[i, NumberOfRows - i - 1].WordMultiplier = 2;
+            Field[NumberOfRows - i - 1, i].WordMultiplier = 2;
+            Field[NumberOfRows - i - 1, NumberOfRows - i - 1].WordMultiplier = 2;
         }
-        GameField[5, 1].LetterMultiplier = 3;
-        GameField[5, 5].LetterMultiplier = 3;
-        GameField[5, 9].LetterMultiplier = 3;
-        GameField[5, 13].LetterMultiplier = 3;
-        GameField[9, 1].LetterMultiplier = 3;
-        GameField[9, 5].LetterMultiplier = 3;
-        GameField[9, 9].LetterMultiplier = 3;
-        GameField[9, 13].LetterMultiplier = 3;
-        GameField[1, 5].LetterMultiplier = 3;
-        GameField[1, 9].LetterMultiplier = 3;
-        GameField[13, 5].LetterMultiplier = 3;
-        GameField[13, 9].LetterMultiplier = 3;
-        GameField[0, 3].LetterMultiplier = 2;
-        GameField[0, 11].LetterMultiplier = 2;
-        GameField[14, 3].LetterMultiplier = 2;
-        GameField[14, 11].LetterMultiplier = 2;
-        GameField[2, 6].LetterMultiplier = 2;
-        GameField[2, 8].LetterMultiplier = 2;
-        GameField[12, 6].LetterMultiplier = 2;
-        GameField[12, 8].LetterMultiplier = 2;
-        GameField[3, 0].LetterMultiplier = 2;
-        GameField[3, 7].LetterMultiplier = 2;
-        GameField[3, 14].LetterMultiplier = 2;
-        GameField[11, 0].LetterMultiplier = 2;
-        GameField[11, 7].LetterMultiplier = 2;
-        GameField[11, 14].LetterMultiplier = 2;
-        GameField[6, 2].LetterMultiplier = 2;
-        GameField[6, 6].LetterMultiplier = 2;
-        GameField[6, 8].LetterMultiplier = 2;
-        GameField[6, 12].LetterMultiplier = 2;
-        GameField[8, 2].LetterMultiplier = 2;
-        GameField[8, 6].LetterMultiplier = 2;
-        GameField[8, 8].LetterMultiplier = 2;
-        GameField[8, 12].LetterMultiplier = 2;
-        GameField[7, 3].LetterMultiplier = 2;
-        GameField[7, 11].LetterMultiplier = 2;
+        Field[5, 1].LetterMultiplier = 3;
+        Field[5, 5].LetterMultiplier = 3;
+        Field[5, 9].LetterMultiplier = 3;
+        Field[5, 13].LetterMultiplier = 3;
+        Field[9, 1].LetterMultiplier = 3;
+        Field[9, 5].LetterMultiplier = 3;
+        Field[9, 9].LetterMultiplier = 3;
+        Field[9, 13].LetterMultiplier = 3;
+        Field[1, 5].LetterMultiplier = 3;
+        Field[1, 9].LetterMultiplier = 3;
+        Field[13, 5].LetterMultiplier = 3;
+        Field[13, 9].LetterMultiplier = 3;
+        Field[0, 3].LetterMultiplier = 2;
+        Field[0, 11].LetterMultiplier = 2;
+        Field[14, 3].LetterMultiplier = 2;
+        Field[14, 11].LetterMultiplier = 2;
+        Field[2, 6].LetterMultiplier = 2;
+        Field[2, 8].LetterMultiplier = 2;
+        Field[12, 6].LetterMultiplier = 2;
+        Field[12, 8].LetterMultiplier = 2;
+        Field[3, 0].LetterMultiplier = 2;
+        Field[3, 7].LetterMultiplier = 2;
+        Field[3, 14].LetterMultiplier = 2;
+        Field[11, 0].LetterMultiplier = 2;
+        Field[11, 7].LetterMultiplier = 2;
+        Field[11, 14].LetterMultiplier = 2;
+        Field[6, 2].LetterMultiplier = 2;
+        Field[6, 6].LetterMultiplier = 2;
+        Field[6, 8].LetterMultiplier = 2;
+        Field[6, 12].LetterMultiplier = 2;
+        Field[8, 2].LetterMultiplier = 2;
+        Field[8, 6].LetterMultiplier = 2;
+        Field[8, 8].LetterMultiplier = 2;
+        Field[8, 12].LetterMultiplier = 2;
+        Field[7, 3].LetterMultiplier = 2;
+        Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion GameField generation
+    #endregion Field generation
 
     private void OnEndTimer()
     {
@@ -292,7 +292,7 @@ public class Field : MonoBehaviour
             else Controller.ShowNotExistError();
         }
         else Controller.ShowZeroTilesError();
-        _wordsFound = new List<Tile>();
+        _wordsFound = new List<TileH>();
     }
 
     public void OnChangeLetters()
@@ -375,12 +375,12 @@ public class Field : MonoBehaviour
                 bool wordExists;
                 if (currentStart != currentEnd)
                 {
-                    current = CreateWord(Direction.Horizontal, GameField[CurrentTiles[0].Row, currentStart], currentEnd);
+                    current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row, currentStart], currentEnd);
                     wordExists = CheckWord(current);
                     if (wordExists)
                     {
-                        _wordsFound.Add(GameField[CurrentTiles[0].Row, currentStart]);
-                        _wordsFound.Add(GameField[CurrentTiles[0].Row, currentEnd]);
+                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
+                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
                     }
                     else return false;
                     wordFound = true;
@@ -388,12 +388,12 @@ public class Field : MonoBehaviour
                 FindWord(CurrentTiles[0], Direction.Vertical, out currentStart, out currentEnd);
                 if (currentStart != currentEnd)
                 {
-                    current = CreateWord(Direction.Vertical, GameField[currentStart, CurrentTiles[0].Column], currentEnd);
+                    current = CreateWord(Direction.Vertical, Field[currentStart, CurrentTiles[0].Column], currentEnd);
                     wordExists = CheckWord(current);
                     if (wordExists)
                     {
-                        _wordsFound.Add(GameField[currentStart, CurrentTiles[0].Column]);
-                        _wordsFound.Add(GameField[currentEnd, CurrentTiles[0].Column]);
+                        _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
+                        _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
                     }
                     else return false;
                     wordFound = true;
@@ -419,12 +419,12 @@ public class Field : MonoBehaviour
         FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
         if (currentStart != currentEnd)
         {
-            current = CreateWord(CurrentDirection, GameField[CurrentTiles[0].Row, currentStart], currentEnd);
+            current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, currentStart], currentEnd);
             wordExists = CheckWord(current);
             if (wordExists)
             {
-                _wordsFound.Add(GameField[CurrentTiles[0].Row, currentStart]);
-                _wordsFound.Add(GameField[CurrentTiles[0].Row, currentEnd]);
+                _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
+                _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
             }
             else return false;
         }
@@ -435,12 +435,12 @@ public class Field : MonoBehaviour
             FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
             if (currentStart != currentEnd)
             {
-                current = CreateWord(CurrentDirection, GameField[currentStart, tile.Column], currentEnd);
+                current = CreateWord(CurrentDirection, Field[currentStart, tile.Column], currentEnd);
                 wordExists = CheckWord(current);
                 if (wordExists)
                 {
-                    _wordsFound.Add(GameField[currentStart, tile.Column]);
-                    _wordsFound.Add(GameField[currentEnd, tile.Column]);
+                    _wordsFound.Add(Field[currentStart, tile.Column]);
+                    _wordsFound.Add(Field[currentEnd, tile.Column]);
                 }
                 else return false;
             }
@@ -456,12 +456,12 @@ public class Field : MonoBehaviour
         FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
         if (currentStart != currentEnd)
         {
-            current = CreateWord(CurrentDirection, GameField[currentStart, CurrentTiles[0].Column], currentEnd);
+            current = CreateWord(CurrentDirection, Field[currentStart, CurrentTiles[0].Column], currentEnd);
             wordExists = CheckWord(current);
             if (wordExists)
             {
-                _wordsFound.Add(GameField[currentStart, CurrentTiles[0].Column]);
-                _wordsFound.Add(GameField[currentEnd, CurrentTiles[0].Column]);
+                _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
+                _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
             }
             else return false;
             CurrentDirection = Direction.Horizontal;
@@ -472,12 +472,12 @@ public class Field : MonoBehaviour
             FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
             if (currentStart != currentEnd)
             {
-                current = CreateWord(CurrentDirection, GameField[tile.Row, currentStart], currentEnd);
+                current = CreateWord(CurrentDirection, Field[tile.Row, currentStart], currentEnd);
                 wordExists = CheckWord(current);
                 if (wordExists)
                 {
-                    _wordsFound.Add(GameField[tile.Row, currentStart]);
-                    _wordsFound.Add(GameField[tile.Row, currentEnd]);
+                    _wordsFound.Add(Field[tile.Row, currentStart]);
+                    _wordsFound.Add(Field[tile.Row, currentEnd]);
                 }
                 else return false;
             }
@@ -496,8 +496,8 @@ public class Field : MonoBehaviour
             if (_wordsFound[i].Row == _wordsFound[i + 1].Row)
                 for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
                 {
-                    var tile = GameField[_wordsFound[i].Row, j];
-                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    var tile = Field[_wordsFound[i].Row, j];
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
@@ -506,8 +506,8 @@ public class Field : MonoBehaviour
             {
                 for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
                 {
-                    var tile = GameField[j, _wordsFound[i].Column];
-                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    var tile = Field[j, _wordsFound[i].Column];
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
@@ -519,20 +519,20 @@ public class Field : MonoBehaviour
         var start = 7 + _wordsFound.Count / 2;
         foreach (var i in score)
         {
-            GameField[start, 0].SetPoints(i * wordMultiplier);
+            Field[start, 0].SetPoints(i * wordMultiplier);
             start--;
         }
         return result * wordMultiplier;
     }
 
-    private string CreateWord(Direction current, Tile start, int end)
+    private string CreateWord(Direction current, TileH start, int end)
     {
         var sb = new StringBuilder();
         if (current == Direction.Vertical)
         {
             for (int j = end; j >= start.Row; j--)
             {
-                string temp = GameField[j, start.Column].CurrentLetter.text;
+                string temp = Field[j, start.Column].CurrentLetter.text;
                 if (String.Equals("*", temp))
                     temp = "_";
                 sb.Append(temp);
@@ -543,7 +543,7 @@ public class Field : MonoBehaviour
         {
             for (int j = start.Column; j <= end; j++)
             {
-                var temp = GameField[start.Row, j].CurrentLetter.text;
+                var temp = Field[start.Row, j].CurrentLetter.text;
                 if (String.Equals("*", temp))
                     temp = "_";
                 sb.Append(temp);
@@ -552,19 +552,19 @@ public class Field : MonoBehaviour
         }
     }
 
-    private void FindWord(Tile currentTile, Direction current, out int startPosition, out int endPosition)
+    private void FindWord(TileH currentTileH, Direction current, out int startPosition, out int endPosition)
     {
         if (current == Direction.Vertical)
         {
-            var j = currentTile.Row;
-            while (j >= 0 && GameField[j, currentTile.Column].HasLetter)
+            var j = currentTileH.Row;
+            while (j >= 0 && Field[j, currentTileH.Column].HasLetter)
             {
                 j--;
             }
             j++;
             startPosition = j;
-            j = currentTile.Row;
-            while (j < NumberOfRows && GameField[j, currentTile.Column].HasLetter)
+            j = currentTileH.Row;
+            while (j < NumberOfRows && Field[j, currentTileH.Column].HasLetter)
             {
                 j++;
             }
@@ -573,15 +573,15 @@ public class Field : MonoBehaviour
         }
         else
         {
-            var j = currentTile.Column;
-            while (j >= 0 && GameField[currentTile.Row, j].HasLetter)
+            var j = currentTileH.Column;
+            while (j >= 0 && Field[currentTileH.Row, j].HasLetter)
             {
                 j--;
             }
             j++;
             startPosition = j;
-            j = currentTile.Column;
-            while (j < NumberOfRows && GameField[currentTile.Row, j].HasLetter)
+            j = currentTileH.Column;
+            while (j < NumberOfRows && Field[currentTileH.Row, j].HasLetter)
             {
                 j++;
             }
@@ -609,7 +609,7 @@ public class Field : MonoBehaviour
 
     #endregion Word cheking
 
-    private void EndGame(LetterBox playerOut)//Player, who ran out of letters is passed
+    private void EndGame(LetterBoxH playerOut)//Player, who ran out of letters is passed
     {
         var tempPoints = Player1.RemovePoints();
         tempPoints += Player2.RemovePoints();

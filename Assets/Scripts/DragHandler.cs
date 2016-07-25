@@ -11,11 +11,11 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     {
         if (ObjectDragged != null)
         {
-            //Removes stuck Letter from field
+            //Removes stuck LetterH from field
             //To lazy to write it the right way
             try
             {
-                ObjectDragged.GetComponent<Letter>().Fix();
+                ObjectDragged.GetComponent<LetterH>().Fix();
             }
             catch (Exception)
             {

@@ -133,7 +133,7 @@ public class FieldLAN : MonoBehaviour
         AssignMultipliers();
     }
 
-    #region GameField generation
+    #region Field generation
 
     private void AssignMaterials()
     {
@@ -245,7 +245,7 @@ public class FieldLAN : MonoBehaviour
         Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion GameField generation
+    #endregion Field generation
 
     private void OnEndTimer()
     {
@@ -456,7 +456,7 @@ public class FieldLAN : MonoBehaviour
                 for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
                 {
                     var tile = Field[_wordsFound[i].Row, j];
-                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
@@ -466,7 +466,7 @@ public class FieldLAN : MonoBehaviour
                 for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
                 {
                     var tile = Field[j, _wordsFound[i].Column];
-                    tempRes += LetterBox.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
                     tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;

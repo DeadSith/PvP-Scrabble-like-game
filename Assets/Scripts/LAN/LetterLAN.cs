@@ -19,11 +19,11 @@ public class LetterLAN : MonoBehaviour, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         LetterText.text = letter;
-        PointsText.text = LetterBox.PointsDictionary[letter].ToString();
+        PointsText.text = LetterBoxH.PointsDictionary[letter].ToString();
         PointsText.enabled = false;
     }
 
-    //Mark Letter as checked
+    //Mark LetterH as checked
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right && parent.CanChangeLetters)

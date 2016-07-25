@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 //Todo: Add leters only in the end of the turn
-public class LetterBox : MonoBehaviour
+public class LetterBoxH : MonoBehaviour
 {
     #region Letters and scores
 
@@ -54,10 +54,10 @@ public class LetterBox : MonoBehaviour
     #endregion Letters and scores
 
     public List<Vector3> FreeCoordinates;
-    public List<Letter> CurrentLetters;
+    public List<LetterH> CurrentLetters;
     public int Score = 0;
     public Button ChangeLetterButton;
-    public Letter LetterPrefab;
+    public LetterH LetterHPrefab;
     public bool CanChangeLetters = true;
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
@@ -65,7 +65,7 @@ public class LetterBox : MonoBehaviour
 
     private Vector3 _pos;
     private float _xOffset = 0;
-    private Field _currentField;
+    private FieldH _currentFieldH;
 
     public Text NumberOfLettersText;//for testing only
 
@@ -80,12 +80,12 @@ public class LetterBox : MonoBehaviour
         "я","п","о","о","л","е","а","б","і","е","ь","т","р","ґ","з","д","о","і","і","є","й",
         "е","д","н","о","у","г","ї","ч","о","о","о","к","т","н","в","т","з","'","*","*"
     };
-        CurrentLetters = new List<Letter>();
+        CurrentLetters = new List<LetterH>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         FreeCoordinates = new List<Vector3>();
-        _currentField = GameObject.FindGameObjectWithTag("GameField").GetComponent<Field>();
+        _currentFieldH = GameObject.FindGameObjectWithTag("Field").GetComponent<FieldH>();
         DistanceBetweenLetters = LetterSize.x;
-        LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
+        LetterHPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
         _xOffset = gameObject.transform.position.x - 2 * DistanceBetweenLetters;
         var yOffset = gameObject.transform.position.y + DistanceBetweenLetters;
         _pos = new Vector3(_xOffset, yOffset);
@@ -97,7 +97,7 @@ public class LetterBox : MonoBehaviour
     {
         if (_allLetters == null || _allLetters.Count == 0)
             CanChangeLetters = false;
-        else CanChangeLetters = _currentField.CurrentTiles.Count == 0;
+        else CanChangeLetters = _currentFieldH.CurrentTiles.Count == 0;
         ChangeLetterButton.interactable = CanChangeLetters;
     }
 
@@ -142,13 +142,13 @@ public class LetterBox : MonoBehaviour
         NumberOfLettersText.text = _allLetters.Count.ToString();
     }
 
-    //Crates new Letter on field
+    //Crates new LetterH on field
     private void AddLetter(Vector3 position, string letter)
     {
-        var newLetter = Instantiate(LetterPrefab, position,
-            transform.rotation) as Letter;
+        var newLetter = Instantiate(LetterHPrefab, position,
+            transform.rotation) as LetterH;
         newLetter.transform.SetParent(gameObject.transform);
-        if (String.IsNullOrEmpty(letter))//if letter is retrned from GameField
+        if (String.IsNullOrEmpty(letter))//if letter is retrned from Field
         {
             var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
             newLetter.ChangeLetter(current);
@@ -165,7 +165,7 @@ public class LetterBox : MonoBehaviour
     //Removes letter from hand when it is dropped on grid
     public void RemoveLetter()
     {
-        var currentObject = DragHandler.ObjectDragged.GetComponent<Letter>();
+        var currentObject = DragHandler.ObjectDragged.GetComponent<LetterH>();
         var currentIndex = FindIndex(currentObject);
         var previousCoordinates = DragHandler.StartPosition;
         for (var j = currentIndex + 1; j < CurrentLetters.Count; j++)//shifts all letters
@@ -182,7 +182,7 @@ public class LetterBox : MonoBehaviour
     public bool ChangeLetters()
     {
         var successful = false;
-        foreach (Letter t in CurrentLetters)
+        foreach (LetterH t in CurrentLetters)
         {
             if (t.isChecked)
             {
@@ -198,8 +198,8 @@ public class LetterBox : MonoBehaviour
         return successful;
     }
 
-    //Finds the index of Letter in CurrentLetters
-    public int FindIndex(Letter input)
+    //Finds the index of LetterH in CurrentLetters
+    public int FindIndex(LetterH input)
     {
         var j = 0;
         for (; j < CurrentLetters.Count; j++)

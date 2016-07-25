@@ -26,7 +26,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent = transform.parent.gameObject.GetComponent<FieldLAN>();
     }
 
-    //Checks if letter can be dropped, if it is, calls the method to change this Tile for both players
+    //Checks if letter can be dropped, if it is, calls the method to change this TileH for both players
     public void OnDrop(PointerEventData eventData)
     {
         if (CanDrop && !HasLetter)
@@ -64,7 +64,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         else parent.Controller.ShowWrongTileError();
     }
 
-    //Is called from LetterBox
+    //Is called from LetterBoxH
     //Changes the current letter on this tile, makes checks for nearby Tiles
     public void ChangeLetter(string letter)
     {
@@ -152,7 +152,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (!String.IsNullOrEmpty(CurrentLetter.text))
         {
             PointsText.enabled = true;
-            PointsText.text = LetterBox.PointsDictionary[CurrentLetter.text].ToString();
+            PointsText.text = LetterBoxH.PointsDictionary[CurrentLetter.text].ToString();
             CurrentLetter.enabled = false;
         }
     }
