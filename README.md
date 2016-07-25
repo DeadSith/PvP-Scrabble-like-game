@@ -1,5 +1,5 @@
-#[Latest version of words.db](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6237&authkey=!ADPaXttvgeZduSA&ithint=file%2czip)
-Place it in Assets/SharedAssets. 
+#[Latest version of words.db](https://1drv.ms/u/s!AiMRzyTQY-LIsHQanItwghCH5x21)
+More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any word is missing.
 #[Latest built version x86](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6240&authkey=!AG8x7AoxwjhBzqw&ithint=file%2czip)
 **Links are constantly updated.**  
 # PvP-Scrabble-like-game
