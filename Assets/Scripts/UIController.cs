@@ -6,12 +6,14 @@ public class UIController : MonoBehaviour
 {
     //Score of player
     public Text Player1Text;
+
     public Text Player2Text;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
 
     //Error messages
     public Text NotExistText;
+
     public Text DeleteText;
     public Text ChangeLetterText;
     public Text WrongTileText;
@@ -26,6 +28,7 @@ public class UIController : MonoBehaviour
 
     //Endgame fields
     public Canvas EndGameCanvas;
+
     public Text Player1Points;
     public Text Player2Points;
     public Text Player1Name;

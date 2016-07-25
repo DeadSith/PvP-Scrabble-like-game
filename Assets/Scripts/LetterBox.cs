@@ -65,7 +65,7 @@ public class LetterBox : MonoBehaviour
 
     private Vector3 _pos;
     private float _xOffset = 0;
-    private Grid _currentGrid;
+    private Field _currentField;
 
     public Text NumberOfLettersText;//for testing only
 
@@ -83,7 +83,7 @@ public class LetterBox : MonoBehaviour
         CurrentLetters = new List<Letter>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         FreeCoordinates = new List<Vector3>();
-        _currentGrid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+        _currentField = GameObject.FindGameObjectWithTag("GameField").GetComponent<Field>();
         DistanceBetweenLetters = LetterSize.x;
         LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
         _xOffset = gameObject.transform.position.x - 2 * DistanceBetweenLetters;
@@ -97,7 +97,7 @@ public class LetterBox : MonoBehaviour
     {
         if (_allLetters == null || _allLetters.Count == 0)
             CanChangeLetters = false;
-        else CanChangeLetters = _currentGrid.CurrentTiles.Count == 0;
+        else CanChangeLetters = _currentField.CurrentTiles.Count == 0;
         ChangeLetterButton.interactable = CanChangeLetters;
     }
 
@@ -148,7 +148,7 @@ public class LetterBox : MonoBehaviour
         var newLetter = Instantiate(LetterPrefab, position,
             transform.rotation) as Letter;
         newLetter.transform.SetParent(gameObject.transform);
-        if (String.IsNullOrEmpty(letter))//if letter is retrned from Grid
+        if (String.IsNullOrEmpty(letter))//if letter is retrned from GameField
         {
             var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
             newLetter.ChangeLetter(current);

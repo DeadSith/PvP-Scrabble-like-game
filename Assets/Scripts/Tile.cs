@@ -19,11 +19,11 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
 
-    private Grid parent;
+    private Field parent;
 
     private void Start()
     {
-        parent = transform.parent.gameObject.GetComponent<Grid>();
+        parent = transform.parent.gameObject.GetComponent<Field>();
     }
 
     //Checks if letter can be dropped, if it is, writes letter in this Tile
@@ -32,15 +32,15 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (CanDrop && !HasLetter)
         {
             DragHandler.ObjectDragged.transform.position = new Vector3(-1500, -1500);//Prevents letter getting stuck on the field
-            if (parent.CurrentDirection == Grid.Direction.None ||
-                (parent.CurrentDirection == Grid.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
-                (parent.CurrentDirection == Grid.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
+            if (parent.CurrentDirection == Field.Direction.None ||
+                (parent.CurrentDirection == Field.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
+                (parent.CurrentDirection == Field.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
             {
                 parent.CurrentTiles.Add(this);
                 if (parent.CurrentTiles.Count == 2)
                 {
-                    if (parent.CurrentTiles[0].Row == Row) parent.CurrentDirection = Grid.Direction.Horizontal;
-                    else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = Grid.Direction.Vertical;
+                    if (parent.CurrentTiles[0].Row == Row) parent.CurrentDirection = Field.Direction.Horizontal;
+                    else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = Field.Direction.Vertical;
                     else
                     {
                         parent.Controller.ShowWrongTileError();
@@ -52,10 +52,10 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
                 CurrentLetter.text = DragHandler.ObjectDragged.GetComponent<Letter>().LetterText.text;
                 var letterPanel = DragHandler.ObjectDragged.transform.parent.gameObject.GetComponent<LetterBox>();
                 letterPanel.RemoveLetter();
-                if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
-                if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;
-                if (Row != 0) parent.Field[Row - 1, Column].CanDrop = true;
-                if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = true;
+                if (Column != 0) parent.GameField[Row, Column - 1].CanDrop = true;
+                if (Column != parent.NumberOfColumns - 1) parent.GameField[Row, Column + 1].CanDrop = true;
+                if (Row != 0) parent.GameField[Row - 1, Column].CanDrop = true;
+                if (Row != parent.NumberOfRows - 1) parent.GameField[Row + 1, Column].CanDrop = true;
                 Destroy(DragHandler.ObjectDragged);
             }
             else parent.Controller.ShowWrongTileError();
@@ -66,19 +66,19 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
     //checks if one of the nearby tiles has letter
     private bool CheckTile(Tile checkedTile)
     {
-        if (checkedTile.Row != 0 && parent.Field[checkedTile.Row - 1, checkedTile.Column].HasLetter)
+        if (checkedTile.Row != 0 && parent.GameField[checkedTile.Row - 1, checkedTile.Column].HasLetter)
         {
             return true;
         }
-        if (checkedTile.Row != parent.NumberOfRows - 1 && parent.Field[checkedTile.Row + 1, checkedTile.Column].HasLetter)
+        if (checkedTile.Row != parent.NumberOfRows - 1 && parent.GameField[checkedTile.Row + 1, checkedTile.Column].HasLetter)
         {
             return true;
         }
-        if (checkedTile.Column != 0 && parent.Field[checkedTile.Row, checkedTile.Column - 1].HasLetter)
+        if (checkedTile.Column != 0 && parent.GameField[checkedTile.Row, checkedTile.Column - 1].HasLetter)
         {
             return true;
         }
-        if (checkedTile.Column != parent.NumberOfColumns - 1 && parent.Field[checkedTile.Row, checkedTile.Column + 1].HasLetter)
+        if (checkedTile.Column != parent.NumberOfColumns - 1 && parent.GameField[checkedTile.Row, checkedTile.Column + 1].HasLetter)
         {
             return true;
         }
@@ -107,17 +107,17 @@ public class Tile : MonoBehaviour, IDropHandler, IPointerClickHandler
         else parent.Player2.ChangeBox(1, CurrentLetter.text);
         CurrentLetter.text = "";
         parent.CurrentTiles.Remove(this);
-        if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
-        if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
-        if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
-        if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
+        if (Row != 0) parent.GameField[Row - 1, Column].CanDrop = CheckTile(parent.GameField[Row - 1, Column]);
+        if (Row != parent.NumberOfRows - 1) parent.GameField[Row + 1, Column].CanDrop = CheckTile(parent.GameField[Row + 1, Column]);
+        if (Column != 0) parent.GameField[Row, Column - 1].CanDrop = CheckTile(parent.GameField[Row, Column - 1]);
+        if (Column != parent.NumberOfColumns - 1) parent.GameField[Row, Column + 1].CanDrop = CheckTile(parent.GameField[Row, Column + 1]);
         CanDrop = CheckTile(this);
-        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = Grid.Direction.None;
+        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = Field.Direction.None;
         if (parent.isFirstTurn)
         {
-            parent.CurrentDirection = Grid.Direction.None;
+            parent.CurrentDirection = Field.Direction.None;
             if (parent.CurrentTurn == 1)
-                parent.Field[7, 7].CanDrop = true;
+                parent.GameField[7, 7].CanDrop = true;
         }
     }
 

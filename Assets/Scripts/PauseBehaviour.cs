@@ -46,7 +46,7 @@ public class PauseBehaviour : MonoBehaviour
 
     public void MainMenu()
     {
-        PlayerPrefs.SetInt("Exiting",1);
+        PlayerPrefs.SetInt("Exiting", 1);
         SceneManager.LoadScene(0);
     }
 

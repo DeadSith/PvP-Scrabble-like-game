@@ -31,7 +31,7 @@ public class LetterBoxLAN : NetworkBehaviour
     private Vector3 _pos;
     private float _xOffset;
     private bool _isFirstTurn = true;
-    private GridLAN _currentGrid;
+    private FieldLAN _currentField;
     private GameObject _waitTextGameObject;
     private List<TileLAN> _currenTiles = new List<TileLAN>();
 
@@ -126,8 +126,8 @@ public class LetterBoxLAN : NetworkBehaviour
         gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 0);
         gameObject.transform.localPosition = new Vector3(0, 0);
         FreeCoordinates = new List<Vector3>();
-        _currentGrid = GameObject.FindGameObjectWithTag("Grid").GetComponent<GridLAN>();
-        _distanceBetweenLetters = _currentGrid.DistanceBetweenTiles;
+        _currentField = GameObject.FindGameObjectWithTag("GameField").GetComponent<FieldLAN>();
+        _distanceBetweenLetters = _currentField.DistanceBetweenTiles;
         _letterSize = new Vector2(_distanceBetweenLetters, _distanceBetweenLetters);
         LetterPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = _letterSize;
         _xOffset = gameObject.transform.position.x - 2 * _distanceBetweenLetters;
@@ -143,17 +143,17 @@ public class LetterBoxLAN : NetworkBehaviour
     };
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
         AllLetters.AddRange(_allLetters);
-        if (_currentGrid.PlayerToSendCommands == null)
-            _currentGrid.PlayerToSendCommands = this;
+        if (_currentField.PlayerToSendCommands == null)
+            _currentField.PlayerToSendCommands = this;
         if (isServer)
         {
             _waitTextGameObject = GameObject.FindWithTag("Wait");
-            _currentGrid.PlayerNumber = 1;
+            _currentField.PlayerNumber = 1;
             _waitTextGameObject.GetComponent<Text>().enabled = true;
         }
         else
         {
-            _currentGrid.PlayerNumber = 2;
+            _currentField.PlayerNumber = 2;
         }
     }
 
@@ -177,7 +177,7 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         if (AllLetters.Count == 0)
             CanChangeLetters = false;
-        else if (_currentGrid.PlayerNumber == CurrentPlayer && _currentGrid.CurrentTiles.Count == 0)
+        else if (_currentField.PlayerNumber == CurrentPlayer && _currentField.CurrentTiles.Count == 0)
             CanChangeLetters = true;
         else
         {
@@ -316,13 +316,13 @@ public class LetterBoxLAN : NetworkBehaviour
     //Resets timer, calls commands to change player and score
     public void ChangePlayer(int nextPlayer, int score)
     {
-        if (CurrentPlayer == _currentGrid.PlayerNumber)
+        if (CurrentPlayer == _currentField.PlayerNumber)
             CmdSetTimeRemaining(TimerLength);
         else
         {
-            _currentGrid.TimeRemaining = TimeReamining;
+            _currentField.TimeRemaining = TimeReamining;
         }
-        if (_currentGrid.IsFirstTurn && score != 0)
+        if (_currentField.IsFirstTurn && score != 0)
             CmdSetFirstTurn();
         score += CurrentPlayer == 1 ? Player1Score : Player2Score;
         CmdChangeScore(CurrentPlayer, score);
@@ -449,14 +449,14 @@ public class LetterBoxLAN : NetworkBehaviour
         if (isServer)
         {
             CmdSetPlayer1(PlayerPrefs.GetString("Player1", "Гравець 1"));
-            _currentGrid.SetName(1, PlayerPrefs.GetString("Player1", "Гравець 1"));
+            _currentField.SetName(1, PlayerPrefs.GetString("Player1", "Гравець 1"));
             GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameStarted = true;
             GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().Resume();
             _waitTextGameObject.SetActive(false);
             var enabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
             var length = PlayerPrefs.GetInt("Length");
             CmdSetTimer(enabled, length);
-            _currentGrid.SetTimer(enabled, length);
+            _currentField.SetTimer(enabled, length);
             ChangeBox(NumberOfLetters);
         }
     }
@@ -482,19 +482,19 @@ public class LetterBoxLAN : NetworkBehaviour
         }
     }
 
-    //Writes letter to cell in Grid
+    //Writes letter to cell in GameField
     public void OnGridChanged(string value)
     {
         LetterToPlace = "xyz";
         if (!String.IsNullOrEmpty(value))
         {
-            _currentGrid.Field[GridX, GridY].ChangeLetter(value);
-            _currenTiles.Add(_currentGrid.Field[GridX, GridY]);
+            _currentField.Field[GridX, GridY].ChangeLetter(value);
+            _currenTiles.Add(_currentField.Field[GridX, GridY]);
         }
         else
         {
-            _currentGrid.Field[GridX, GridY].Remove();
-            _currenTiles.Remove(_currentGrid.Field[GridX, GridY]);
+            _currentField.Field[GridX, GridY].Remove();
+            _currenTiles.Remove(_currentField.Field[GridX, GridY]);
         }
     }
 
@@ -508,7 +508,7 @@ public class LetterBoxLAN : NetworkBehaviour
         }
         _currenTiles.Clear();
         CurrentPlayer = value;
-        _currentGrid.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
+        _currentField.InvalidatePlayer(CurrentPlayer, CurrentPlayer == 1 ? Player2Score : Player1Score);
     }
 
     //Called in the end of game to remove points for each letter left in box
@@ -520,7 +520,7 @@ public class LetterBoxLAN : NetworkBehaviour
             result += LetterBox.PointsDictionary[letter.LetterText.text];
         }
         CmdAddBonusScore(result);
-        if (_currentGrid.PlayerNumber == 1)
+        if (_currentField.PlayerNumber == 1)
             CmdChangeScore(1, Player1Score - result);
         else
         {
@@ -529,7 +529,7 @@ public class LetterBoxLAN : NetworkBehaviour
         if (AllLetters.Count == 0)
         {
             if (CurrentLetters.Count == 0)
-                if (_currentGrid.PlayerNumber == 2)
+                if (_currentField.PlayerNumber == 2)
                     CmdChangeScore(2, Player2Score + BonusScore);
                 else
                 {
@@ -550,7 +550,7 @@ public class LetterBoxLAN : NetworkBehaviour
         Player1Score = value;
         if (isServer)
             return;
-        _currentGrid.InvalidatePlayer(CurrentPlayer, value);
+        _currentField.InvalidatePlayer(CurrentPlayer, value);
     }
 
     public void OnPlayer2ScoreChange(int value)
@@ -558,7 +558,7 @@ public class LetterBoxLAN : NetworkBehaviour
         Player2Score = value;
         if (isServer)
             return;
-        _currentGrid.InvalidatePlayer(CurrentPlayer, value);
+        _currentField.InvalidatePlayer(CurrentPlayer, value);
     }
 
     #endregion Workaroung to incorrect syncing
@@ -568,23 +568,23 @@ public class LetterBoxLAN : NetworkBehaviour
     {
         End = value;
         var winner = Player1Score > Player2Score ? 1 : 2;
-        _currentGrid.EndGame(winner, Player1Score, Player2Score);
+        _currentField.EndGame(winner, Player1Score, Player2Score);
     }
 
     //Changes length of timer
     public void OnLengthChanged(int value)
     {
         TimerLength = value;
-        _currentGrid.SetTimer(TimerEnabled, value);
+        _currentField.SetTimer(TimerEnabled, value);
     }
 
     //Starts timer on client and server
     public void OnSync(float value)
     {
         TimeReamining = 1;
-        _currentGrid.TimeRemaining = value;
+        _currentField.TimeRemaining = value;
         if (!isServer)
-            _currentGrid.TimeRemaining += 2;
+            _currentField.TimeRemaining += 2;
     }
 
     //Called on server and client when turn is skipped
@@ -600,11 +600,11 @@ public class LetterBoxLAN : NetworkBehaviour
         {
             var row = int.Parse(letters[i]);
             var column = int.Parse(letters[++i]);
-            if (_currentGrid.PlayerNumber == player)
-                _currentGrid.Field[row, column].RemoveOnClick(true);
+            if (_currentField.PlayerNumber == player)
+                _currentField.Field[row, column].RemoveOnClick(true);
             else
             {
-                _currentGrid.Field[row, column].Remove();
+                _currentField.Field[row, column].Remove();
             }
         }
     }
@@ -613,13 +613,13 @@ public class LetterBoxLAN : NetworkBehaviour
     public void OnPlayer1NameChanged(string value)
     {
         Player1Name = value;
-        _currentGrid.SetName(1, value);
+        _currentField.SetName(1, value);
     }
 
     public void OnPlayer2NameChanged(string value)
     {
         Player2Name = value;
-        _currentGrid.SetName(2, value);
+        _currentField.SetName(2, value);
     }
 
     #endregion Hooks

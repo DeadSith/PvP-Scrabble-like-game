@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GridLAN : MonoBehaviour
+public class FieldLAN : MonoBehaviour
 {
     public enum Direction
     {
@@ -133,7 +133,7 @@ public class GridLAN : MonoBehaviour
         AssignMultipliers();
     }
 
-    #region Field generation
+    #region GameField generation
 
     private void AssignMaterials()
     {
@@ -245,7 +245,7 @@ public class GridLAN : MonoBehaviour
         Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion Field generation
+    #endregion GameField generation
 
     private void OnEndTimer()
     {

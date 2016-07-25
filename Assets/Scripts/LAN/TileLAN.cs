@@ -19,11 +19,11 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     public int LetterMultiplier = 1;
     public int WordMultiplier = 1;
 
-    private GridLAN parent;
+    private FieldLAN parent;
 
     private void Start()
     {
-        parent = transform.parent.gameObject.GetComponent<GridLAN>();
+        parent = transform.parent.gameObject.GetComponent<FieldLAN>();
     }
 
     //Checks if letter can be dropped, if it is, calls the method to change this Tile for both players
@@ -37,15 +37,15 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
                 parent.Controller.ShowWrongTurnError();
                 return;
             }
-            if (parent.CurrentDirection == GridLAN.Direction.None ||
-                (parent.CurrentDirection == GridLAN.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
-                (parent.CurrentDirection == GridLAN.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
+            if (parent.CurrentDirection == FieldLAN.Direction.None ||
+                (parent.CurrentDirection == FieldLAN.Direction.Horizontal && Row == parent.CurrentTiles[0].Row) ||
+                (parent.CurrentDirection == FieldLAN.Direction.Vertical && Column == parent.CurrentTiles[0].Column))
             {
                 parent.CurrentTiles.Add(this);
                 if (parent.CurrentTiles.Count == 2)
                 {
-                    if (parent.CurrentTiles[0].Row == Row) parent.CurrentDirection = GridLAN.Direction.Horizontal;
-                    else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = GridLAN.Direction.Vertical;
+                    if (parent.CurrentTiles[0].Row == Row) parent.CurrentDirection = FieldLAN.Direction.Horizontal;
+                    else if (parent.CurrentTiles[0].Column == Column) parent.CurrentDirection = FieldLAN.Direction.Vertical;
                     else
                     {
                         parent.Controller.ShowWrongTileError();
@@ -120,7 +120,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent.CurrentTiles.Remove(this);
         if (!skip)
             parent.Player1.ChangeGrid(Row, Column, "");
-        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = GridLAN.Direction.None;
+        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = FieldLAN.Direction.None;
     }
 
     //Called for both players
@@ -141,7 +141,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         CanDrop = CheckTile(this);
         if (parent.IsFirstTurn)
         {
-            parent.CurrentDirection = GridLAN.Direction.None;
+            parent.CurrentDirection = FieldLAN.Direction.None;
             parent.Field[7, 7].CanDrop = true;
         }
     }
