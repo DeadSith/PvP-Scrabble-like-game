@@ -24,6 +24,7 @@ public class FieldLAN : MonoBehaviour
 
     #endregion Prefabs and materials
 
+    public UIGrid FieldGrid;
     public GameObject TimerImage;
     public Text TimerText;
     public Text Player1Text;
@@ -60,11 +61,8 @@ public class FieldLAN : MonoBehaviour
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<TileLAN>();
-        var size = gameObject.GetComponent<RectTransform>().rect;
-        DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
-        TilePrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
-        _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
+        FieldGrid.Create();
+        DistanceBetweenTiles = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
         CreateField();
         _fixed = true;
     }
@@ -106,26 +104,20 @@ public class FieldLAN : MonoBehaviour
 
     private void CreateField()
     {
-        var xOffset = _xOffset;
-        var yOffset = _yOffset;
         Field = new TileLAN[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TilePrefab,
-                    new Vector2(transform.position.x + xOffset, transform.position.y + yOffset),
-                    transform.rotation) as TileLAN;
+                var newTile = Instantiate(TilePrefab) as TileLAN;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
                 render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
-                xOffset += DistanceBetweenTiles;
+                FieldGrid.AddElement(i, j, newTile.gameObject);
             }
-            xOffset = _xOffset;
-            yOffset += DistanceBetweenTiles;
         }
         Field[7, 7].CanDrop = true;
         Field[7, 7].GetComponent<Image>().material = StartMaterial;

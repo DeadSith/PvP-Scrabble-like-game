@@ -8,12 +8,12 @@ public class UIGrid : MonoBehaviour
     public int ColCount = 1;
     public GameObject CellPrefab;
 
-    private void Start()
+    public void Create()
     {
         Items = new GameObject[RowCount, ColCount];
         var gridSize = GetComponent<RectTransform>().rect;
-        var xSize = gridSize.width / ColCount;
-        var ySize = gridSize.height / RowCount;
+        var xSize = gridSize.width / ColCount*gameObject.transform.lossyScale.x;
+        var ySize = gridSize.height / RowCount * gameObject.transform.lossyScale.y;
         var cellTransform = CellPrefab.gameObject.GetComponent<RectTransform>();
         if (IsSquare)
         {
@@ -28,8 +28,9 @@ public class UIGrid : MonoBehaviour
         {
             for (var j = 0; j < ColCount; j++)
             {
-                var curCell = Instantiate(CellPrefab, curPosition, transform.rotation) as GameObject;
+                var curCell = Instantiate(CellPrefab);
                 curCell.transform.SetParent(gameObject.transform);
+                curCell.transform.position = curPosition;
                 Items[i, j] = curCell;
                 curPosition.x += xSize;
             }
@@ -38,9 +39,11 @@ public class UIGrid : MonoBehaviour
         }
     }
 
-    public void AddElement(int row, int column, GameObject element, float padding = 0, bool isSquare = false)//element should have anchors in middle and centre
+    public void AddElement(int row, int column, GameObject element, float padding = 0, bool isSquare = false, bool preserveSize = false)//element should have anchors in middle and centre
     {
         element.transform.position = new Vector3(Items[row, column].transform.position.x, Items[row, column].transform.position.y);
+        if(preserveSize)
+            return;
         if (!isSquare)
             element.gameObject.GetComponent<RectTransform>().sizeDelta =
                 new Vector2((1 - padding) * Items[row, column].GetComponent<RectTransform>().rect.width,
@@ -56,10 +59,12 @@ public class UIGrid : MonoBehaviour
         }
     }
 
-    public void AddElement(int upperRow, int upperColumn, int lowerRow, int lowerColumn, GameObject element, float padding = 0, bool isSquare = false)
+    public void AddElement(int upperRow, int upperColumn, int lowerRow, int lowerColumn, GameObject element, float padding = 0, bool isSquare = false, bool preserveSize = false)
     {
         element.transform.position = new Vector3((Items[upperRow, upperColumn].transform.position.x + Items[lowerRow, lowerColumn].transform.position.x) / 2,
             (Items[upperRow, upperColumn].transform.position.y + Items[lowerRow, lowerColumn].transform.position.y) / 2);
+        if(preserveSize)
+            return;
         var xSize = (upperRow - lowerRow) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
         var ySize = (upperColumn - lowerColumn) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);
         if (isSquare)

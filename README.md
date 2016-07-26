@@ -3,6 +3,8 @@ More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any 
 #[Latest built version x86](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6240&authkey=!AG8x7AoxwjhBzqw&ithint=file%2czip)
 **Links are constantly updated.**  
 # PvP-Scrabble-like-game
+### Android version is in development. 
+First alpha will be available soon, but it will support only hotseat mode.
 ###1. What:
 Open-source version of games like scrabble with LAN and hot-seat multiplayer. Written fully in C#.
 ###2. Why:

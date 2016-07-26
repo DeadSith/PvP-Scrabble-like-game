@@ -32,6 +32,7 @@ public class FieldH : MonoBehaviour
     public UIController Controller;
     public Button SkipTurnButton;
 
+    public UIGrid FieldGrid;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
     public bool isFirstTurn = true;
@@ -40,7 +41,6 @@ public class FieldH : MonoBehaviour
     public LetterBoxH Player1;
     public LetterBoxH Player2;
     public byte CurrentPlayer = 1;
-    public float DistanceBetweenTiles = 1.2f;
     public TileH[,] Field;
     public List<TileH> CurrentTiles;
 
@@ -50,8 +50,6 @@ public class FieldH : MonoBehaviour
     private bool _timerEnabled;
     private int _timerLength;
     private float _timeRemaining;
-    private float _xOffset = 0;
-    private float _yOffset = 0;
 
     private void Start()
     {
@@ -67,13 +65,10 @@ public class FieldH : MonoBehaviour
             _timerLength = PlayerPrefs.GetInt("Length");
             _timeRemaining = (float)_timerLength + 1;
         }
-        var size = gameObject.GetComponent<RectTransform>().rect;
-        DistanceBetweenTiles = Math.Min(Math.Abs(size.width * gameObject.transform.lossyScale.x), Math.Abs(size.height * gameObject.transform.lossyScale.y)) / 15; // gameObject.transform.parent.GetComponent<Canvas>().scaleFactor;
-        TileHPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        Player1.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        Player2.LetterSize = new Vector2(DistanceBetweenTiles, DistanceBetweenTiles);
-        _xOffset = (size.width * gameObject.transform.lossyScale.x - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
-        _yOffset = (size.height * gameObject.transform.lossyScale.y - DistanceBetweenTiles * 15 + DistanceBetweenTiles / 2) / 2;
+        FieldGrid.Create();
+        var letterSize = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
+        Player1.LetterSize = new Vector2(letterSize, letterSize);
+        Player2.LetterSize = new Vector2(letterSize, letterSize);
         CreateField();
         Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
         Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
@@ -99,26 +94,20 @@ public class FieldH : MonoBehaviour
 
     private void CreateField()
     {
-        var xOffset = _xOffset;
-        var yOffset = _yOffset;
         Field = new TileH[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TileHPrefab,
-                    new Vector2(transform.position.x + xOffset, transform.position.y + yOffset),
-                    transform.rotation) as TileH;
+                var newTile = Instantiate(TileHPrefab);
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
                 render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
-                xOffset += DistanceBetweenTiles;
+                FieldGrid.AddElement(i,j,newTile.gameObject);
             }
-            xOffset = _xOffset;
-            yOffset += DistanceBetweenTiles;
         }
         Field[7, 7].CanDrop = true;
         Field[7, 7].GetComponent<Image>().material = StartMaterial;

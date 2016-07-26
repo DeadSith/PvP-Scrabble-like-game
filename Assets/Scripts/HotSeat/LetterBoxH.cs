@@ -148,7 +148,7 @@ public class LetterBoxH : MonoBehaviour
         var newLetter = Instantiate(LetterHPrefab, position,
             transform.rotation) as LetterH;
         newLetter.transform.SetParent(gameObject.transform);
-        if (String.IsNullOrEmpty(letter))//if letter is retrned from Field
+        if (String.IsNullOrEmpty(letter))//if letter is returned from Field
         {
             var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
             newLetter.ChangeLetter(current);
