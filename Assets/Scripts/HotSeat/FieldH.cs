@@ -106,7 +106,7 @@ public class FieldH : MonoBehaviour
                 render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
-                FieldGrid.AddElement(i,j,newTile.gameObject);
+                FieldGrid.AddElement(i, j, newTile.gameObject);
             }
         }
         Field[7, 7].CanDrop = true;
