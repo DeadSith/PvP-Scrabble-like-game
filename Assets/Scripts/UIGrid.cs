@@ -7,7 +7,7 @@ public class UIGrid : MonoBehaviour
     public int RowCount = 1;
     public int ColCount = 1;
     public GameObject CellPrefab;
-    public  bool IsIntialized { get; private set; }
+    public bool IsIntialized { get; private set; }
 
     public void Initialize()
     {

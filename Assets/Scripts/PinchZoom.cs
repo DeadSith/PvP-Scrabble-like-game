@@ -1,5 +1,6 @@
 ﻿/*#if DEBUG
     #undef DEBUG*/
+
 //Uncomment upper lines for build
 using UnityEngine;
 
@@ -14,7 +15,7 @@ public class PinchZoom : MonoBehaviour
     private void Update()
     {
         var camera = gameObject.GetComponent<Camera>();
-        if (Application.platform==RuntimePlatform.Android&&Input.multiTouchEnabled)
+        if (Application.platform == RuntimePlatform.Android && Input.multiTouchEnabled)
         {
             if (Input.touchCount > 1)
             {
@@ -26,11 +27,11 @@ public class PinchZoom : MonoBehaviour
                                     (touchZero.position - touchOne.position).magnitude;
                 camera.orthographicSize += magnitudeDiff * ZoomSpeed;
             }
-            else if (Input.touchCount==1)
+            else if (Input.touchCount == 1)
             {
                 var touchZero = Input.GetTouch(0);
-                var diff = (touchZero.position - touchZero.deltaPosition)*MoveSpeed;
-                camera.transform.position += new Vector3(diff.x,diff.y);
+                var diff = (touchZero.position - touchZero.deltaPosition) * MoveSpeed;
+                camera.transform.position += new Vector3(diff.x, diff.y);
             }
         }
 #if DEBUG
@@ -40,11 +41,11 @@ public class PinchZoom : MonoBehaviour
             if (Input.GetMouseButton(1))
             {
                 var diff = LastPoss - Input.mousePosition;
-                camera.transform.position += diff*MoveSpeed;
+                camera.transform.position += diff * MoveSpeed;
             }
             LastPoss = Input.mousePosition;
         }
-#endif 
+#endif
         if (camera.orthographicSize < MinSize)
             camera.orthographicSize = MinSize;
         else if (camera.orthographicSize > MaxSize)
