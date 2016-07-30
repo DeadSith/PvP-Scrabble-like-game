@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class FieldH : MonoBehaviour
+public class FieldLAN : MonoBehaviour
 {
     public enum Direction
     {
@@ -14,7 +14,7 @@ public class FieldH : MonoBehaviour
 
     #region Prefabs and materials
 
-    public TileH TileHPrefab;
+    public TileLAN TilePrefab;
     public Material StandardMaterial;
     public Material StartMaterial;
     public Material WordX2Material;
@@ -24,89 +24,99 @@ public class FieldH : MonoBehaviour
 
     #endregion Prefabs and materials
 
+    public UIGrid FieldGrid;
     public GameObject TimerImage;
     public Text TimerText;
     public Text Player1Text;
     public Text Player2Text;
-    public GameObject EndGameCanvas;
     public UIController Controller;
-    public Button SkipTurnButton;
-
-    public UIGrid FieldGrid;
     public Direction CurrentDirection = Direction.None;
     public int CurrentTurn = 1;
-    public bool isFirstTurn = true;
+    public bool IsFirstTurn = true;
     public byte NumberOfRows = 15;
     public byte NumberOfColumns = 15;
-    public LetterBoxH Player1;
-    public LetterBoxH Player2;
-    public byte CurrentPlayer = 1;
-    public TileH[,] Field;
-    public List<TileH> CurrentTiles;
+    public LetterBoxLAN Player1;
+    public LetterBoxLAN PlayerToSendCommands;
+    public float DistanceBetweenTiles = 1.2f;
+    public TileLAN[,] Field;
+    public List<TileLAN> CurrentTiles;
+    public int PlayerNumber;
 
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
-    private List<TileH> _wordsFound;
+    private List<TileLAN> _wordsFound;
+    private float _xOffset = 0;
+    private float _yOffset = 0;
+    private bool _fixed;//Required to fix error with materials
+    private bool _gameStarted;
+
     private bool _timerEnabled;
     private int _timerLength;
-    private float _timeRemaining;
+    public float TimeRemaining;
 
     private void Start()
     {
-        CurrentTiles = new List<TileH>();
+        CurrentTiles = new List<TileLAN>();
         var conection = @"URI=file:" + Application.streamingAssetsPath + @"/words.db";
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
-        _wordsFound = new List<TileH>();
-        _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
-        if (_timerEnabled)
-        {
-            TimerImage.SetActive(true);
-            _timerLength = PlayerPrefs.GetInt("Length");
-            _timeRemaining = (float)_timerLength + 1;
-        }
+        _wordsFound = new List<TileLAN>();
         FieldGrid.Create();
-        var letterSize = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
-        Player1.LetterSize = new Vector2(letterSize, letterSize);
-        Player2.LetterSize = new Vector2(letterSize, letterSize);
+        DistanceBetweenTiles = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
         CreateField();
-        Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
-        Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
+        _fixed = true;
     }
 
     private void Update()
     {
-        if (SkipTurnButton.interactable != (CurrentTiles.Count == 0))
-            SkipTurnButton.interactable = CurrentTiles.Count == 0;
-        if (Input.GetKeyDown(KeyCode.A))
-            EndGame(null);
+        if (_gameStarted && Player1 == null)
+            Controller.ShowConnectionError();
+        Controller.SetSkipButtonActive(CurrentTiles.Count == 0);
+        if (Input.GetKeyDown(KeyCode.A) && Player1 != null)
+        {
+            Player1.EndGame();
+        }
         if (_timerEnabled)
         {
-            _timeRemaining -= Time.deltaTime;
-            var timerValue = (int)_timeRemaining - 1;
-            if (timerValue < 0)
-                timerValue = 0;
-            TimerText.text = timerValue.ToString();
-            if (_timeRemaining < 0)
+            TimeRemaining -= Time.deltaTime;
+            if (Player1 == null)
+                return;
+            var value = Player1.isServer ? (int)TimeRemaining : (int)TimeRemaining - 2;
+            if (value < 0) value = 0;
+            TimerText.text = value.ToString();
+            if (TimeRemaining < 0)
                 OnEndTimer();
+        }
+        if (Player1 == null && PlayerToSendCommands != null && GameObject.FindGameObjectsWithTag("Player").Length > 1)//Do not touch. It's a feature
+            foreach (var o in GameObject.FindGameObjectsWithTag("Player"))
+            {
+                if (o.GetComponent<LetterBoxLAN>() == PlayerToSendCommands)
+                    continue;
+                Player1 = o.GetComponent<LetterBoxLAN>();
+                _gameStarted = true;
+                break;
+            }
+        else if (Player1 != null)
+        {
+            Controller.SetChangeButtonActive(Player1.AllLetters.Count > 0 && Player1.CanChangeLetters);
         }
     }
 
     private void CreateField()
     {
-        Field = new TileH[NumberOfRows, NumberOfColumns];
+        Field = new TileLAN[NumberOfRows, NumberOfColumns];
         for (var i = 0; i < NumberOfRows; i++)
         {
             for (var j = 0; j < NumberOfColumns; j++)
             {
-                var newTile = Instantiate(TileHPrefab);
+                var newTile = Instantiate(TilePrefab) as TileLAN;
                 newTile.transform.SetParent(gameObject.transform);
                 newTile.Column = j;
                 var render = newTile.GetComponent<Image>();
                 render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
-                FieldGrid.AddElement(i,j,newTile.gameObject);
+                FieldGrid.AddElement(i, j, newTile.gameObject);
             }
         }
         Field[7, 7].CanDrop = true;
@@ -231,7 +241,7 @@ public class FieldH : MonoBehaviour
 
     private void OnEndTimer()
     {
-        _timeRemaining = (float)_timerLength + 1;
+        TimeRemaining = (float)_timerLength + 1;
         OnRemoveAll();
         OnSkipTurn();
     }
@@ -245,111 +255,63 @@ public class FieldH : MonoBehaviour
                 _turnsSkipped = 0;
                 CurrentTurn++;
                 var points = CountPoints();
-                if (CurrentPlayer == 1)
-                {
-                    Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
-                    Player1.Score += points;
-                    if (Player1.CurrentLetters.Count == 0)
-                    {
-                        EndGame(Player1);
-                    }
-                    Player1.gameObject.SetActive(false);
-                    Player2.gameObject.SetActive(true);
-                    CurrentTiles.Clear();
-                    CurrentDirection = Direction.None;
-                    CurrentPlayer = 2;
-                    Controller.InvalidatePlayer(1, Player1.Score);
-                    isFirstTurn = false;
-                }
-                else
-                {
-                    Player2.ChangeBox(7 - Player2.CurrentLetters.Count);
-                    Player2.Score += points;
-                    if (Player2.CurrentLetters.Count == 0)
-                        EndGame(Player2);
-                    Player1.gameObject.SetActive(true);
-                    Player2.gameObject.SetActive(false);
-                    CurrentDirection = Direction.None;
-                    CurrentTiles.Clear();
-                    CurrentPlayer = 1;
-                    Controller.InvalidatePlayer(2, Player2.Score);
-                    isFirstTurn = false;
-                }
+                Player1.ChangeBox(7 - Player1.CurrentLetters.Count);
+                CurrentTiles = new List<TileLAN>();
+                CurrentDirection = Direction.None;
+                IsFirstTurn = false;
                 if (_timerEnabled)
-                    _timeRemaining = (float)_timerLength + 1;
+                    TimeRemaining = (float)_timerLength + 1;
+                Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, points);
+                if (Player1.CurrentLetters.Count == 0)
+                {
+                    Player1.EndGame();
+                }
             }
             else Controller.ShowNotExistError();
         }
         else Controller.ShowZeroTilesError();
-        _wordsFound = new List<TileH>();
+        _wordsFound = new List<TileLAN>();
     }
 
     public void OnChangeLetters()
     {
-        if (CurrentPlayer == 1)
-        {
-            if (!Player1.ChangeLetters())
-            {
-                Controller.ShowChangeLetterError();
-                return;
-            }
-            _turnsSkipped = 0;
-            Player1.gameObject.SetActive(false);
-            Player2.gameObject.SetActive(true);
-            CurrentPlayer = 2;
-            Controller.InvalidatePlayer(1, Player1.Score);
-            CurrentTiles.Clear();
-        }
+        if (Player1.ChangeLetters())
+            CurrentTurn++;
         else
         {
-            if (!Player2.ChangeLetters())
-            {
-                Controller.ShowChangeLetterError();
-                return;
-            }
-            _turnsSkipped = 0;
-            Player1.gameObject.SetActive(true);
-            Player2.gameObject.SetActive(false);
-            CurrentPlayer = 1;
-            Controller.InvalidatePlayer(2, Player2.Score);
-            CurrentTiles.Clear();
+            Controller.ShowChangeLetterError();
+            return;
         }
+        _turnsSkipped = 0;
+        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
-            _timeRemaining = (float)_timerLength + 1;
+            TimeRemaining = (float)_timerLength + 1;
     }
 
     public void OnSkipTurn()
     {
-        if (CurrentPlayer == 1)
-        {
-            Player1.gameObject.SetActive(false);
-            Player2.gameObject.SetActive(true);
-            CurrentPlayer = 2;
-            Controller.InvalidatePlayer(1, Player1.Score);
-        }
-        else
-        {
-            Player1.gameObject.SetActive(true);
-            Player2.gameObject.SetActive(false);
-            CurrentPlayer = 1;
-            Controller.InvalidatePlayer(2, Player2.Score);
-        }
+        Player1.ChangePlayer(PlayerNumber == 1 ? 2 : 1, 0);
         if (_timerEnabled)
-            _timeRemaining = (float)_timerLength + 1;
-        if (++_turnsSkipped == 4)
-            EndGame(null);
+            TimeRemaining = (float)_timerLength + 1;
+        if (++_turnsSkipped == 3)
+        {
+            Player1.EndGame();
+        }
     }
 
     public void OnRemoveAll()
     {
+        var sb = new StringBuilder();
         for (var i = CurrentTiles.Count - 1; i >= 0; i--)
         {
-            CurrentTiles[i].RemoveTile();
+            sb.Append(CurrentTiles[i].Row + " " + CurrentTiles[i].Column + " ");
         }
-        CurrentTiles.Clear();
+        if (sb.Length != 0)
+            sb.Append(Player1.CurrentPlayer);
+        Player1.DeleteOnSkip(sb.ToString().Trim());
     }
 
-    #region Word cheking
+    #region Words Checking
 
     private bool CheckWords()
     {
@@ -477,8 +439,8 @@ public class FieldH : MonoBehaviour
     private int CountPoints()
     {
         var result = 0;
-        var wordMultiplier = 1;
         var score = new int[_wordsFound.Count / 2];
+        var wordMultiplier = 1;
         for (var i = 0; i < _wordsFound.Count; i += 2)
         {
             var tempRes = 0;
@@ -514,7 +476,7 @@ public class FieldH : MonoBehaviour
         return result * wordMultiplier;
     }
 
-    private string CreateWord(Direction current, TileH start, int end)
+    private string CreateWord(Direction current, TileLAN start, int end)
     {
         var sb = new StringBuilder();
         if (current == Direction.Vertical)
@@ -541,19 +503,19 @@ public class FieldH : MonoBehaviour
         }
     }
 
-    private void FindWord(TileH currentTileH, Direction current, out int startPosition, out int endPosition)
+    private void FindWord(TileLAN currentTile, Direction current, out int startPosition, out int endPosition)
     {
         if (current == Direction.Vertical)
         {
-            var j = currentTileH.Row;
-            while (j >= 0 && Field[j, currentTileH.Column].HasLetter)
+            var j = currentTile.Row;
+            while (j >= 0 && Field[j, currentTile.Column].HasLetter)
             {
                 j--;
             }
             j++;
             startPosition = j;
-            j = currentTileH.Row;
-            while (j < NumberOfRows && Field[j, currentTileH.Column].HasLetter)
+            j = currentTile.Row;
+            while (j < NumberOfRows && Field[j, currentTile.Column].HasLetter)
             {
                 j++;
             }
@@ -562,15 +524,15 @@ public class FieldH : MonoBehaviour
         }
         else
         {
-            var j = currentTileH.Column;
-            while (j >= 0 && Field[currentTileH.Row, j].HasLetter)
+            var j = currentTile.Column;
+            while (j >= 0 && Field[currentTile.Row, j].HasLetter)
             {
                 j--;
             }
             j++;
             startPosition = j;
-            j = currentTileH.Column;
-            while (j < NumberOfRows && Field[currentTileH.Row, j].HasLetter)
+            j = currentTile.Column;
+            while (j < NumberOfRows && Field[currentTile.Row, j].HasLetter)
             {
                 j++;
             }
@@ -596,17 +558,36 @@ public class FieldH : MonoBehaviour
         }*/
     }
 
-    #endregion Word cheking
+    #endregion Words Checking
 
-    private void EndGame(LetterBoxH playerOut)//Player, who ran out of letters is passed
+    public void EndGame(int winner, int player1Score, int player2Score)//Player, who ran out of letters is passed
     {
-        var tempPoints = Player1.RemovePoints();
-        tempPoints += Player2.RemovePoints();
-        if (playerOut != null)
+        Controller.SetWinner(winner, player1Score, player2Score, Player1Text.text, Player2Text.text);
+    }
+
+    public void InvalidatePlayer(int playerNumber, int score)
+    {
+        Controller.InvalidatePlayer(playerNumber, score, playerNumber == PlayerNumber);
+        if (_fixed)
+            Controller.FixFirstTurn();
+        _fixed = false;
+    }
+
+    public void SetTimer(bool enabled, int length = 0)
+    {
+        _timerEnabled = enabled;
+        _timerLength = length;
+        if (_timerEnabled)
         {
-            playerOut.Score += tempPoints;
+            TimerImage.SetActive(true);
+            TimeRemaining = (float)_timerLength + 1;
         }
-        var winner = Player1.Score > Player2.Score ? 1 : 2;
-        Controller.SetWinner(winner, Player1.Score, Player2.Score, Player1Text.text, Player2Text.text);
+    }
+
+    public void SetName(int playerNumber, string name)
+    {
+        if (playerNumber == 1)
+            Player1Text.text = name;
+        else Player2Text.text = name;
     }
 }
