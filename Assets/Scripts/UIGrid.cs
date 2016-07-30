@@ -7,9 +7,11 @@ public class UIGrid : MonoBehaviour
     public int RowCount = 1;
     public int ColCount = 1;
     public GameObject CellPrefab;
+    public  bool IsIntialized { get; private set; }
 
-    public void Create()
+    public void Initialize()
     {
+        IsIntialized = true;
         Items = new GameObject[RowCount, ColCount];
         var gridSize = GetComponent<RectTransform>().rect;
         var xSize = gridSize.width / ColCount * gameObject.transform.lossyScale.x;
