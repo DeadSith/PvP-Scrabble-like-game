@@ -7,12 +7,14 @@ public class UIGrid : MonoBehaviour
     public int RowCount = 1;
     public int ColCount = 1;
     public GameObject CellPrefab;
+    public  bool IsIntialized { get; private set; }
 
-    public void Create()
+    public void Initialize()
     {
+        IsIntialized = true;
         Items = new GameObject[RowCount, ColCount];
         var gridSize = GetComponent<RectTransform>().rect;
-        var xSize = gridSize.width / ColCount*gameObject.transform.lossyScale.x;
+        var xSize = gridSize.width / ColCount * gameObject.transform.lossyScale.x;
         var ySize = gridSize.height / RowCount * gameObject.transform.lossyScale.y;
         var cellTransform = CellPrefab.gameObject.GetComponent<RectTransform>();
         if (IsSquare)
@@ -42,7 +44,7 @@ public class UIGrid : MonoBehaviour
     public void AddElement(int row, int column, GameObject element, float padding = 0, bool isSquare = false, bool preserveSize = false)//element should have anchors in middle and centre
     {
         element.transform.position = new Vector3(Items[row, column].transform.position.x, Items[row, column].transform.position.y);
-        if(preserveSize)
+        if (preserveSize)
             return;
         if (!isSquare)
             element.gameObject.GetComponent<RectTransform>().sizeDelta =
@@ -63,7 +65,7 @@ public class UIGrid : MonoBehaviour
     {
         element.transform.position = new Vector3((Items[upperRow, upperColumn].transform.position.x + Items[lowerRow, lowerColumn].transform.position.x) / 2,
             (Items[upperRow, upperColumn].transform.position.y + Items[lowerRow, lowerColumn].transform.position.y) / 2);
-        if(preserveSize)
+        if (preserveSize)
             return;
         var xSize = (upperRow - lowerRow) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
         var ySize = (upperColumn - lowerColumn) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);

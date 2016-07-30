@@ -65,7 +65,7 @@ public class FieldH : MonoBehaviour
             _timerLength = PlayerPrefs.GetInt("Length");
             _timeRemaining = (float)_timerLength + 1;
         }
-        FieldGrid.Create();
+        FieldGrid.Initialize();
         var letterSize = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
         Player1.LetterSize = new Vector2(letterSize, letterSize);
         Player2.LetterSize = new Vector2(letterSize, letterSize);
@@ -106,7 +106,7 @@ public class FieldH : MonoBehaviour
                 render.material = StandardMaterial;
                 newTile.Row = i;
                 Field[i, j] = newTile;
-                FieldGrid.AddElement(i,j,newTile.gameObject);
+                FieldGrid.AddElement(i, j, newTile.gameObject);
             }
         }
         Field[7, 7].CanDrop = true;

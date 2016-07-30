@@ -12,15 +12,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         if (ObjectDragged != null)
         {
             //Removes stuck LetterH from field
-            //To lazy to write it the right way
-            try
-            {
-                ObjectDragged.GetComponent<LetterH>().Fix();
-            }
-            catch (Exception)
-            {
-                ObjectDragged.GetComponent<LetterLAN>().Fix();
-            }
+            ObjectDragged.GetComponent<LetterH>().Fix();
         }
         ObjectDragged = gameObject;
         StartPosition = transform.position;
@@ -29,7 +21,8 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20));
+        transform.position = //Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 20));
+            new Vector3(Input.mousePosition.x,Input.mousePosition.y);
     }
 
     //Called when dropped in the wrong place
