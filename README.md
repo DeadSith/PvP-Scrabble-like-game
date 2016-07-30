@@ -1,10 +1,9 @@
-#[Latest version of words.db](https://1drv.ms/u/s!AiMRzyTQY-LIsHQanItwghCH5x21)
-More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any word is missing.
-#[Latest built version x86](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6240&authkey=!AG8x7AoxwjhBzqw&ithint=file%2czip)
+#[Latest version of words.db](https://1drv.ms/u/s!AiMRzyTQY-LIsHQanItwghCH5x21)   
+More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any word is missing.   
+#[Latest built version x86](https://onedrive.live.com/redir?resid=C8E263D024CF1123!6240&authkey=!AG8x7AoxwjhBzqw&ithint=file%2czip)   
 **Links are constantly updated.**  
 # PvP-Scrabble-like-game
-### Android version is in development. 
-First alpha will be available soon, but it will support only hotseat mode.
+### [Android version ](https://github.com/DeadSith/PvP-Scrabble-like-game/tree/Android)
 ###1. What:
 Open-source version of games like scrabble with LAN and hot-seat multiplayer. Written fully in C#.
 ###2. Why:
