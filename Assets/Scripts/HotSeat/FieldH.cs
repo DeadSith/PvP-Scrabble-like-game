@@ -67,8 +67,8 @@ public class FieldH : MonoBehaviour
         }
         FieldGrid.Initialize();
         var letterSize = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
-        Player1.LetterSize = new Vector2(letterSize, letterSize);
-        Player2.LetterSize = new Vector2(letterSize, letterSize);
+        //Player1.LetterSize = new Vector2(letterSize, letterSize);
+        //Player2.LetterSize = new Vector2(letterSize, letterSize);
         CreateField();
         Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
         Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
