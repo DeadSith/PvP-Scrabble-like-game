@@ -14,6 +14,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             ObjectDragged.GetComponent<LetterH>().Fix();
         }
         ObjectDragged = gameObject;
+        ObjectDragged.GetComponent<LetterH>().PointsText.enabled = false;
         StartPosition = transform.position;
         GetComponent<CanvasGroup>().blocksRaycasts = false;
     }
@@ -28,6 +29,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void OnEndDrag(PointerEventData eventData)
     {
         ObjectDragged.transform.position = StartPosition;
+        ObjectDragged.GetComponent<LetterH>().PointsText.enabled = true;
         ObjectDragged = null;
         GetComponent<CanvasGroup>().blocksRaycasts = true;
     }

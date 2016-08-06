@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-//Todo: Add leters only in the end of the turn
 public class LetterBoxH : MonoBehaviour
 {
     #region Letters and scores
@@ -53,7 +52,6 @@ public class LetterBoxH : MonoBehaviour
 
     #endregion Letters and scores
 
-    public List<Vector3> FreeCoordinates;
     public List<LetterH> CurrentLetters;
     public int Score = 0;
     public Button ChangeLetterButton;
@@ -62,10 +60,10 @@ public class LetterBoxH : MonoBehaviour
     public byte NumberOfLetters = 7;
     public float DistanceBetweenLetters = 1.2f;
     public Vector2 LetterSize;
+    public Vector3 OriginalPosition;
 
-    private Vector3 _pos;
-    private float _xOffset = 0;
     private FieldH _currentFieldH;
+    public UIGrid LetterGrid;
 
     public Text NumberOfLettersText;//for testing only
 
@@ -82,14 +80,13 @@ public class LetterBoxH : MonoBehaviour
     };
         CurrentLetters = new List<LetterH>();
         _allLetters = _allLetters.OrderBy(letter => letter).ToList();
-        FreeCoordinates = new List<Vector3>();
         _currentFieldH = GameObject.FindGameObjectWithTag("Field").GetComponent<FieldH>();
         DistanceBetweenLetters = LetterSize.x;
         LetterHPrefab.gameObject.GetComponent<RectTransform>().sizeDelta = LetterSize;
-        _xOffset = gameObject.transform.position.x - 2 * DistanceBetweenLetters;
-        var yOffset = gameObject.transform.position.y + DistanceBetweenLetters;
-        _pos = new Vector3(_xOffset, yOffset);
+        OriginalPosition = gameObject.transform.localPosition;
         ChangeBox(NumberOfLetters);
+        if (_currentFieldH.Player2 == this)
+            gameObject.transform.localPosition = new Vector3(-2000, -2000);
     }
 
     //Activates/deactivates ChangeLetters button
@@ -118,44 +115,28 @@ public class LetterBoxH : MonoBehaviour
         {
             numberOfLetters = _allLetters.Count;
         }
-        if (FreeCoordinates.Count == 0)//If there is no free space create new letter in unused space
+        for (var i = 0; i < numberOfLetters; i++)
         {
-            for (var i = 0; i < numberOfLetters; i++)
-            {
-                AddLetter(_pos, letter);
-                _pos.x += DistanceBetweenLetters;
-                if (i % 4 == 3)
-                {
-                    _pos.x = _xOffset;
-                    _pos.y -= DistanceBetweenLetters;
-                }
-            }
-        }
-        else
-        {
-            for (var j = 0; j < numberOfLetters; j++)
-            {
-                AddLetter(FreeCoordinates[FreeCoordinates.Count - 1], letter);
-                FreeCoordinates.RemoveAt(FreeCoordinates.Count - 1);
-            }
+            AddLetter(CurrentLetters.Count, letter);
         }
         NumberOfLettersText.text = _allLetters.Count.ToString();
     }
 
     //Crates new LetterH on field
-    private void AddLetter(Vector3 position, string letter)
+    private void AddLetter(int index, string letter)
     {
-        var newLetter = Instantiate(LetterHPrefab, position,
-            transform.rotation) as LetterH;
+        var newLetter = Instantiate(LetterHPrefab);
         newLetter.transform.SetParent(gameObject.transform);
-        if (String.IsNullOrEmpty(letter))//if letter is returned from Field
+        LetterGrid.AddElement(index, 1, newLetter.gameObject);
+        LetterGrid.AddElement(index, 0, newLetter.PointsText.gameObject);
+        if (String.IsNullOrEmpty(letter))//if new letter is created
         {
             var current = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
             newLetter.ChangeLetter(current);
             _allLetters.Remove(current);
             CurrentLetters.Add(newLetter);
         }
-        else//if new letter is created
+        else//if letter is returned from Field
         {
             newLetter.ChangeLetter(letter);
             CurrentLetters.Add(newLetter);
@@ -167,14 +148,11 @@ public class LetterBoxH : MonoBehaviour
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<LetterH>();
         var currentIndex = FindIndex(currentObject);
-        var previousCoordinates = DragHandler.StartPosition;
-        for (var j = currentIndex + 1; j < CurrentLetters.Count; j++)//shifts all letters
+        for (var j = currentIndex; j < CurrentLetters.Count; j++)//shifts all letters
         {
-            var tempCoordinates = CurrentLetters[j].gameObject.transform.position;
-            CurrentLetters[j].gameObject.transform.position = previousCoordinates;
-            previousCoordinates = tempCoordinates;
+            LetterGrid.AddElement(j, 1, CurrentLetters[j + 1].gameObject);
+            LetterGrid.AddElement(j, 0, CurrentLetters[j + 1].PointsText.gameObject);
         }
-        FreeCoordinates.Add(previousCoordinates);
         CurrentLetters.Remove(currentObject);
     }
 
@@ -187,7 +165,7 @@ public class LetterBoxH : MonoBehaviour
             if (t.isChecked)
             {
                 var text = t.LetterText.text;
-                t.LetterText.text = _allLetters[UnityEngine.Random.Range(0, _allLetters.Count)];
+                t.ChangeLetter(_allLetters[UnityEngine.Random.Range(0, _allLetters.Count)]);
                 _allLetters.Add(text);
                 _allLetters.Remove(t.LetterText.text);
                 t.isChecked = false;

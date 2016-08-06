@@ -51,4 +51,10 @@ public class PinchZoom : MonoBehaviour
         else if (camera.orthographicSize > MaxSize)
             camera.orthographicSize = MaxSize;
     }
+
+    public void Center()
+    {
+        gameObject.transform.position = new Vector3(0, 0, -15);
+        gameObject.GetComponent<Camera>().orthographicSize = 200;
+    }
 }

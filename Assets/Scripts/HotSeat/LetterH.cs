@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -21,7 +22,8 @@ public class LetterH : MonoBehaviour, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         LetterText.text = letter;
-        PointsText.enabled = false;
+        PointsText.enabled = true;
+        PointsText.text = LetterBoxH.PointsDictionary[LetterText.text].ToString();
     }
 
     //Mark LetterH as checked
@@ -34,29 +36,9 @@ public class LetterH : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    //Hides points, shows letter
-    public void OnMouseExit()
-    {
-        LetterText.enabled = true;
-        PointsText.enabled = false;
-    }
-
-    //Shows points for current letter
-    public void OnMouseEnter()
-    {
-        PointsText.text = LetterBoxH.PointsDictionary[LetterText.text].ToString();
-        LetterText.enabled = false;
-        PointsText.enabled = true;
-    }
-
     //Removes stuck letter from field
     public void Fix()
     {
-        parent.FreeCoordinates.Add(DragHandler.StartPosition);
-        parent.ChangeBox(1, LetterText.text);
-        var index = parent.FindIndex(this);
-        parent.CurrentLetters[index] = parent.CurrentLetters[parent.CurrentLetters.Count - 1];
-        parent.CurrentLetters.RemoveAt(parent.CurrentLetters.Count - 1);
-        transform.position = new Vector3(-1500, -1500);
+        throw new NotImplementedException();
     }
 }

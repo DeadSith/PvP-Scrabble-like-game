@@ -66,9 +66,6 @@ public class FieldH : MonoBehaviour
             _timeRemaining = (float)_timerLength + 1;
         }
         FieldGrid.Initialize();
-        var letterSize = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
-        //Player1.LetterSize = new Vector2(letterSize, letterSize);
-        //Player2.LetterSize = new Vector2(letterSize, letterSize);
         CreateField();
         Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
         Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
@@ -253,8 +250,8 @@ public class FieldH : MonoBehaviour
                     {
                         EndGame(Player1);
                     }
-                    Player1.gameObject.SetActive(false);
-                    Player2.gameObject.SetActive(true);
+                    Player1.transform.localPosition = new Vector3(-2000, -2000);
+                    Player2.transform.localPosition = Player2.OriginalPosition;
                     CurrentTiles.Clear();
                     CurrentDirection = Direction.None;
                     CurrentPlayer = 2;
@@ -267,8 +264,8 @@ public class FieldH : MonoBehaviour
                     Player2.Score += points;
                     if (Player2.CurrentLetters.Count == 0)
                         EndGame(Player2);
-                    Player1.gameObject.SetActive(true);
-                    Player2.gameObject.SetActive(false);
+                    Player1.transform.localPosition = Player1.OriginalPosition;
+                    Player2.transform.localPosition = new Vector3(-2000, -2000);
                     CurrentDirection = Direction.None;
                     CurrentTiles.Clear();
                     CurrentPlayer = 1;
@@ -294,8 +291,8 @@ public class FieldH : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
-            Player1.gameObject.SetActive(false);
-            Player2.gameObject.SetActive(true);
+            Player1.transform.localPosition = new Vector3(-2000, -2000);
+            Player2.transform.localPosition = Player2.OriginalPosition;
             CurrentPlayer = 2;
             Controller.InvalidatePlayer(1, Player1.Score);
             CurrentTiles.Clear();
@@ -308,8 +305,8 @@ public class FieldH : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
-            Player1.gameObject.SetActive(true);
-            Player2.gameObject.SetActive(false);
+            Player1.transform.localPosition = Player1.OriginalPosition;
+            Player2.transform.localPosition = new Vector3(-2000, -2000);
             CurrentPlayer = 1;
             Controller.InvalidatePlayer(2, Player2.Score);
             CurrentTiles.Clear();
@@ -322,15 +319,15 @@ public class FieldH : MonoBehaviour
     {
         if (CurrentPlayer == 1)
         {
-            Player1.gameObject.SetActive(false);
-            Player2.gameObject.SetActive(true);
+            Player1.transform.localPosition = new Vector3(-2000, -2000);
+            Player2.transform.localPosition = Player2.OriginalPosition;
             CurrentPlayer = 2;
             Controller.InvalidatePlayer(1, Player1.Score);
         }
         else
         {
-            Player1.gameObject.SetActive(true);
-            Player2.gameObject.SetActive(false);
+            Player1.transform.localPosition = Player1.OriginalPosition;
+            Player2.transform.localPosition = new Vector3(-2000, -2000);
             CurrentPlayer = 1;
             Controller.InvalidatePlayer(2, Player2.Score);
         }

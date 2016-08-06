@@ -129,24 +129,6 @@ public class TileH : MonoBehaviour, IDropHandler, IPointerClickHandler
         StartCoroutine(Fade());
     }
 
-    //Shows points for current letter
-    public void OnMouseEnter()
-    {
-        if (!String.IsNullOrEmpty(CurrentLetter.text))
-        {
-            PointsText.enabled = true;
-            PointsText.text = LetterBoxH.PointsDictionary[CurrentLetter.text].ToString();
-            CurrentLetter.enabled = false;
-        }
-    }
-
-    //Hides points and shows letter
-    public void OnMouseExit()
-    {
-        PointsText.enabled = false;
-        CurrentLetter.enabled = true;
-    }
-
     //Visual effect for fading score for words in the end of turn
     private IEnumerator Fade()
     {
