@@ -11,7 +11,7 @@ scrabble_Data/
 *.exe
 sysinfo.txt
 *.stackdump
- 
+*.apk
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
 # ===================================== #

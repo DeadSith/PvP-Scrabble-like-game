@@ -17,8 +17,8 @@ public class MainMenu : MonoBehaviour
     public void Start()
     {
         MenuGrid.Initialize();
-        MenuGrid.AddElement(6, 2, StartButton, .2f);
-        MenuGrid.AddElement(5, 2, StartLANButton, .2f);
+        //MenuGrid.AddElement(6, 2, StartLANButton, .2f);
+        MenuGrid.AddElement(5, 2, StartButton, .2f);
         MenuGrid.AddElement(4, 2, HelpButton, .2f);
         MenuGrid.AddElement(3, 2, SettingsButton, .2f);
         MenuGrid.AddElement(2, 2, ExitButton, .2f);

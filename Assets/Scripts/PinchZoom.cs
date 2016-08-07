@@ -1,5 +1,6 @@
-﻿/*#if DEBUG
-    #undef DEBUG*/
+﻿#if DEBUG
+    #undef DEBUG
+#endif
 
 //Uncomment upper lines for build
 using UnityEngine;
@@ -27,11 +28,12 @@ public class PinchZoom : MonoBehaviour
                                     (touchZero.position - touchOne.position).magnitude;
                 camera.orthographicSize += magnitudeDiff * ZoomSpeed;
             }
-            else if (Input.touchCount == 1)
+            else if (Input.touchCount == 1&&DragHandler.ObjectDragged==null)
             {
                 var touchZero = Input.GetTouch(0);
-                var diff = (touchZero.position - touchZero.deltaPosition) * MoveSpeed;
-                camera.transform.position += new Vector3(diff.x, diff.y);
+                var diff = touchZero.deltaPosition * MoveSpeed;
+                camera.transform.position -= new Vector3(diff.x, diff.y);
+                Debug.Log(camera.transform.position);
             }
         }
 #if DEBUG

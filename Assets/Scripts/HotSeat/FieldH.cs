@@ -55,8 +55,10 @@ public class FieldH : MonoBehaviour
     {
         CurrentTiles = new List<TileH>();
         var conection = @"URI=file:" + Application.streamingAssetsPath + @"/words.db";
+#if Release
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
+#endif
         _wordsFound = new List<TileH>();
         _timerEnabled = PlayerPrefs.GetInt("TimerEnabled") == 1;
         if (_timerEnabled)
@@ -112,7 +114,7 @@ public class FieldH : MonoBehaviour
         AssignMultipliers();
     }
 
-    #region Field generation
+#region Field generation
 
     private void AssignMaterials()
     {
@@ -224,7 +226,7 @@ public class FieldH : MonoBehaviour
         Field[7, 11].LetterMultiplier = 2;
     }
 
-    #endregion Field generation
+#endregion Field generation
 
     private void OnEndTimer()
     {
@@ -346,7 +348,7 @@ public class FieldH : MonoBehaviour
         CurrentTiles.Clear();
     }
 
-    #region Word cheking
+#region Word cheking
 
     private bool CheckWords()
     {
@@ -578,22 +580,16 @@ public class FieldH : MonoBehaviour
 
     private bool CheckWord(string word)
     {
+#if Release
         var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
         var command = new SqliteCommand(sql, _dbConnection);
         var inp = command.ExecuteScalar();
         return Convert.ToInt32(inp) != 0;
-        /*if (Convert.ToInt32(inp) != 0)
-            return true;
-        else
-        {
-            sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
-            command = new SqliteCommand(sql, _dbConnection);
-            inp = command.ExecuteScalar();
-            return Convert.ToInt32(inp) != 0;
-        }*/
+#endif
+        return true;
     }
 
-    #endregion Word cheking
+#endregion Word cheking
 
     private void EndGame(LetterBoxH playerOut)//Player, who ran out of letters is passed
     {

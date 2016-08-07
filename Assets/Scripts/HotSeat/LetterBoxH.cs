@@ -61,6 +61,7 @@ public class LetterBoxH : MonoBehaviour
     public float DistanceBetweenLetters = 1.2f;
     public Vector2 LetterSize;
     public Vector3 OriginalPosition;
+    public float DoubleTapDuration = 1;
 
     private FieldH _currentFieldH;
     public UIGrid LetterGrid;
@@ -148,7 +149,8 @@ public class LetterBoxH : MonoBehaviour
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<LetterH>();
         var currentIndex = FindIndex(currentObject);
-        for (var j = currentIndex; j < CurrentLetters.Count; j++)//shifts all letters
+        Debug.Log(currentIndex);
+        for (var j = currentIndex; j < CurrentLetters.Count-1; j++)//shifts all letters
         {
             LetterGrid.AddElement(j, 1, CurrentLetters[j + 1].gameObject);
             LetterGrid.AddElement(j, 0, CurrentLetters[j + 1].PointsText.gameObject);
