@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -6,43 +7,47 @@ public class UIController : MonoBehaviour
 {
     //Score of player
     public Text Player1Text;
-
     public Text Player2Text;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
 
     //Error messages
     public Text NotExistText;
-
     public Text DeleteText;
     public Text ChangeLetterText;
     public Text WrongTileText;
     public Text StartText;
-    public Text WrongTurnText;
     public Text ZeroTilesText;
 
+#if MP
     public Button NextTurnButton;
     public Button SkipTurnButton;
     public Button ChangeLettersButton;
     public Button ReturnAllButton;
+    
+    public Text WrongTurnText;
+    public GameObject DisconnectedMenu;
+#endif
 
     //Endgame fields
     public Canvas EndGameCanvas;
-
-    public Text Player1Points;
-    public Text Player2Points;
-    public Text Player1Name;
-    public Text Player2Name;
+    public Text Player1EndText;
+    public Text Player2EndText;
     public Text Winner;
-
-    public GameObject DisconnectedMenu;
 
     private static GameObject _currentObject;
     private bool _isLocalTurn;
+    private string _player1Name;
+    private string _player2Name;
+
 
     private void Start()
     {
         _currentObject = StartText.gameObject;
+        _player1Name = PlayerPrefs.GetString("Player1", "Гравець 1");
+        _player2Name = PlayerPrefs.GetString("Player2", "Гравець 2");
+        Player1Text.text = String.Format("{0}\nБали: 0", _player1Name);
+        Player2Text.text = String.Format("{0}\nБали: 0", _player2Name);
     }
 
     //Makes current player glow, updates points
@@ -51,13 +56,13 @@ public class UIController : MonoBehaviour
     {
         if (playerNumber == 1)
         {
-            Player1Text.text = score.ToString();
+            Player1Text.text = String.Format("{0}\nБали: {1}",_player1Name,score);
             Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
             Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
         }
         else
         {
-            Player2Text.text = score.ToString();
+            Player2Text.text = String.Format("{0}\nБали: {1}", _player2Name, score);
             Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
             Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
         }
@@ -66,7 +71,7 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
-    #region Error showing
+#region Error showing
 
     public void ShowNotExistError()
     {
@@ -75,12 +80,14 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
+#if MP
     public void ShowWrongTurnError()
     {
         _currentObject.SetActive(false);
         _currentObject = WrongTurnText.gameObject;
         _currentObject.SetActive(true);
     }
+#endif
 
     public void ShowDeleteError()
     {
@@ -110,9 +117,13 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
-    #endregion Error showing
+#endregion Error showing
 
-    #region Button activation
+
+#if MP
+#region Multiplayer only
+
+#region Button activation
 
     public void SetChangeButtonActive(bool active)
     {
@@ -137,9 +148,7 @@ public class UIController : MonoBehaviour
         }
     }
 
-    #endregion Button activation
-
-    #region Multiplayer only
+#endregion Button activation
 
     //Multipalyer envelope for InvalidatePlayer
     //_isLocalTurn is used here to set button active state
@@ -176,20 +185,16 @@ public class UIController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    #endregion Multiplayer only
-
+#endregion Multiplayer only
+#endif
     //Creates endgame field with player names and scores
-    public void SetWinner(int winner, int player1Score, int player2Score, string player1Name, string player2Name)
+    public void SetWinner(int winner, int player1Score, int player2Score)
     {
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         EndGameCanvas.gameObject.SetActive(true);
         if (winner == 1)
-            Winner.text = player1Name;
-        else Winner.text = player2Name;
-        Player1Name.text = "Бали " + player1Name;
-        Player2Name.text = "Бали " + player2Name;
-        Player1Points.text = player1Score.ToString();
-        Player2Points.text = player2Score.ToString();
+            Winner.text = _player1Name;
+        else Winner.text = _player2Name;
         gameObject.GetComponent<Canvas>().enabled = false;
     }
 }

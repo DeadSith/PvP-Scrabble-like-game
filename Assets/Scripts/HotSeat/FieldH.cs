@@ -26,8 +26,6 @@ public class FieldH : MonoBehaviour
 
     public GameObject TimerImage;
     public Text TimerText;
-    public Text Player1Text;
-    public Text Player2Text;
     public GameObject EndGameCanvas;
     public UIController Controller;
     public Button SkipTurnButton;
@@ -69,8 +67,6 @@ public class FieldH : MonoBehaviour
         }
         FieldGrid.Initialize();
         CreateField();
-        Player1Text.text = PlayerPrefs.GetString("Player1", "Гравець 1");
-        Player2Text.text = PlayerPrefs.GetString("Player2", "Гравець 2");
     }
 
     private void Update()
@@ -600,6 +596,6 @@ public class FieldH : MonoBehaviour
             playerOut.Score += tempPoints;
         }
         var winner = Player1.Score > Player2.Score ? 1 : 2;
-        Controller.SetWinner(winner, Player1.Score, Player2.Score, Player1Text.text, Player2Text.text);
+        Controller.SetWinner(winner, Player1.Score, Player2.Score);
     }
 }

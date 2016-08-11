@@ -9,11 +9,17 @@ public class OverlayController : MonoBehaviour
     public int WidthCoef;//Width is divided by this coefficient
     public int HeightCoef;
 
+    //ButtonPanel
     public Button NextTurnButton;
     public Button SkipTurnButton;
     public Button ChangeLetterButton;
     public Button RemoveAllButton;
     public Button CenterButton;
+
+    //InfoPanel
+    public GameObject MessagePanel;
+    public GameObject Player1Info;
+    public GameObject Player2Info;
 
     private void Start()
     {
@@ -30,11 +36,17 @@ public class OverlayController : MonoBehaviour
         letterGrid.Initialize();
         var buttonGrid = ButtonPanel.GetComponent<UIGrid>();
         buttonGrid.Initialize();
+        var infoGrid = InfoPanel.GetComponent<UIGrid>();
+        infoGrid.Initialize();
         //HideMenuButton
         buttonGrid.AddElement(0, 1, RemoveAllButton.gameObject, .05f);
         buttonGrid.AddElement(0, 2, SkipTurnButton.gameObject, .05f);
         buttonGrid.AddElement(0, 3, NextTurnButton.gameObject, .05f);
         buttonGrid.AddElement(0, 4, ChangeLetterButton.gameObject, .05f);
         buttonGrid.AddElement(0, 5, CenterButton.gameObject, .05f);
+        infoGrid.AddElement(0,0,Player1Info);
+        infoGrid.AddElement(0,4,Player2Info);
+        //timer
+        infoGrid.AddElement(0,2,0,3,MessagePanel);
     }
 }
