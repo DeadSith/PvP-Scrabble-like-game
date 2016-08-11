@@ -7,9 +7,11 @@ public class UIGrid : MonoBehaviour
     public int RowCount = 1;
     public int ColCount = 1;
     public GameObject CellPrefab;
+    public bool IsIntialized { get; private set; }
 
-    public void Create()
+    public void Initialize()
     {
+        IsIntialized = true;
         Items = new GameObject[RowCount, ColCount];
         var gridSize = GetComponent<RectTransform>().rect;
         var xSize = gridSize.width / ColCount * gameObject.transform.lossyScale.x;
@@ -65,8 +67,8 @@ public class UIGrid : MonoBehaviour
             (Items[upperRow, upperColumn].transform.position.y + Items[lowerRow, lowerColumn].transform.position.y) / 2);
         if (preserveSize)
             return;
-        var xSize = (upperRow - lowerRow) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
-        var ySize = (upperColumn - lowerColumn) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);
+        var ySize = (upperRow - lowerRow + 1) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
+        var xSize = (lowerColumn - upperColumn + 1) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);
         if (isSquare)
         {
             if (xSize < ySize)

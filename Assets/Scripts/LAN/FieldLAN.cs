@@ -45,8 +45,6 @@ public class FieldLAN : MonoBehaviour
     private int _turnsSkipped = 0;
     private SqliteConnection _dbConnection;
     private List<TileLAN> _wordsFound;
-    private float _xOffset = 0;
-    private float _yOffset = 0;
     private bool _fixed;//Required to fix error with materials
     private bool _gameStarted;
 
@@ -61,7 +59,7 @@ public class FieldLAN : MonoBehaviour
         _dbConnection = new SqliteConnection(conection);
         _dbConnection.Open();
         _wordsFound = new List<TileLAN>();
-        FieldGrid.Create();
+        FieldGrid.Initialize();
         DistanceBetweenTiles = FieldGrid.Items[0, 0].gameObject.GetComponent<RectTransform>().rect.width;
         CreateField();
         _fixed = true;
