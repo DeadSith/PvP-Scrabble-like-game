@@ -20,6 +20,7 @@ public class OverlayController : MonoBehaviour
     public GameObject MessagePanel;
     public GameObject Player1Info;
     public GameObject Player2Info;
+    public GameObject Timer;
 
     private void Start()
     {
@@ -39,14 +40,21 @@ public class OverlayController : MonoBehaviour
         var infoGrid = InfoPanel.GetComponent<UIGrid>();
         infoGrid.Initialize();
         //HideMenuButton
-        buttonGrid.AddElement(0, 1, RemoveAllButton.gameObject, .05f);
-        buttonGrid.AddElement(0, 2, SkipTurnButton.gameObject, .05f);
-        buttonGrid.AddElement(0, 3, NextTurnButton.gameObject, .05f);
-        buttonGrid.AddElement(0, 4, ChangeLetterButton.gameObject, .05f);
-        buttonGrid.AddElement(0, 5, CenterButton.gameObject, .05f);
+        buttonGrid.AddElement(0, 0, RemoveAllButton.gameObject, .05f);
+        buttonGrid.AddElement(0, 1, SkipTurnButton.gameObject, .05f);
+        buttonGrid.AddElement(0, 2, NextTurnButton.gameObject, .05f);
+        buttonGrid.AddElement(0, 3, ChangeLetterButton.gameObject, .05f);
+        buttonGrid.AddElement(0, 4, CenterButton.gameObject, .05f);
         infoGrid.AddElement(0,0,Player1Info);
         infoGrid.AddElement(0,4,Player2Info);
-        //timer
-        infoGrid.AddElement(0,2,0,3,MessagePanel);
+        if (PlayerPrefs.GetInt("TimerEnabled", 0) == 1)
+        {
+            infoGrid.AddElement(0, 1, Timer);
+            infoGrid.AddElement(0, 2, 0, 3, MessagePanel);
+        }
+        else
+        {
+            infoGrid.AddElement(0, 1, 0, 3, MessagePanel);
+        }
     }
 }

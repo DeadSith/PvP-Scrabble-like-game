@@ -2,7 +2,6 @@
 More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any word is missing.   
 **Links are constantly updated.**  
 # PvP-Scrabble-like-game[Android version]
-First alpha will be available soon, but it will support only hotseat mode.   
 ###1. What:   
 Open-source version of games like scrabble with LAN and hot-seat multiplayer. Written fully in C#.   
 ###2. Why:   
@@ -19,8 +18,8 @@ Unity3d 5.x, everything is done in GUI layer, supports drag&drop. Words are stor
 5. Now game should build without any errors
 
 ###5. What is done:
-![Latest version screenshot](http://i67.tinypic.com/2d95xxd.png)   
-Game is partially playable.   
+![Latest version screenshot](http://i68.tinypic.com/2nkjsch.png)   
+Game is fully playable, though some parts are not converted and may be unusable on mobile devices.   
 ###6. Rules:   
 Game is based on partially changed rules of scrabble. Most notable change: you can continue your turn even if you submitted a wrong word.
 ###7. More info:   

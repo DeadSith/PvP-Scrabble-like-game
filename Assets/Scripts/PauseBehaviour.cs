@@ -1,41 +1,49 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PauseBehaviour : MonoBehaviour
 {
-    public GameObject NotImplementedGameObject;
-    public GameObject PauseMenu;
-    public GameObject Game;
+    public Canvas PauseMenuCanvas;
+    public Canvas FieldCanvas;
+    public Canvas OverlayCanvas;
     private bool _paused = false;
     public bool GameOver = false;
 
-    //Used only for multiplayer
-    public GameObject StartMenu;
+    private UIGrid _pauseGrid;
+    public Button ResumeButton;
+    public Button MainMenuButton;
+    public Button ExitButton;
 
     public bool GameStarted;
+
+    private void Start()
+    {
+        _pauseGrid = PauseMenuCanvas.gameObject.GetComponentInChildren<UIGrid>();
+        _pauseGrid.Initialize();
+        _pauseGrid.AddElement(4,1,ResumeButton.gameObject, .05f);
+        _pauseGrid.AddElement(3,1,MainMenuButton.gameObject, .05f);
+        _pauseGrid.AddElement(2,1,ExitButton.gameObject, .05f);
+        PauseMenuCanvas.GetComponent<Canvas>().enabled = false;
+    }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            _paused = !_paused;
-            NotImplementedGameObject.SetActive(false);
+            _paused = !_paused;            
         }
         if (!GameOver && _paused)
         {
-            PauseMenu.GetComponent<Canvas>().enabled = true;
-            if (StartMenu != null && !GameStarted)
-                StartMenu.GetComponent<Canvas>().enabled = false;
-            Game.GetComponent<Canvas>().enabled = false;
+            PauseMenuCanvas.enabled = true;
+            FieldCanvas.enabled = false;
+            OverlayCanvas.enabled = false;
         }
         else if (!GameOver)
         {
-            PauseMenu.GetComponent<Canvas>().enabled = false;
-            if (StartMenu != null && !GameStarted)
-            {
-                StartMenu.GetComponent<Canvas>().enabled = true;
-            }
-            Game.GetComponent<Canvas>().enabled = true;
+            PauseMenuCanvas.enabled = false;
+            FieldCanvas.enabled = true;
+            OverlayCanvas.enabled = true;
         }
     }
 

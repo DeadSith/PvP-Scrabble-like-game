@@ -66,8 +66,6 @@ public class LetterBoxH : MonoBehaviour
     private FieldH _currentFieldH;
     public UIGrid LetterGrid;
 
-    public Text NumberOfLettersText;//for testing only
-
     private void Start()
     {
         if (_allLetters == null)
@@ -120,7 +118,6 @@ public class LetterBoxH : MonoBehaviour
         {
             AddLetter(CurrentLetters.Count, letter);
         }
-        NumberOfLettersText.text = _allLetters.Count.ToString();
     }
 
     //Crates new LetterH on field

@@ -37,7 +37,8 @@ public class LetterH : MonoBehaviour, IPointerClickHandler
             isChecked = !isChecked;
             _lastTap = new DateTime(0);
         }
-        _lastTap = DateTime.Now;
+        else
+            _lastTap = DateTime.Now;
 
     }
 
