@@ -1,18 +1,19 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
     //Score of player
     public Text Player1Text;
+
     public Text Player2Text;
     public Material PlayerGlowMaterial;
     public Material PlayerIdleMaterial;
 
     //Error messages
     public Text NotExistText;
+
     public Text DeleteText;
     public Text ChangeLetterText;
     public Text WrongTileText;
@@ -24,22 +25,20 @@ public class UIController : MonoBehaviour
     public Button SkipTurnButton;
     public Button ChangeLettersButton;
     public Button ReturnAllButton;
-    
+
     public Text WrongTurnText;
     public GameObject DisconnectedMenu;
 #endif
 
     //Endgame fields
     public Canvas EndGameCanvas;
-    public Text Player1EndText;
-    public Text Player2EndText;
-    public Text Winner;
+
+    public Text EndText;
 
     private static GameObject _currentObject;
     private bool _isLocalTurn;
     private string _player1Name;
     private string _player2Name;
-
 
     private void Start()
     {
@@ -56,7 +55,7 @@ public class UIController : MonoBehaviour
     {
         if (playerNumber == 1)
         {
-            Player1Text.text = String.Format("{0}\nБали: {1}",_player1Name,score);
+            Player1Text.text = String.Format("{0}\nБали: {1}", _player1Name, score);
             Player1Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerIdleMaterial;
             Player2Text.gameObject.transform.parent.GetComponent<Image>().material = PlayerGlowMaterial;
         }
@@ -71,7 +70,7 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
-#region Error showing
+    #region Error showing
 
     public void ShowNotExistError()
     {
@@ -117,13 +116,13 @@ public class UIController : MonoBehaviour
         _currentObject.SetActive(true);
     }
 
-#endregion Error showing
-
+    #endregion Error showing
 
 #if MP
-#region Multiplayer only
 
-#region Button activation
+    #region Multiplayer only
+
+    #region Button activation
 
     public void SetChangeButtonActive(bool active)
     {
@@ -148,7 +147,7 @@ public class UIController : MonoBehaviour
         }
     }
 
-#endregion Button activation
+    #endregion Button activation
 
     //Multipalyer envelope for InvalidatePlayer
     //_isLocalTurn is used here to set button active state
@@ -185,16 +184,18 @@ public class UIController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-#endregion Multiplayer only
+    #endregion Multiplayer only
+
 #endif
+
     //Creates endgame field with player names and scores
     public void SetWinner(int winner, int player1Score, int player2Score)
     {
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         EndGameCanvas.gameObject.SetActive(true);
-        if (winner == 1)
-            Winner.text = _player1Name;
-        else Winner.text = _player2Name;
+        EndText.text = String.Format("Переміг {0}\tБали {1}: {2}\tБали {3}: {4}", 
+            winner == 1 ? _player1Name : _player2Name, _player1Name, player1Score, 
+            _player2Name, player2Score);
         gameObject.GetComponent<Canvas>().enabled = false;
     }
 }

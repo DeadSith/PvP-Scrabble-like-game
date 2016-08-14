@@ -597,5 +597,6 @@ public class FieldH : MonoBehaviour
         }
         var winner = Player1.Score > Player2.Score ? 1 : 2;
         Controller.SetWinner(winner, Player1.Score, Player2.Score);
+        gameObject.SetActive(false);
     }
 }

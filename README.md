@@ -19,7 +19,7 @@ Unity3d 5.x, everything is done in GUI layer, supports drag&drop. Words are stor
 
 ###5. What is done:
 ![Latest version screenshot](http://i68.tinypic.com/2nkjsch.png)   
-Game is fully playable, though some parts are not converted and may be unusable on mobile devices.   
+Game is fully playable. Main manu and points per turn showing will be implemented soon.   
 ###6. Rules:   
 Game is based on partially changed rules of scrabble. Most notable change: you can continue your turn even if you submitted a wrong word.
 ###7. More info:   
