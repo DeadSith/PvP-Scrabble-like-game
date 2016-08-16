@@ -146,8 +146,7 @@ public class LetterBoxH : MonoBehaviour
     {
         var currentObject = DragHandler.ObjectDragged.GetComponent<LetterH>();
         var currentIndex = FindIndex(currentObject);
-        Debug.Log(currentIndex);
-        for (var j = currentIndex; j < CurrentLetters.Count-1; j++)//shifts all letters
+        for (var j = currentIndex; j < CurrentLetters.Count - 1; j++)//shifts all letters
         {
             LetterGrid.AddElement(j, 1, CurrentLetters[j + 1].gameObject);
             LetterGrid.AddElement(j, 0, CurrentLetters[j + 1].PointsText.gameObject);

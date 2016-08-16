@@ -21,9 +21,9 @@ public class PauseBehaviour : MonoBehaviour
     {
         _pauseGrid = PauseMenuCanvas.gameObject.GetComponentInChildren<UIGrid>();
         _pauseGrid.Initialize();
-        _pauseGrid.AddElement(4,1,ResumeButton.gameObject, .05f);
-        _pauseGrid.AddElement(3,1,MainMenuButton.gameObject, .05f);
-        _pauseGrid.AddElement(2,1,ExitButton.gameObject, .05f);
+        _pauseGrid.AddElement(4, 1, ResumeButton.gameObject, .1f);
+        _pauseGrid.AddElement(3, 1, MainMenuButton.gameObject, .1f);
+        _pauseGrid.AddElement(2, 1, ExitButton.gameObject, .1f);
         PauseMenuCanvas.GetComponent<Canvas>().enabled = false;
     }
 
@@ -31,7 +31,7 @@ public class PauseBehaviour : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            _paused = !_paused;            
+            _paused = !_paused;
         }
         if (!GameOver && _paused)
         {

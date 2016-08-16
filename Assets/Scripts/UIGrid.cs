@@ -67,8 +67,8 @@ public class UIGrid : MonoBehaviour
             (Items[upperRow, upperColumn].transform.position.y + Items[lowerRow, lowerColumn].transform.position.y) / 2);
         if (preserveSize)
             return;
-        var ySize = (upperRow - lowerRow+1) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
-        var xSize = (lowerColumn - upperColumn+1) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);
+        var ySize = (upperRow - lowerRow + 1) * Items[0, 0].GetComponent<RectTransform>().rect.height * (1 - padding);
+        var xSize = (lowerColumn - upperColumn + 1) * Items[0, 0].GetComponent<RectTransform>().rect.width * (1 - padding);
         if (isSquare)
         {
             if (xSize < ySize)

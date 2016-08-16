@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-    #undef DEBUG
+#undef DEBUG
 #endif
 
 //Uncomment upper lines for build
@@ -11,7 +11,6 @@ public class PinchZoom : MonoBehaviour
     public int MaxSize = 200;
     public float ZoomSpeed = 15;
     public float MoveSpeed = 0.5f;
-    private Vector3 LastPoss = Vector3.zero;
 
     private void Update()
     {
@@ -28,7 +27,7 @@ public class PinchZoom : MonoBehaviour
                                     (touchZero.position - touchOne.position).magnitude;
                 camera.orthographicSize += magnitudeDiff * ZoomSpeed;
             }
-            else if (Input.touchCount == 1&&DragHandler.ObjectDragged==null)
+            else if (Input.touchCount == 1 && DragHandler.ObjectDragged == null)
             {
                 var touchZero = Input.GetTouch(0);
                 var diff = touchZero.deltaPosition * MoveSpeed;

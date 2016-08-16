@@ -31,7 +31,7 @@ public class LetterH : MonoBehaviour, IPointerClickHandler
     //Mark LetterH as checked
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (DateTime.Now - _lastTap < new TimeSpan((int)(TimeSpan.TicksPerSecond*parent.DoubleTapDuration))&& parent.CanChangeLetters)
+        if (DateTime.Now - _lastTap < new TimeSpan((int)(TimeSpan.TicksPerSecond * parent.DoubleTapDuration)) && parent.CanChangeLetters)
         {
             gameObject.GetComponent<Image>().material = isChecked ? StandardMaterial : CheckedMaterial;
             isChecked = !isChecked;
@@ -39,7 +39,6 @@ public class LetterH : MonoBehaviour, IPointerClickHandler
         }
         else
             _lastTap = DateTime.Now;
-
     }
 
     //Removes stuck letter from field

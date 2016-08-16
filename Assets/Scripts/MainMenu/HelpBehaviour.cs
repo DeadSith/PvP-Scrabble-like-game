@@ -15,9 +15,9 @@ public class HelpBehaviour : MonoBehaviour
     {
         var grid = gameObject.GetComponent<UIGrid>();
         grid.Initialize();
-        grid.AddElement(3, 1, RulesButton.gameObject, .05f);
-        grid.AddElement(2, 1, BonusButton.gameObject, .05f);
-        grid.AddElement(1, 1, ReturnButton.gameObject, .05f);
+        grid.AddElement(3, 1, RulesButton.gameObject, .1f);
+        grid.AddElement(2, 1, BonusButton.gameObject, .1f);
+        grid.AddElement(1, 1, ReturnButton.gameObject, .1f);
         gameObject.SetActive(false);
     }
 

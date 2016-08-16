@@ -193,8 +193,8 @@ public class UIController : MonoBehaviour
     {
         GameObject.FindGameObjectWithTag("Pause").GetComponent<PauseBehaviour>().GameOver = true;
         EndGameCanvas.gameObject.SetActive(true);
-        EndText.text = String.Format("Переміг {0}\tБали {1}: {2}\tБали {3}: {4}", 
-            winner == 1 ? _player1Name : _player2Name, _player1Name, player1Score, 
+        EndText.text = String.Format("Переміг {0}. Бали {1}: {2}. Бали {3}: {4}.",
+            winner == 1 ? _player1Name : _player2Name, _player1Name, player1Score,
             _player2Name, player2Score);
         gameObject.GetComponent<Canvas>().enabled = false;
     }

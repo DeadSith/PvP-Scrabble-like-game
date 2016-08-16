@@ -11,6 +11,7 @@ public class OverlayController : MonoBehaviour
 
     //ButtonPanel
     public Button NextTurnButton;
+
     public Button SkipTurnButton;
     public Button ChangeLetterButton;
     public Button RemoveAllButton;
@@ -18,6 +19,7 @@ public class OverlayController : MonoBehaviour
 
     //InfoPanel
     public GameObject MessagePanel;
+
     public GameObject Player1Info;
     public GameObject Player2Info;
     public GameObject Timer;
@@ -45,8 +47,8 @@ public class OverlayController : MonoBehaviour
         buttonGrid.AddElement(0, 2, NextTurnButton.gameObject, .05f);
         buttonGrid.AddElement(0, 3, ChangeLetterButton.gameObject, .05f);
         buttonGrid.AddElement(0, 4, CenterButton.gameObject, .05f);
-        infoGrid.AddElement(0,0,Player1Info);
-        infoGrid.AddElement(0,4,Player2Info);
+        infoGrid.AddElement(0, 0, Player1Info);
+        infoGrid.AddElement(0, 4, Player2Info);
         if (PlayerPrefs.GetInt("TimerEnabled", 0) == 1)
         {
             infoGrid.AddElement(0, 1, Timer);
