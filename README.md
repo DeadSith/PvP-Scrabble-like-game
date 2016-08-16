@@ -2,7 +2,7 @@
 More than 2.2 million words! Place it in Assets/SharedAssets. Inform me, if any word is missing.   
 **Links are constantly updated.**  
 # PvP-Scrabble-like-game
-### [Android version ](https://github.com/DeadSith/PvP-Scrabble-like-game/tree/Android)
+### [Android version ](https://github.com/DeadSith/-Android-PvP-Scrabble-like-game)
 ###1. What:   
 Open-source version of games like scrabble with LAN and hot-seat multiplayer. Written fully in C#.   
 ###2. Why:   
