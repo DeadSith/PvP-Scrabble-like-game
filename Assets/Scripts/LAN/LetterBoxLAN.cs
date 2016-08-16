@@ -33,7 +33,7 @@ public class LetterBoxLAN : NetworkBehaviour
     private bool _isFirstTurn = true;
     private FieldLAN _currentField;
     private GameObject _waitTextGameObject;
-    private List<TileLAN> _currenTiles = new List<TileLAN>();
+    public List<TileLAN> _currenTiles = new List<TileLAN>();
 
     #region SyncVars
 
@@ -600,6 +600,7 @@ public class LetterBoxLAN : NetworkBehaviour
         {
             var row = int.Parse(letters[i]);
             var column = int.Parse(letters[++i]);
+            _currenTiles.Remove(_currentField.Field[row, column]);
             if (_currentField.PlayerNumber == player)
                 _currentField.Field[row, column].RemoveOnClick(true);
             else
