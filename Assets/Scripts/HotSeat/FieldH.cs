@@ -581,19 +581,10 @@ public class FieldH : MonoBehaviour
 
     private bool CheckWord(string word)
     {
-        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
+        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";//"SELECT * FROM AllWords WHERE Word like \"" + word.ToLower() + "\" LIMIT 1"
         var command = new SqliteCommand(sql, _dbConnection);
-        var inp = command.ExecuteScalar();
+        var inp = /*(string)*/command.ExecuteScalar();
         return Convert.ToInt32(inp) != 0;
-        /*if (Convert.ToInt32(inp) != 0)
-            return true;
-        else
-        {
-            sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
-            command = new SqliteCommand(sql, _dbConnection);
-            inp = command.ExecuteScalar();
-            return Convert.ToInt32(inp) != 0;
-        }*/
     }
 
     #endregion Word cheking
