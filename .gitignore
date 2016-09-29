@@ -5,8 +5,7 @@
 [Oo]bj/
 [Bb]uild/
 [Ll]ibrary/
-Scrabble_64_Data/
-scrabble_Data/
+*_Data/
 *.pdb
 *.exe
 sysinfo.txt
