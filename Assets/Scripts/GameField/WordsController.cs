@@ -11,10 +11,6 @@ public class WordsController : MonoBehaviour
 	void Start ()
     {
         parent = GameObject.FindWithTag("Words");
-        for (int i = 0; i < 10; i++)
-        {
-            AddButton(i.ToString());
-        }
 	}
 	
 	
