@@ -5,6 +5,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+//[0,0] - lower left angle
+
 public class FieldH : MonoBehaviour
 {
     public enum Direction
@@ -50,6 +52,7 @@ public class FieldH : MonoBehaviour
     private bool _timerEnabled;
     private int _timerLength;
     private float _timeRemaining;
+    private List<TileH> _asterixTiles = new List<TileH>();
 
     private void Start()
     {
@@ -349,245 +352,74 @@ public class FieldH : MonoBehaviour
         CurrentTiles.Clear();
     }
 
-    #region Word cheking
+    #region Word checking
 
     private bool CheckWords()
     {
+        var words = CreateWords();
+        throw new NotImplementedException();
+    }
+
+    private List<List<TileH>> CreateWords()
+    {
+        throw new NotImplementedException();
         switch (CurrentDirection)
         {
             case Direction.None:
-                bool wordFound = false;
-                int currentStart;
-                int currentEnd;
-                FindWord(CurrentTiles[0], Direction.Horizontal, out currentStart, out currentEnd);
-                string current;
-                bool wordExists;
-                if (currentStart != currentEnd)
-                {
-                    current = CreateWord(Direction.Horizontal, Field[CurrentTiles[0].Row, currentStart], currentEnd);
-                    wordExists = CheckWord(current);
-                    if (wordExists)
-                    {
-                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
-                        _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
-                    }
-                    else return false;
-                    wordFound = true;
-                }
-                FindWord(CurrentTiles[0], Direction.Vertical, out currentStart, out currentEnd);
-                if (currentStart != currentEnd)
-                {
-                    current = CreateWord(Direction.Vertical, Field[currentStart, CurrentTiles[0].Column], currentEnd);
-                    wordExists = CheckWord(current);
-                    if (wordExists)
-                    {
-                        _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
-                        _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
-                    }
-                    else return false;
-                    wordFound = true;
-                }
-                return wordFound;
+                break;
 
-            case Direction.Vertical:
-                return CheckVertical();
-
-            case Direction.Horizontal:
-                return CheckHorizontal();
-
-            default:
-                return false;
         }
     }
 
-    private bool CheckHorizontal()
+    private void CreateWord(Direction current, TileH start, int end, out TileH wordStart, out TileH wordEnd)
     {
-        int currentStart, currentEnd;
-        string current;
-        bool wordExists;
-        FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
-        if (currentStart != currentEnd)
+        throw new NotImplementedException();
+        if (current == Direction.Vertical)
         {
-            current = CreateWord(CurrentDirection, Field[CurrentTiles[0].Row, currentStart], currentEnd);
-            wordExists = CheckWord(current);
-            if (wordExists)
+            var j = start.Row;
+            while (j < 15 && Field[j, start.Column].HasLetter)
             {
-                _wordsFound.Add(Field[CurrentTiles[0].Row, currentStart]);
-                _wordsFound.Add(Field[CurrentTiles[0].Row, currentEnd]);
+                if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
+                    _asterixTiles.Add(Field[j, start.Column]);
+                j++;
             }
-            else return false;
+            wordStart = Field[j - 1, start.Column];
+            j = start.Row;
+            while (j >= 0 && Field[j, start.Column].HasLetter)
+            {
+                if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
+                    _asterixTiles.Add(Field[j, start.Column]);
+                j--;
+            }
+            wordEnd = Field[j + 1, start.Column];
         }
-        else return false;
-        CurrentDirection = Direction.Vertical;
-        foreach (var tile in CurrentTiles)
+        else
         {
-            FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
-            if (currentStart != currentEnd)
+            var j = start.Column;
+            while (j < 15 && Field[start.Row, j].HasLetter)
             {
-                current = CreateWord(CurrentDirection, Field[currentStart, tile.Column], currentEnd);
-                wordExists = CheckWord(current);
-                if (wordExists)
-                {
-                    _wordsFound.Add(Field[currentStart, tile.Column]);
-                    _wordsFound.Add(Field[currentEnd, tile.Column]);
-                }
-                else return false;
+                if (Field[start.Row, j].CurrentLetter.text.Equals("*"))
+                    _asterixTiles.Add(Field[start.Row, j]);
+                j++;
             }
-        }
-        return true;
-    }
-
-    private bool CheckVertical()
-    {
-        int currentStart, currentEnd;
-        string current;
-        bool wordExists;
-        FindWord(CurrentTiles[0], CurrentDirection, out currentStart, out currentEnd);
-        if (currentStart != currentEnd)
-        {
-            current = CreateWord(CurrentDirection, Field[currentStart, CurrentTiles[0].Column], currentEnd);
-            wordExists = CheckWord(current);
-            if (wordExists)
+            wordStart = Field[start.Row, j - 1];
+            j = start.Column;
+            while (j >= 0 && Field[start.Row, j].HasLetter)
             {
-                _wordsFound.Add(Field[currentStart, CurrentTiles[0].Column]);
-                _wordsFound.Add(Field[currentEnd, CurrentTiles[0].Column]);
+                if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
+                    _asterixTiles.Add(Field[start.Row, j]);
+                j--;
             }
-            else return false;
-            CurrentDirection = Direction.Horizontal;
+            wordEnd = Field[start.Row, j + 1];
         }
-        else return false;
-        foreach (var tile in CurrentTiles)
-        {
-            FindWord(tile, CurrentDirection, out currentStart, out currentEnd);
-            if (currentStart != currentEnd)
-            {
-                current = CreateWord(CurrentDirection, Field[tile.Row, currentStart], currentEnd);
-                wordExists = CheckWord(current);
-                if (wordExists)
-                {
-                    _wordsFound.Add(Field[tile.Row, currentStart]);
-                    _wordsFound.Add(Field[tile.Row, currentEnd]);
-                }
-                else return false;
-            }
-        }
-        return true;
     }
 
     private int CountPoints()
     {
-        var result = 0;
-        var wordMultiplier = 1;
-        var score = new int[_wordsFound.Count / 2];
-        for (var i = 0; i < _wordsFound.Count; i += 2)
-        {
-            var tempRes = 0;
-            if (_wordsFound[i].Row == _wordsFound[i + 1].Row)
-                for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
-                {
-                    var tile = Field[_wordsFound[i].Row, j];
-                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
-                    tile.LetterMultiplier = 1;
-                    wordMultiplier *= tile.WordMultiplier;
-                    tile.WordMultiplier = 1;
-                }
-            else
-            {
-                for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
-                {
-                    var tile = Field[j, _wordsFound[i].Column];
-                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
-                    tile.LetterMultiplier = 1;
-                    wordMultiplier *= tile.WordMultiplier;
-                    tile.WordMultiplier = 1;
-                }
-            }
-            result += tempRes;
-            score[i / 2] = tempRes;
-        }
-        var start = 7 + _wordsFound.Count / 2;
-        foreach (var i in score)
-        {
-            Field[start, 0].SetPoints(i * wordMultiplier);
-            start--;
-        }
-        return result * wordMultiplier;
+        throw new NotImplementedException();
     }
 
-    private string CreateWord(Direction current, TileH start, int end)
-    {
-        var sb = new StringBuilder();
-        if (current == Direction.Vertical)
-        {
-            for (int j = end; j >= start.Row; j--)
-            {
-                string temp = Field[j, start.Column].CurrentLetter.text;
-                if (String.Equals("*", temp))
-                    temp = "_";
-                sb.Append(temp);
-            }
-            return sb.ToString();
-        }
-        else
-        {
-            for (int j = start.Column; j <= end; j++)
-            {
-                var temp = Field[start.Row, j].CurrentLetter.text;
-                if (String.Equals("*", temp))
-                    temp = "_";
-                sb.Append(temp);
-            }
-            return sb.ToString();
-        }
-    }
-
-    private void FindWord(TileH currentTileH, Direction current, out int startPosition, out int endPosition)
-    {
-        if (current == Direction.Vertical)
-        {
-            var j = currentTileH.Row;
-            while (j >= 0 && Field[j, currentTileH.Column].HasLetter)
-            {
-                j--;
-            }
-            j++;
-            startPosition = j;
-            j = currentTileH.Row;
-            while (j < NumberOfRows && Field[j, currentTileH.Column].HasLetter)
-            {
-                j++;
-            }
-            j--;
-            endPosition = j;
-        }
-        else
-        {
-            var j = currentTileH.Column;
-            while (j >= 0 && Field[currentTileH.Row, j].HasLetter)
-            {
-                j--;
-            }
-            j++;
-            startPosition = j;
-            j = currentTileH.Column;
-            while (j < NumberOfRows && Field[currentTileH.Row, j].HasLetter)
-            {
-                j++;
-            }
-            j--;
-            endPosition = j;
-        }
-    }
-
-    private bool CheckWord(string word)
-    {
-        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";//"SELECT * FROM AllWords WHERE Word like \"" + word.ToLower() + "\" LIMIT 1"
-        var command = new SqliteCommand(sql, _dbConnection);
-        var inp = /*(string)*/command.ExecuteScalar();
-        return Convert.ToInt32(inp) != 0;
-    }
-
-    #endregion Word cheking
+    #endregion
 
     private void EndGame(LetterBoxH playerOut)//Player, who ran out of letters is passed
     {

@@ -8,6 +8,7 @@ public class TileH : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+    public char TempLetter;
 
     //Is used to show points for single word in the end of turn
     public Text ScoreForWord;
