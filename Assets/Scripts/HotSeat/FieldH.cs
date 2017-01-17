@@ -1,6 +1,7 @@
 ﻿using Mono.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -357,23 +358,70 @@ public class FieldH : MonoBehaviour
     private bool CheckWords()
     {
         var words = CreateWords();
-        throw new NotImplementedException();
-    }
-
-    private List<List<TileH>> CreateWords()
-    {
-        throw new NotImplementedException();
-        switch (CurrentDirection)
+        if (_asterixTiles.Count == 1)
         {
-            case Direction.None:
-                break;
-
+            var word = GetWord(words[0], words[1]);
+            var index = word.IndexOf('_');
+            var variants = GetAllWordVariants(word);
+            SwitchDirection();
+            foreach (var variant in variants)
+            {
+                _asterixTiles[0].TempLetter = variant[index].ToString();
+                var successful = true;
+                for (var i = 3; i < words.Count; i++)
+                {
+                    word = GetWord(words[i - 1], words[i]);
+                    if (!CheckWord(word))
+                    {
+                        successful = false;
+                        break;
+                    }
+                }
+                if (successful)
+                {
+                    SwitchDirection();
+                    _wordsFound = words;
+                    return true;
+                }
+            }
+            SwitchDirection();
+            return false;
+        }
+        else if (_asterixTiles.Count == 2)
+        {
+            throw new NotImplementedException();
+        }
+        else
+        {
+            throw new NotImplementedException();
         }
     }
 
-    private void CreateWord(Direction current, TileH start, int end, out TileH wordStart, out TileH wordEnd)
+    private List<TileH> CreateWords()
     {
-        throw new NotImplementedException();
+        _asterixTiles.Clear();
+        var res = new List<TileH>();
+        if(CurrentDirection == Direction.None)
+            CurrentDirection = Direction.Horizontal;
+        TileH start, end;
+        CreateWord(CurrentDirection,CurrentTiles[0],out start,out end);
+        res.Add(start);
+        res.Add(end);
+        SwitchDirection();
+        foreach (var tile in CurrentTiles)
+        {
+            CreateWord(CurrentDirection, tile, out start, out end);
+            res.Add(start);
+            res.Add(end);
+        }
+        if (_asterixTiles.Count == 2)
+            _asterixTiles = _asterixTiles.OrderByDescending(t => t.Row).ThenBy(t => t.Column).ToList();
+        SwitchDirection();
+        return res;
+    }
+
+    private void CreateWord(Direction current, TileH start, out TileH wordStart, out TileH wordEnd)
+    {
         if (current == Direction.Vertical)
         {
             var j = start.Row;
@@ -417,6 +465,69 @@ public class FieldH : MonoBehaviour
     private int CountPoints()
     {
         throw new NotImplementedException();
+    }
+
+    private void SwitchDirection()
+    {
+        CurrentDirection = CurrentDirection == Direction.Horizontal ? Direction.Vertical : Direction.Horizontal;
+    }
+
+    private string GetWord(TileH begin, TileH end)
+    {
+        if (CurrentDirection == Direction.Vertical)
+        {
+            var sb = new StringBuilder();
+            for (var j = begin.Row; j >= end.Row; j--)
+            {
+                if (!String.IsNullOrEmpty(Field[j, begin.Column].TempLetter))
+                    sb.Append(Field[j, begin.Column].TempLetter);
+                else if (Field[j, begin.Column].CurrentLetter.text.Equals("*"))
+                    sb.Append('_');
+                else sb.Append(Field[j, begin.Column].CurrentLetter.text);
+            }
+            return sb.ToString();
+        }
+        else
+        {
+            var sb = new StringBuilder();
+            for (var j = begin.Column; j <= end.Column; j++)
+            {
+                if (!String.IsNullOrEmpty(Field[begin.Row, j].TempLetter))
+                    sb.Append(Field[begin.Row, j].TempLetter);
+                else if (Field[begin.Row, j].CurrentLetter.text.Equals("*"))
+                    sb.Append('_');
+                else sb.Append(Field[begin.Row, j].CurrentLetter.text);
+            }
+            return sb.ToString();
+        }
+        return null;
+    }
+
+    private List<string> GetAllWordVariants(string word)
+    {
+        var sql = "SELECT * FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
+        var command = new SqliteCommand(sql, _dbConnection);
+        var reader = command.ExecuteReader();
+        if (reader.HasRows)
+        {
+            var res = new List<string>();
+            while (reader.Read())
+            {
+                res.Add(reader.GetString(0));
+            }
+            reader.Close();
+            return res;
+        }
+        reader.Close();
+        return null;
+    }
+
+    private bool CheckWord(string word)
+    {
+        var sql = "SELECT count(*) FROM AllWords WHERE Word like \"" + word.ToLower() + "\"";
+        var command = new SqliteCommand(sql, _dbConnection);
+        var inp = command.ExecuteScalar();
+        return Convert.ToInt32(inp) != 0;
     }
 
     #endregion
