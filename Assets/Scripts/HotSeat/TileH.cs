@@ -113,7 +113,8 @@ public class TileH : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);
         if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = CheckTile(parent.Field[Row, Column + 1]);
         CanDrop = CheckTile(this);
-        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = FieldH.Direction.None;
+        if (parent.CurrentTiles.Count == 1 || parent.CurrentTiles.Count == 0)
+            parent.CurrentDirection = FieldH.Direction.None;
         if (parent.isFirstTurn)
         {
             parent.CurrentDirection = FieldH.Direction.None;

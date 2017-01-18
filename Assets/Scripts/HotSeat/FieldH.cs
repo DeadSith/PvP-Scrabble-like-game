@@ -298,6 +298,7 @@ public class FieldH : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
+            CurrentDirection = Direction.None;
             Player1.gameObject.SetActive(false);
             Player2.gameObject.SetActive(true);
             CurrentPlayer = 2;
@@ -312,6 +313,7 @@ public class FieldH : MonoBehaviour
                 return;
             }
             _turnsSkipped = 0;
+            CurrentDirection = Direction.None;
             Player1.gameObject.SetActive(true);
             Player2.gameObject.SetActive(false);
             CurrentPlayer = 1;
@@ -324,6 +326,7 @@ public class FieldH : MonoBehaviour
 
     public void OnSkipTurn()
     {
+        CurrentDirection = Direction.None;
         if (CurrentPlayer == 1)
         {
             Player1.gameObject.SetActive(false);
@@ -351,6 +354,7 @@ public class FieldH : MonoBehaviour
             CurrentTiles[i].RemoveTile();
         }
         CurrentTiles.Clear();
+        CurrentDirection = Direction.None;
     }
 
     #region Word checking
@@ -360,11 +364,11 @@ public class FieldH : MonoBehaviour
         var words = CreateWords();
         _wordsFound = words;
         var word = GetWord(words[0], words[1]);
-        if (_asterixTiles.Count!=0)
+        if (_asterixTiles.Count != 0)
         {
             var index1 = word.IndexOf('_');
             var index2 = 0;
-            if(_asterixTiles.Count == 2)
+            if (_asterixTiles.Count == 2)
                 index2 = word.IndexOf('_', index1 + 1);
             var variants = GetAllWordVariants(word);
             SwitchDirection();
@@ -374,7 +378,7 @@ public class FieldH : MonoBehaviour
                 if (_asterixTiles.Count == 2)
                     _asterixTiles[1].TempLetter = variant[index2].ToString();
                 var successful = true;
-                for (var i = 3; i < words.Count; i+=2)
+                for (var i = 3; i < words.Count; i += 2)
                 {
                     word = GetWord(words[i - 1], words[i]);
                     if (!CheckWord(word))
@@ -412,34 +416,43 @@ public class FieldH : MonoBehaviour
     {
         _asterixTiles.Clear();
         var res = new List<TileH>();
-        if(CurrentDirection == Direction.None)
+        if (CurrentDirection == Direction.None)
             CurrentDirection = Direction.Horizontal;
         TileH start, end;
-        CreateWord(CurrentDirection,CurrentTiles[0],out start,out end);
+        CreateWord(CurrentTiles[0], out start, out end);
+        if (start == end)
+        {
+            SwitchDirection();
+            CreateWord(CurrentTiles[0], out start, out end);
+        }
         res.Add(start);
         res.Add(end);
         SwitchDirection();
         foreach (var tile in CurrentTiles)
         {
-            CreateWord(CurrentDirection, tile, out start, out end);
-            res.Add(start);
-            res.Add(end);
+            CreateWord(tile, out start, out end);
+            if (start != end)
+            {
+                res.Add(start);
+                res.Add(end);
+            }
         }
         if (_asterixTiles.Count == 2)
-            _asterixTiles = _asterixTiles.OrderByDescending(t => t.Row).ThenBy(t => t.Column).ToList();
+            _asterixTiles = _asterixTiles.OrderByDescending(t => t.Row).ThenBy(t => t.Column).Distinct().ToList();
         SwitchDirection();
         return res;
     }
 
-    private void CreateWord(Direction current, TileH start, out TileH wordStart, out TileH wordEnd)
+    private void CreateWord(TileH start, out TileH wordStart, out TileH wordEnd)
     {
-        if (current == Direction.Vertical)
+        if (CurrentDirection == Direction.Vertical)
         {
             var j = start.Row;
             while (j < 15 && Field[j, start.Column].HasLetter)
             {
                 if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
-                    _asterixTiles.Add(Field[j, start.Column]);
+                    if (!_asterixTiles.Contains(Field[j, start.Column]))
+                        _asterixTiles.Add(Field[j, start.Column]);
                 j++;
             }
             wordStart = Field[j - 1, start.Column];
@@ -447,7 +460,8 @@ public class FieldH : MonoBehaviour
             while (j >= 0 && Field[j, start.Column].HasLetter)
             {
                 if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
-                    _asterixTiles.Add(Field[j, start.Column]);
+                    if (!_asterixTiles.Contains(Field[j, start.Column]))
+                        _asterixTiles.Add(Field[j, start.Column]);
                 j--;
             }
             wordEnd = Field[j + 1, start.Column];
@@ -455,21 +469,23 @@ public class FieldH : MonoBehaviour
         else
         {
             var j = start.Column;
-            while (j < 15 && Field[start.Row, j].HasLetter)
-            {
-                if (Field[start.Row, j].CurrentLetter.text.Equals("*"))
-                    _asterixTiles.Add(Field[start.Row, j]);
-                j++;
-            }
-            wordStart = Field[start.Row, j - 1];
-            j = start.Column;
             while (j >= 0 && Field[start.Row, j].HasLetter)
             {
-                if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
-                    _asterixTiles.Add(Field[start.Row, j]);
+                if (Field[start.Row, j].CurrentLetter.text.Equals("*"))
+                    if (!_asterixTiles.Contains(Field[start.Row, j]))
+                        _asterixTiles.Add(Field[start.Row, j]);
                 j--;
             }
-            wordEnd = Field[start.Row, j + 1];
+            wordStart = Field[start.Row, j + 1];
+            j = start.Column;
+            while (j < 15 && Field[start.Row, j].HasLetter)
+            {
+                if (Field[j, start.Column].CurrentLetter.text.Equals("*"))
+                    if (!_asterixTiles.Contains(Field[start.Row, j]))
+                        _asterixTiles.Add(Field[start.Row, j]);
+                j++;
+            }
+            wordEnd = Field[start.Row, j - 1];
         }
     }
 
@@ -492,7 +508,7 @@ public class FieldH : MonoBehaviour
                 }
             else
             {
-                for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
+                for (var j = _wordsFound[i].Row; j >= _wordsFound[i + 1].Row; j--)
                 {
                     var tile = Field[j, _wordsFound[i].Column];
                     tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
@@ -520,6 +536,7 @@ public class FieldH : MonoBehaviour
         foreach (var tile in _asterixTiles)
         {
             tile.CurrentLetter.text = tile.TempLetter;
+            tile.TempLetter = null;
         }
     }
 
@@ -556,7 +573,6 @@ public class FieldH : MonoBehaviour
             }
             return sb.ToString();
         }
-        return null;
     }
 
     private List<string> GetAllWordVariants(string word)
@@ -586,7 +602,7 @@ public class FieldH : MonoBehaviour
         return Convert.ToInt32(inp) != 0;
     }
 
-    #endregion
+    #endregion Word checking
 
     private void EndGame(LetterBoxH playerOut)//Player, who ran out of letters is passed
     {
