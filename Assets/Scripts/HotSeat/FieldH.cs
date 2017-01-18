@@ -358,6 +358,7 @@ public class FieldH : MonoBehaviour
     private bool CheckWords()
     {
         var words = CreateWords();
+        _wordsFound = words;
         var word = GetWord(words[0], words[1]);
         if (_asterixTiles.Count!=0)
         {
@@ -385,7 +386,6 @@ public class FieldH : MonoBehaviour
                 if (successful)
                 {
                     SwitchDirection();
-                    _wordsFound = words;
                     return true;
                 }
             }
@@ -396,12 +396,14 @@ public class FieldH : MonoBehaviour
         {
             var successful = CheckWord(word);
             var i = 3;
+            SwitchDirection();
             while (successful && i < words.Count)
             {
                 word = GetWord(words[i - 1], words[i]);
                 successful = CheckWord(word);
                 i += 2;
             }
+            SwitchDirection();
             return successful;
         }
     }
