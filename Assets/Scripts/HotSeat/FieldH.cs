@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 //[0,0] - lower left angle
-
+//Todo: test
 public class FieldH : MonoBehaviour
 {
     public enum Direction
@@ -358,17 +358,22 @@ public class FieldH : MonoBehaviour
     private bool CheckWords()
     {
         var words = CreateWords();
-        if (_asterixTiles.Count == 1)
+        var word = GetWord(words[0], words[1]);
+        if (_asterixTiles.Count!=0)
         {
-            var word = GetWord(words[0], words[1]);
-            var index = word.IndexOf('_');
+            var index1 = word.IndexOf('_');
+            var index2 = 0;
+            if(_asterixTiles.Count == 2)
+                index2 = word.IndexOf('_', index1 + 1);
             var variants = GetAllWordVariants(word);
             SwitchDirection();
             foreach (var variant in variants)
             {
-                _asterixTiles[0].TempLetter = variant[index].ToString();
+                _asterixTiles[0].TempLetter = variant[index1].ToString();
+                if (_asterixTiles.Count == 2)
+                    _asterixTiles[1].TempLetter = variant[index2].ToString();
                 var successful = true;
-                for (var i = 3; i < words.Count; i++)
+                for (var i = 3; i < words.Count; i+=2)
                 {
                     word = GetWord(words[i - 1], words[i]);
                     if (!CheckWord(word))
@@ -387,13 +392,17 @@ public class FieldH : MonoBehaviour
             SwitchDirection();
             return false;
         }
-        else if (_asterixTiles.Count == 2)
-        {
-            throw new NotImplementedException();
-        }
         else
         {
-            throw new NotImplementedException();
+            var successful = CheckWord(word);
+            var i = 3;
+            while (successful && i < words.Count)
+            {
+                word = GetWord(words[i - 1], words[i]);
+                successful = CheckWord(word);
+                i += 2;
+            }
+            return successful;
         }
     }
 
@@ -464,7 +473,52 @@ public class FieldH : MonoBehaviour
 
     private int CountPoints()
     {
-        throw new NotImplementedException();
+        var result = 0;
+        var wordMultiplier = 1;
+        var score = new int[_wordsFound.Count / 2];
+        for (var i = 0; i < _wordsFound.Count; i += 2)
+        {
+            var tempRes = 0;
+            if (_wordsFound[i].Row == _wordsFound[i + 1].Row)
+                for (var j = _wordsFound[i].Column; j <= _wordsFound[i + 1].Column; j++)
+                {
+                    var tile = Field[_wordsFound[i].Row, j];
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    tile.LetterMultiplier = 1;
+                    wordMultiplier *= tile.WordMultiplier;
+                    tile.WordMultiplier = 1;
+                }
+            else
+            {
+                for (var j = _wordsFound[i].Row; j <= _wordsFound[i + 1].Row; j++)
+                {
+                    var tile = Field[j, _wordsFound[i].Column];
+                    tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
+                    tile.LetterMultiplier = 1;
+                    wordMultiplier *= tile.WordMultiplier;
+                    tile.WordMultiplier = 1;
+                }
+            }
+            result += tempRes;
+            score[i / 2] = tempRes;
+        }
+        var start = 7 + _wordsFound.Count / 2;
+        foreach (var i in score)
+        {
+            Field[start, 0].SetPoints(i * wordMultiplier);
+            start--;
+        }
+        if (_asterixTiles.Count != 0)
+            ApplyAsterixLetters();
+        return result * wordMultiplier;
+    }
+
+    private void ApplyAsterixLetters()
+    {
+        foreach (var tile in _asterixTiles)
+        {
+            tile.CurrentLetter.text = tile.TempLetter;
+        }
     }
 
     private void SwitchDirection()
