@@ -8,6 +8,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
 {
     public Text CurrentLetter;
     public Text PointsText;
+    public string TempLetter;
 
     //Is used to show points for single word in the end of turn
     public Text ScoreForWord;
@@ -64,7 +65,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         else parent.Controller.ShowWrongTileError();
     }
 
-    //Is called from LetterBoxH
+    //Is called from LetterBoxLAN
     //Changes the current letter on this tile, makes checks for nearby Tiles
     public void ChangeLetter(string letter)
     {
@@ -120,7 +121,8 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         parent.CurrentTiles.Remove(this);
         if (!skip)
             parent.Player1.ChangeGrid(Row, Column, "");
-        if (parent.CurrentTiles.Count == 1) parent.CurrentDirection = FieldLAN.Direction.None;
+        if (parent.CurrentTiles.Count == 1 || parent.CurrentTiles.Count == 0)
+            parent.CurrentDirection = FieldLAN.Direction.None;
     }
 
     //Called for both players
@@ -133,7 +135,6 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         }
         HasLetter = false;
         CurrentLetter.text = "";
-        Debug.Log("");
         if (Row != 0) parent.Field[Row - 1, Column].CanDrop = CheckTile(parent.Field[Row - 1, Column]);
         if (Row != parent.NumberOfRows - 1) parent.Field[Row + 1, Column].CanDrop = CheckTile(parent.Field[Row + 1, Column]);
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = CheckTile(parent.Field[Row, Column - 1]);

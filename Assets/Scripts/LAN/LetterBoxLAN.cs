@@ -95,7 +95,7 @@ public class LetterBoxLAN : NetworkBehaviour
 
     [HideInInspector]
     [SyncVar(hook = "OnSync")]
-    public float TimeReamining;
+    public float TimeRemaining;
 
     [HideInInspector]
     [SyncVar]
@@ -320,7 +320,7 @@ public class LetterBoxLAN : NetworkBehaviour
             CmdSetTimeRemaining(TimerLength);
         else
         {
-            _currentField.TimeRemaining = TimeReamining;
+            _currentField.TimeRemaining = TimeRemaining;
         }
         if (_currentField.IsFirstTurn && score != 0)
             CmdSetFirstTurn();
@@ -423,7 +423,7 @@ public class LetterBoxLAN : NetworkBehaviour
     [Command]
     private void CmdSetTimeRemaining(float remaining)
     {
-        TimeReamining = remaining;
+        TimeRemaining = remaining;
     }
 
     [Command]
@@ -581,10 +581,10 @@ public class LetterBoxLAN : NetworkBehaviour
     //Starts timer on client and server
     public void OnSync(float value)
     {
-        TimeReamining = 1;
+        TimeRemaining = 1;
         _currentField.TimeRemaining = value;
         if (!isServer)
-            _currentField.TimeRemaining += 2;
+            _currentField.TimeRemaining += 1;
     }
 
     //Called on server and client when turn is skipped
