@@ -70,6 +70,11 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         HasLetter = true;
+        if (CurrentLetter.text.Equals("*")&&!String.IsNullOrEmpty(letter)&&!letter.Equals(" "))
+        {
+            WordMultiplier = 1;
+            LetterMultiplier = 0;
+        }
         CurrentLetter.text = letter;
         if (Column != 0) parent.Field[Row, Column - 1].CanDrop = true;
         if (Column != parent.NumberOfColumns - 1) parent.Field[Row, Column + 1].CanDrop = true;

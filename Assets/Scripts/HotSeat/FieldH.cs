@@ -537,6 +537,8 @@ public class FieldH : MonoBehaviour
         {
             tile.CurrentLetter.text = tile.TempLetter;
             tile.TempLetter = null;
+            tile.LetterMultiplier = 0;
+            tile.WordMultiplier = 1;
         }
     }
 
