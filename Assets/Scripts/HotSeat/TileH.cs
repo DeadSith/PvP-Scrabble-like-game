@@ -137,7 +137,7 @@ public class TileH : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (!String.IsNullOrEmpty(CurrentLetter.text))
         {
             PointsText.enabled = true;
-            PointsText.text = LetterBoxH.PointsDictionary[CurrentLetter.text].ToString();
+            PointsText.text = (LetterBoxH.PointsDictionary[CurrentLetter.text]*LetterMultiplier).ToString();
             CurrentLetter.enabled = false;
         }
     }
