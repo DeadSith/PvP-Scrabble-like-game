@@ -453,7 +453,8 @@ public class FieldLAN : MonoBehaviour
                 {
                     var tile = Field[_wordsFound[i].Row, j];
                     tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
-                    tile.LetterMultiplier = 1;
+                    if (tile.LetterMultiplier != 0)
+                        tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
                 }
@@ -463,7 +464,8 @@ public class FieldLAN : MonoBehaviour
                 {
                     var tile = Field[j, _wordsFound[i].Column];
                     tempRes += LetterBoxH.PointsDictionary[tile.CurrentLetter.text] * tile.LetterMultiplier;
-                    tile.LetterMultiplier = 1;
+                    if (tile.LetterMultiplier != 0)
+                        tile.LetterMultiplier = 1;
                     wordMultiplier *= tile.WordMultiplier;
                     tile.WordMultiplier = 1;
                 }

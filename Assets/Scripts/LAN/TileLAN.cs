@@ -70,7 +70,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
     public void ChangeLetter(string letter)
     {
         HasLetter = true;
-        if (CurrentLetter.text.Equals("*")&&!String.IsNullOrEmpty(letter)&&!letter.Equals(" "))
+        if (CurrentLetter.text.Equals("*") && !String.IsNullOrEmpty(letter) && !letter.Equals(" "))
         {
             WordMultiplier = 1;
             LetterMultiplier = 0;
@@ -158,7 +158,7 @@ public class TileLAN : MonoBehaviour, IDropHandler, IPointerClickHandler
         if (!String.IsNullOrEmpty(CurrentLetter.text))
         {
             PointsText.enabled = true;
-            PointsText.text = (LetterBoxH.PointsDictionary[CurrentLetter.text]*LetterMultiplier).ToString();
+            PointsText.text = (LetterBoxH.PointsDictionary[CurrentLetter.text] * LetterMultiplier).ToString();
             CurrentLetter.enabled = false;
         }
     }

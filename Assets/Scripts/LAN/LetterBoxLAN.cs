@@ -504,7 +504,8 @@ public class LetterBoxLAN : NetworkBehaviour
         foreach (var tile in _currenTiles)
         {
             tile.WordMultiplier = 1;
-            tile.LetterMultiplier = 1;
+            if (tile.LetterMultiplier != 0)
+                tile.LetterMultiplier = 1;
         }
         _currenTiles.Clear();
         CurrentPlayer = value;

@@ -5,18 +5,17 @@ using UnityEngine.UI;
 
 public class WordsController : MonoBehaviour
 {
-
     public GameObject WordButton;
     private GameObject parent;
-	void Start ()
+
+    private void Start()
     {
         parent = GameObject.FindWithTag("Words");
-	}
-	
-	
-	void AddButton (string word)
-	{
-	    var button = Instantiate(WordButton, parent.transform) as GameObject;
-	    button.GetComponentInChildren<Text>().text = word;
-	}
+    }
+
+    private void AddButton(string word)
+    {
+        var button = Instantiate(WordButton, parent.transform) as GameObject;
+        button.GetComponentInChildren<Text>().text = word;
+    }
 }
